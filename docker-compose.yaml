@@ -1,0 +1,7 @@
+services:
+  sol:
+    image: dpduado/sol
+    build: ./build/dpduado-sol
+    volumes:
+      - ./dpduado-sol:/app
+
