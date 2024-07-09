@@ -2,6 +2,17 @@ services:
   sol:
     image: dpduado/sol
     build: ./build/dpduado-sol
+    hostname: testnet
     volumes:
       - ./dpduado-sol:/app
+    environment:
+      - RPC_HOST=0.0.0.0
+      - RPC_PORT=8545
+      - NUM_FIRST_ACCOUNTS=1
+      - BALANCE_FIRST_ACCOUNTS=300
+      - WALLET_MNEMONIC=chaos knee unit sing method banana chicken quote script boat crouch pig
+
+    ports:
+      - 8545:8545
+    command: start
 

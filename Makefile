@@ -1,5 +1,7 @@
 .SILENT: test
 
+CONTRACT = BaseCounter
+
 build-img:
 	@docker compose build sol
 
@@ -7,13 +9,22 @@ docker-run:
 	docker compose run -it --rm $(SERVICE) $(CMD)
 
 docker-exec:
-	@docker compose exec -it SERVICE=$(SERVICE) $(CMD)
+	docker compose exec $(SERVICE) /entrypoint.sh $(CMD)
 
 sol-build:
 	$(MAKE) docker-run SERVICE="sol" CMD='forge build'
 
 sol-clean:
 	$(MAKE) docker-run SERVICE="sol" CMD='forge clean'
+
+sol-startup:
+	$(MAKE) sol-build
+	docker compose up -d sol
+	$(MAKE) docker-exec SERVICE="sol" CMD="deploy $(CONTRACT)" | tee cache/deploy.log
+	$(MAKE) docker-exec SERVICE="sol" CMD="derive-private-key" | tee cache/derive-private-key.log
+
+sol-shutdown:
+	docker compose down sol
 
 sol-test:
 	$(MAKE) docker-run SERVICE="sol" CMD='forge test'
