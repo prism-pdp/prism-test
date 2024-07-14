@@ -35,7 +35,11 @@ testnet-test:
 	$(MAKE) docker-run SERVICE="testnet" CMD='forge test'
 
 harness-run:
-	$(MAKE) docker-run SERVICE="harness" CMD='go run main.go'
+	$(MAKE) harness-mkconf SERVER="http://testnet:8545" PRIV_KEY=$(file < cache/private.key) CONTRACT_ADDR=$(file < cache/contract.addr)
+	$(MAKE) docker-run SERVICE="harness" CMD='go run main.go config.json'
+
+harness-mkconf:
+	$(MAKE) docker-run SERVICE="harness" CMD="make-conf $(SERVER) $(PRIV_KEY) $(CONTRACT_ADDR)"
 
 show-contract-addr:
 	$(MAKE) docker-exec SERVICE="testnet" CMD="show-contract-addr"

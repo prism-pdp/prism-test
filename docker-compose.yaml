@@ -14,3 +14,14 @@ services:
     ports:
       - 8545:8545
     command: start
+
+  harness:
+    image: dpduado-test/harness
+    build:
+      context: ./harness
+      args:
+        - GITHUB_TOKEN=${GITHUB_TOKEN}
+    container_name: harness
+    hostname: harness
+    volumes:
+      - ./harness/app:/app
