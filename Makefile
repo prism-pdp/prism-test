@@ -3,7 +3,7 @@
 CONTRACT = BaseCounter
 
 build-img:
-	@docker compose build sol
+	@docker compose build testnet
 
 docker-run:
 	docker compose run -it --rm $(SERVICE) $(CMD)
@@ -11,23 +11,23 @@ docker-run:
 docker-exec:
 	docker compose exec $(SERVICE) /entrypoint.sh $(CMD)
 
-sol-build:
-	$(MAKE) docker-run SERVICE="sol" CMD='forge build'
+testnet-build:
+	$(MAKE) docker-run SERVICE="testnet" CMD='forge build'
 
-sol-clean:
-	$(MAKE) docker-run SERVICE="sol" CMD='forge clean'
+testnet-clean:
+	$(MAKE) docker-run SERVICE="testnet" CMD='forge clean'
 
-sol-startup:
-	$(MAKE) sol-build
-	docker compose up -d sol
-	$(MAKE) docker-exec SERVICE="sol" CMD="deploy $(CONTRACT)" | tee cache/deploy.log
-	$(MAKE) docker-exec SERVICE="sol" CMD="derive-private-key" | tee cache/derive-private-key.log
+testnet-startup:
+	$(MAKE) testnet-build
+	docker compose up -d testnet
+	$(MAKE) docker-exec SERVICE="testnet" CMD="deploy $(CONTRACT)" | tee cache/deploy.log
+	$(MAKE) docker-exec SERVICE="testnet" CMD="derive-private-key" | tee cache/derive-private-key.log
 
-sol-shutdown:
-	docker compose down sol
+testnet-shutdown:
+	docker compose down testnet
 
-sol-test:
-	$(MAKE) docker-run SERVICE="sol" CMD='forge test'
+testnet-test:
+	$(MAKE) docker-run SERVICE="testnet" CMD='forge test'
 
 deploy:
 	$(MAKE) docker-exec CMD="/entrypoint.sh deploy $(CONTRACT)"
