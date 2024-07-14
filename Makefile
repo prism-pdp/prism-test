@@ -5,6 +5,7 @@ CONTRACT = BaseCounter
 
 build-img:
 	@docker compose build testnet
+	@docker compose build harness
 
 docker-run:
 	docker compose run -it --rm $(SERVICE) $(CMD)
@@ -14,6 +15,13 @@ docker-exec:
 
 shell:
 	docker compose run $(SERVICE) bash
+
+test:
+	$(MAKE) testnet-shutdown
+	$(MAKE) testnet-startup
+	$(MAKE) harness-mkconf SERVER="http://testnet:8545" PRIV_KEY=$(file < cache/private.key) CONTRACT_ADDR=$(file < cache/contract.addr)
+	$(MAKE) harness-run
+	$(MAKE) testnet-shutdown
 
 testnet-build:
 	$(MAKE) docker-run SERVICE="testnet" CMD='forge build'
@@ -35,8 +43,7 @@ testnet-test:
 	$(MAKE) docker-run SERVICE="testnet" CMD='forge test'
 
 harness-run:
-	$(MAKE) harness-mkconf SERVER="http://testnet:8545" PRIV_KEY=$(file < cache/private.key) CONTRACT_ADDR=$(file < cache/contract.addr)
-	$(MAKE) docker-run SERVICE="harness" CMD='go run main.go config.json'
+	$(MAKE) docker-run SERVICE="harness" CMD='go run main.go ./cache/config.json'
 
 harness-mkconf:
 	$(MAKE) docker-run SERVICE="harness" CMD="make-conf $(SERVER) $(PRIV_KEY) $(CONTRACT_ADDR)"

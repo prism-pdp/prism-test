@@ -1,5 +1,6 @@
 .env
 
 cache/*
+harness/app/cache/*
 
 !.gitkeep

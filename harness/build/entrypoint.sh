@@ -9,7 +9,7 @@ elif [ "$1" = "make-conf" ]; then
 		--arg server $2 \
 		--arg privKey $3 \
 		--arg contractAddr $4 \
-		-f /etc/dpduado/harness/config.json.template > ./config.json
+		-f /etc/dpduado/harness/config.json.template > ./cache/config.json
 else
 	exec "$@"
 fi
