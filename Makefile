@@ -1,4 +1,5 @@
-.SILENT: test
+MAKEFLAGS += --no-print-directory
+.SILENT: show-contract-addr show-private-key
 
 CONTRACT = BaseCounter
 
@@ -9,7 +10,10 @@ docker-run:
 	docker compose run -it --rm $(SERVICE) $(CMD)
 
 docker-exec:
-	docker compose exec $(SERVICE) /entrypoint.sh $(CMD)
+	@docker compose exec $(SERVICE) /entrypoint.sh $(CMD)
+
+shell:
+	docker compose run $(SERVICE) bash
 
 testnet-build:
 	$(MAKE) docker-run SERVICE="testnet" CMD='forge build'
@@ -20,14 +24,24 @@ testnet-clean:
 testnet-startup:
 	$(MAKE) testnet-build
 	docker compose up -d testnet
-	$(MAKE) docker-exec SERVICE="testnet" CMD="deploy $(CONTRACT)" | tee cache/deploy.log
-	$(MAKE) docker-exec SERVICE="testnet" CMD="derive-private-key" | tee cache/derive-private-key.log
+	$(MAKE) docker-exec SERVICE="testnet" CMD="deploy $(CONTRACT)"
+	@$(MAKE) show-contract-addr | tee cache/contract.addr
+	@$(MAKE) show-private-key   | tee cache/private.key
 
 testnet-shutdown:
 	docker compose down testnet
 
 testnet-test:
 	$(MAKE) docker-run SERVICE="testnet" CMD='forge test'
+
+harness-run:
+	$(MAKE) docker-run SERVICE="harness" CMD='go run main.go'
+
+show-contract-addr:
+	$(MAKE) docker-exec SERVICE="testnet" CMD="show-contract-addr"
+
+show-private-key:
+	$(MAKE) docker-exec SERVICE="testnet" CMD="show-private-key"
 
 deploy:
 	$(MAKE) docker-exec CMD="/entrypoint.sh deploy $(CONTRACT)"

@@ -6,7 +6,13 @@ elif [ "$1" = "deploy" ]; then
     contract="$2"
 	forge create \
         --mnemonic-path "$WALLET_MNEMONIC" \
-        src/${contract}.sol:${contract}
+        src/${contract}.sol:${contract} > ./cache/deploy.log
+elif [ "$1" = "show-contract-addr" ]; then
+    cat ./cache/deploy.log | grep 'Deployed to:' | cut -d ':' -f 2 | tr -d ' ' | cut -c 3-
+elif [ "$1" = "show-private-key" ]; then
+    cast wallet derive-private-key \
+        "$WALLET_MNEMONIC" \
+        0 | grep 'Private key:' | cut -d ':' -f 2 | tr -d ' ' | cut -c 3-
 elif [ "$1" = "build" ]; then
     forge build
     for f in $(ls src/*.sol); do
@@ -15,10 +21,6 @@ elif [ "$1" = "build" ]; then
         jq -c -r '.bytecode.object' ./out/${name}.sol/${name}.json > ./cache/${name}.bin
         abigen --abi ./cache/${name}.abi --bin ./cache/${name}.bin --pkg sol --type ${name} --out ./cache/${name}.go
     done
-elif [ "$1" = "derive-private-key" ]; then
-    cast wallet derive-private-key \
-        "$WALLET_MNEMONIC" \
-        0
 elif [ "$1" = "start" ]; then
     anvil \
         --host $RPC_HOST \
