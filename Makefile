@@ -4,8 +4,7 @@ MAKEFLAGS += --no-print-directory
 CONTRACT = BaseCounter
 
 build-img:
-	@docker compose build testnet
-	@docker compose build harness
+	@docker compose build
 
 docker-run:
 	docker compose run -it --rm $(SERVICE) $(CMD)
