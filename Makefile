@@ -19,9 +19,14 @@ shell:
 test:
 	$(MAKE) testnet-shutdown
 	$(MAKE) testnet-startup
-	$(MAKE) harness-mkconf SERVER="http://testnet:8545" PRIV_KEY=$(file < cache/private.key) CONTRACT_ADDR=$(file < cache/contract.addr)
+	$(MAKE) harness-mkconf SERVER="http://testnet:8545"
 	$(MAKE) harness-run
 	$(MAKE) testnet-shutdown
+
+test-clean:
+	rm -rf ./cache/*
+	$(MAKE) testnet-clean
+	$(MAKE) harness-clean
 
 testnet-build:
 	$(MAKE) docker-run SERVICE="testnet" CMD='forge build'
@@ -42,11 +47,17 @@ testnet-shutdown:
 testnet-test:
 	$(MAKE) docker-run SERVICE="testnet" CMD='forge test'
 
+harness-shell:
+	$(MAKE) docker-run SERVICE="harness" CMD="bash"
+
 harness-run:
 	$(MAKE) docker-run SERVICE="harness" CMD='go run main.go ./cache/config.json'
 
 harness-mkconf:
-	$(MAKE) docker-run SERVICE="harness" CMD="make-conf $(SERVER) $(PRIV_KEY) $(CONTRACT_ADDR)"
+	$(MAKE) docker-run SERVICE="harness" CMD="make-conf $(SERVER) $(file < cache/private.key) $(file < cache/contract.addr)"
+
+harness-clean:
+	rm -rf ./harness/app/cache/*
 
 show-contract-addr:
 	$(MAKE) docker-exec SERVICE="testnet" CMD="show-contract-addr"
