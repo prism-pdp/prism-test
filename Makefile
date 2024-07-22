@@ -1,6 +1,7 @@
 MAKEFLAGS += --no-print-directory
 .SILENT: show-contract-addr show-private-key
 
+# dpduado-sol/srcの中から選ぶ
 CONTRACT = BaseCounter
 
 shell:
