@@ -31,7 +31,6 @@ RUN git config --global url."https://${GITHUB_TOKEN}:x-oauth-basic@github.com/".
 COPY ./app/go.mod /app/go.mod
 COPY ./app/go.sum /app/go.sum
 
-RUN go mod tidy
 RUN go mod download
 
 COPY --chmod=755 ./build/entrypoint.sh /entrypoint.sh
