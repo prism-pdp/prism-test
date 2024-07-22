@@ -3,12 +3,13 @@ module harness
 go 1.22.2
 
 require (
-	github.com/dpduado/dpduado-go v0.0.0-20240719012001-d45e2c7c94eb
+	github.com/dpduado/dpduado-go v0.0.0-20240722132502-1ca7f75fef59
 	github.com/ethereum/go-ethereum v1.14.3
 )
 
 require (
 	github.com/Microsoft/go-winio v0.6.1 // indirect
+	github.com/Nik-U/pbc v0.0.0-20181205041846-3e516ca0c5d6 // indirect
 	github.com/StackExchange/wmi v1.2.1 // indirect
 	github.com/bits-and-blooms/bitset v1.10.0 // indirect
 	github.com/btcsuite/btcd/btcec/v2 v2.2.0 // indirect

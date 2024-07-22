@@ -4,6 +4,18 @@ RUN apt update \
 	&& apt -y upgrade
 
 RUN apt -y install \
+	libgmp-dev \
+	build-essential \
+	flex \
+	bison
+
+WORKDIR /usr/src/pbc-0.5.14
+ADD ./build/pbc-0.5.14.tar.gz /usr/src
+RUN ./configure \
+	&& make \
+	&& make install
+
+RUN apt -y install \
 	vim \
 	jq
 
@@ -19,6 +31,7 @@ RUN git config --global url."https://${GITHUB_TOKEN}:x-oauth-basic@github.com/".
 COPY ./app/go.mod /app/go.mod
 COPY ./app/go.sum /app/go.sum
 
+RUN go mod tidy
 RUN go mod download
 
 COPY --chmod=755 ./build/entrypoint.sh /entrypoint.sh
