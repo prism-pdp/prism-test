@@ -1,18 +1,36 @@
 #!/bin/sh
 
+function get_addr()
+{
+    index="$1"
+    cast wallet derive-private-key "$WALLET_MNEMONIC" $index | sed -n 2p | cut -d ':' -f 2 | tr -d ' ' | cut -c 3-
+}
+
+function get_key()
+{
+    index="$1"
+    cast wallet derive-private-key "$WALLET_MNEMONIC" $index | sed -n 3p | cut -d ':' -f 2 | tr -d ' ' | cut -c 3-
+}
+
 if [ "$1" = "" ]; then
     /bin/ash
 elif [ "$1" = "deploy" ]; then
     contract="$2"
+    # PRIVKEY_0: SM, ADDRESS_1: SP, ADDRESS_2: TPA
 	forge create \
-        --mnemonic-path "$WALLET_MNEMONIC" \
-        src/${contract}.sol:${contract} > ./cache/deploy.log
-elif [ "$1" = "show-contract-addr" ]; then
+        --private-key $PRIVKEY_0 \
+        src/${contract}.sol:${contract} \
+        --constructor-args $ADDRESS_1 $ADDRESS_2 > ./cache/deploy.log
     cat ./cache/deploy.log | grep 'Deployed to:' | cut -d ':' -f 2 | tr -d ' ' | cut -c 3-
-elif [ "$1" = "show-private-key" ]; then
-    cast wallet derive-private-key \
-        "$WALLET_MNEMONIC" \
-        0 | grep 'Private key:' | cut -d ':' -f 2 | tr -d ' ' | cut -c 3-
+elif [ "$1" = "show-accounts" ]; then
+    for i in $(seq $NUM_FIRST_ACCOUNTS)
+    do
+        num=$((i-1))
+        address=$(get_addr $num)
+        privkey=$(get_key  $num)
+        echo "ADDRESS_$num=$address"
+        echo "PRIVKEY_$num=$privkey"
+    done
 elif [ "$1" = "build" ]; then
     forge build
     for f in $(ls src/*.sol); do

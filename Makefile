@@ -1,8 +1,7 @@
 MAKEFLAGS += --no-print-directory
-.SILENT: show-contract-addr show-private-key
 
 # dpduado-sol/srcの中から選ぶ
-CONTRACT = BaseCounter
+CONTRACT = XZ21
 
 shell:
 	docker compose run $(SERVICE) bash
@@ -10,7 +9,6 @@ shell:
 test:
 	$(MAKE) testnet/shutdown
 	$(MAKE) testnet/startup
-	$(MAKE) harness/mkconf SERVER="http://testnet:8545"
 	$(MAKE) harness/run
 	$(MAKE) testnet/shutdown
 
@@ -27,9 +25,7 @@ testnet/clean:
 
 testnet/startup:
 	docker compose up -d testnet
-	$(MAKE) docker-exec SERVICE="testnet" CMD="deploy $(CONTRACT)"
-	@$(MAKE) show-contract-addr | tee cache/contract.addr
-	@$(MAKE) show-private-key   | tee cache/private.key
+	@$(MAKE) docker-exec SERVICE="testnet" CMD="deploy $(CONTRACT)" | tee ./cache/contract.addr
 
 testnet/shutdown:
 	docker compose down testnet
@@ -37,23 +33,23 @@ testnet/shutdown:
 testnet/test:
 	$(MAKE) docker-run SERVICE="testnet" CMD='forge test'
 
+testnet/shell:
+	$(MAKE) docker-run SERVICE="testnet" CMD="sh"
+
 harness/shell:
 	$(MAKE) docker-run SERVICE="harness" CMD="bash"
 
-harness/run:
-	$(MAKE) docker-run SERVICE="harness" CMD='go run main.go ./cache/config.json'
+setup:
+	$(MAKE) show-accounts > accounts.env
 
-harness/mkconf:
-	$(MAKE) docker-run SERVICE="harness" CMD="make-conf $(SERVER) $(file < cache/private.key) $(file < cache/contract.addr)"
+harness/run:
+	$(MAKE) docker-run SERVICE="harness" CMD='go run main.go http://testnet:8545 $(file < cache/contract.addr)'
 
 harness/clean:
 	rm -rf ./harness/app/cache/*
 
-show-contract-addr:
-	$(MAKE) docker-exec SERVICE="testnet" CMD="show-contract-addr"
-
-show-private-key:
-	$(MAKE) docker-exec SERVICE="testnet" CMD="show-private-key"
+show-accounts:
+	@$(MAKE) docker-run SERVICE="testnet" CMD="show-accounts"
 
 rpc:
 	@echo METHOD:$(METHOD), PARAMS:[$(PARAMS)]
@@ -66,7 +62,7 @@ build-img:
 	@docker compose build
 
 docker-run:
-	docker compose run -it --rm $(SERVICE) $(CMD)
+	@docker compose run -it --rm $(SERVICE) $(CMD)
 
 docker-exec:
 	@docker compose exec $(SERVICE) /entrypoint.sh $(CMD)

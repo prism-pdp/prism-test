@@ -1,17 +1,18 @@
 package main
 
 import (
-	"encoding/json"
+	// "encoding/json"
 	"fmt"
 	"math/big"
 	"os"
+	// "io/ioutil"
 
-	pdp "github.com/dpduado/dpduado-go"
+	pdp "github.com/dpduado/dpduado-go/xz21"
 
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/crypto"
-	"github.com/ethereum/go-ethereum/core/types"
+	// "github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/ethclient"
 )
 
@@ -26,12 +27,31 @@ const (
 	PURPLE
 )
 
-type Config struct {
-	Server       string `json:'server'`
-	PrivKey      string `json:'privKey'`
-	ContractAddr string `json:'contractAddr'`
+const (
+	SM = 0
+	SP
+	TPA
+	SU1
+	SU2
+	SU3
+)
+
+type Account struct {
+	Address string `json:'Address'`
+	PrivKey string `json:'PrivKey'`
 }
 
+func getAddress(_entity int) string {
+	tmp := fmt.Sprintf("ADDRESS_%d", _entity)
+	return os.Getenv(tmp)
+}
+
+func getPrivKey(_entity int) string {
+	tmp := fmt.Sprintf("PRIVKEY_%d", _entity)
+	return os.Getenv(tmp)
+}
+
+/*
 func increment(_session *pdp.BaseCounterSession) (*types.Transaction, error) {
 	return _session.Increment()
 }
@@ -43,17 +63,8 @@ func setCount(_session *pdp.BaseCounterSession, _number *big.Int) (*types.Transa
 func getNumber(_session *pdp.BaseCounterSession) (*big.Int, error) {
 	return _session.Count()
 }
+*/
 
-func readConf(_path string, _conf *Config) error {
-	f, err := os.Open(_path)
-	if err != nil { return err }
-	defer f.Close()
-
-	err = json.NewDecoder(f).Decode(_conf)
-	if err != nil { return err }
-
-	return nil
-}
 
 func color(c int) string {
 	if c == NONE {
@@ -68,24 +79,24 @@ func colorText(_color int, _text string) string {
 }
 
 func main() {
-	var conf Config
-	err := readConf(os.Args[1], &conf)
+	server := os.Args[1]
+	contractAddr := os.Args[2]
+
+	cl, err := ethclient.Dial(server)
 	if err != nil { panic(err) }
 
-	cl, err := ethclient.Dial(conf.Server)
+	contract, err := pdp.NewXZ21(common.HexToAddress(contractAddr), cl)
 	if err != nil { panic(err) }
 
-	counter, err := pdp.NewBaseCounter(common.HexToAddress(conf.ContractAddr), cl)
-	if err != nil { panic(err) }
-
-	keyECDSA, err := crypto.HexToECDSA(conf.PrivKey)
+	keyECDSA, err := crypto.HexToECDSA(getPrivKey(SM))
 	if err != nil { panic(err) }
 
 	auth, err := bind.NewKeyedTransactorWithChainID(keyECDSA, big.NewInt(31337))
 	if err != nil { panic(err) }
 
-	session := pdp.BaseCounterSession{
-		Contract: counter,
+	//session := pdp.XZ21Session{
+	session := pdp.XZ21Session{
+		Contract: contract,
 		CallOpts: bind.CallOpts{
 			Pending: true,
 		},
@@ -95,6 +106,12 @@ func main() {
 		},
 	}
 
+	addrSM, err := session.GetAddrSM()
+	if err != nil { panic(err) }
+
+	fmt.Println(addrSM)
+
+	/*
 	test_data := big.NewInt(10)
 
 	_, err = setCount(&session, test_data)
@@ -112,4 +129,5 @@ func main() {
 	} else {
 		fmt.Println(colorText(RED, "Failure"))
 	}
+	*/
 }
