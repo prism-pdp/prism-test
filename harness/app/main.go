@@ -6,6 +6,7 @@ import (
 	"math/big"
 	"os"
 	// "io/ioutil"
+	"crypto/ecdsa"
 
 	pdp "github.com/dpduado/dpduado-go/xz21"
 
@@ -41,9 +42,9 @@ type Account struct {
 	PrivKey string `json:'PrivKey'`
 }
 
-func getAddress(_entity int) string {
+func getAddress(_entity int) common.Address {
 	tmp := fmt.Sprintf("ADDRESS_%d", _entity)
-	return os.Getenv(tmp)
+	return common.HexToAddress(os.Getenv(tmp))
 }
 
 func getPrivKey(_entity int) string {
@@ -78,38 +79,95 @@ func colorText(_color int, _text string) string {
 	return color(_color) + _text + color(NONE)
 }
 
-func main() {
-	server := os.Args[1]
-	contractAddr := os.Args[2]
+type Context struct {
+	PrivKey *ecdsa.PrivateKey
+	Auth *bind.TransactOpts
+	Session pdp.XZ21Session
+}
 
-	cl, err := ethclient.Dial(server)
+var ctxTable [6]*Context
+
+func setupContext(_entity int, _contract *pdp.XZ21) {
+	var err error
+
+	var ctx Context
+
+	ctx.PrivKey, err = crypto.HexToECDSA(getPrivKey(_entity))
 	if err != nil { panic(err) }
 
-	contract, err := pdp.NewXZ21(common.HexToAddress(contractAddr), cl)
+	ctx.Auth, err = bind.NewKeyedTransactorWithChainID(ctx.PrivKey, big.NewInt(31337))
 	if err != nil { panic(err) }
 
-	keyECDSA, err := crypto.HexToECDSA(getPrivKey(SM))
-	if err != nil { panic(err) }
-
-	auth, err := bind.NewKeyedTransactorWithChainID(keyECDSA, big.NewInt(31337))
-	if err != nil { panic(err) }
-
-	//session := pdp.XZ21Session{
-	session := pdp.XZ21Session{
-		Contract: contract,
+	ctx.Session = pdp.XZ21Session{
+		Contract: _contract,
 		CallOpts: bind.CallOpts{
 			Pending: true,
 		},
 		TransactOpts: bind.TransactOpts{
-			From: auth.From,
-			Signer: auth.Signer,
+			From: ctx.Auth.From,
+			Signer: ctx.Auth.Signer,
 		},
 	}
 
-	addrSM, err := session.GetAddrSM()
+	ctxTable[_entity] = &ctx
+}
+
+func setup(_server string, _contractAddr string) {
+	cl, err := ethclient.Dial(_server)
 	if err != nil { panic(err) }
 
-	fmt.Println(addrSM)
+	contract, err := pdp.NewXZ21(common.HexToAddress(_contractAddr), cl)
+	if err != nil { panic(err) }
+
+	setupContext(SM, contract)
+	setupContext(SP, contract)
+	setupContext(TPA, contract)
+	setupContext(SU1, contract)
+	setupContext(SU2, contract)
+	setupContext(SU3, contract)
+
+	fmt.Println(ctxTable)
+}
+
+func main() {
+	setup(os.Args[1], os.Args[2])
+
+	// =================================================
+	// Check addresses
+	// =================================================
+	ctxSM := ctxTable[SM]
+	fmt.Println(ctxTable)
+	addrSM, err := ctxSM.Session.AddrSM()
+	if err != nil { panic(err) }
+	fmt.Println("Address of SM: " + addrSM.Hex())
+
+	addrSP, err := ctxSM.Session.AddrSP()
+	if err != nil { panic(err) }
+	fmt.Println("Address of SP: " + addrSP.Hex())
+
+	addrTPA, err := ctxSM.Session.AddrTPA()
+	if err != nil { panic(err) }
+	fmt.Println("Address of TPA: " + addrTPA.Hex())
+
+	// =================================================
+	// Enroll service users
+	// =================================================
+
+	addrSU1 := getAddress(SU1)
+	_, err = ctxSM.Session.EnrollAccount(addrSU1, "PUBKEY_1")
+	if err != nil { panic(err) }
+
+	addrSU2 := getAddress(SU2)
+	_, err = ctxSM.Session.EnrollAccount(addrSU2, "PUBKEY_2")
+	if err != nil { panic(err) }
+
+	addrSU3 := getAddress(SU3)
+	_, err = ctxSM.Session.EnrollAccount(addrSU3, "PUBKEY_3")
+	if err != nil { panic(err) }
+
+	// =================================================
+	// Upload phase (New file)
+	// =================================================
 
 	/*
 	test_data := big.NewInt(10)
