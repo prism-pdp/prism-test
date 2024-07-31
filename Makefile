@@ -66,3 +66,6 @@ docker-run:
 
 docker-exec:
 	@docker compose exec $(SERVICE) /entrypoint.sh $(CMD)
+
+docker-log:
+	@docker compose logs -f
