@@ -1,19 +1,17 @@
 package main
 
 import (
-	// "encoding/json"
+	"crypto/ecdsa"
 	"fmt"
 	"math/big"
 	"os"
-	// "io/ioutil"
-	"crypto/ecdsa"
+	"reflect"
 
 	pdp "github.com/dpduado/dpduado-go/xz21"
 
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/crypto"
-	// "github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/ethclient"
 )
 
@@ -29,7 +27,7 @@ const (
 )
 
 const (
-	SM = 0
+	SM = iota
 	SP
 	TPA
 	SU1
@@ -125,67 +123,148 @@ func setup(_server string, _contractAddr string) {
 	setupContext(SU1, contract)
 	setupContext(SU2, contract)
 	setupContext(SU3, contract)
+}
 
-	fmt.Println(ctxTable)
+func checkSuperAccount() error {
+	ctx := ctxTable[SM]
+
+	addrSM1 := getAddress(SM)
+	addrSM2, err := ctx.Session.AddrSM()
+	if err != nil { return err }
+	if addrSM1 != addrSM2 {
+		return fmt.Errorf("Invalid SM address (%s, %s)", addrSM1.Hex(), addrSM2.Hex())
+	}
+
+	addrSP1 := getAddress(SP)
+	addrSP2, err := ctx.Session.AddrSP()
+	if err != nil { panic(err) }
+	if addrSP1 != addrSP2 {
+		return fmt.Errorf("Invalid SP address (%s, %s)", addrSP1.Hex(), addrSP2.Hex())
+	}
+
+	addrTPA1 := getAddress(TPA)
+	addrTPA2, err := ctx.Session.AddrTPA()
+	if err != nil { panic(err) }
+	if addrTPA1 != addrTPA2 {
+		return fmt.Errorf("Invalid TPA address (%s, %s)", addrTPA1.Hex(), addrTPA2.Hex())
+	}
+	
+	return nil
+}
+
+func registerPara() (*pdp.XZ21Para, error) {
+	var tmp pdp.PairingParam
+	tmp.Gen()
+
+	para := tmp.ToXZ21Para()
+	_, err := ctxTable[SM].Session.RegisterPara(
+		para.Pairing,
+		para.G,
+		para.U,
+	)
+
+	return para, err
+}
+
+func checkPara(_para *pdp.XZ21Para) error {
+	para, err := ctxTable[SM].Session.GetPara()
+	if err != nil { return err }
+
+	if para.Pairing != _para.Pairing {
+		return fmt.Errorf("Invalid pairing")
+	}
+	if !reflect.DeepEqual(para.U, _para.U) {
+		return fmt.Errorf("Invalid U")
+	}
+	if !reflect.DeepEqual(para.G, _para.G) {
+		return fmt.Errorf("Invalid G")
+	}
+
+	return nil
+}
+
+func enrollUserAccount() error {
+	var err error
+
+	ctx := ctxTable[SM]
+
+	addrSU1 := getAddress(SU1)
+	_, err = ctx.Session.EnrollAccount(addrSU1, "PUBKEY_1")
+	if err != nil { return err }
+
+	addrSU2 := getAddress(SU2)
+	_, err = ctx.Session.EnrollAccount(addrSU2, "PUBKEY_2")
+	if err != nil { return err }
+
+	addrSU3 := getAddress(SU3)
+	_, err = ctx.Session.EnrollAccount(addrSU3, "PUBKEY_3")
+	if err != nil { return err }
+
+	return nil
+}
+
+func checkUserAccount() error {
+	var err error
+
+	addrSU1 := getAddress(SU1)
+	accountSU1, err := ctxTable[SU1].Session.GetAccount(addrSU1)
+	if err != nil { return err }
+	if len(accountSU1.PubKey) == 0 { return fmt.Errorf("SU1 is missing.") }
+
+	addrSU2 := getAddress(SU2)
+	accountSU2, err := ctxTable[SU2].Session.GetAccount(addrSU2)
+	if err != nil { return err }
+	if len(accountSU2.PubKey) == 0 { return fmt.Errorf("SU2 is missing.") }
+
+	addrSU3 := getAddress(SU3)
+	accountSU3, err := ctxTable[SU3].Session.GetAccount(addrSU3)
+	if err != nil { return err }
+	if len(accountSU3.PubKey) == 0 { return fmt.Errorf("SU3 is missing.") }
+
+	return nil
 }
 
 func main() {
+	var err error
+
 	setup(os.Args[1], os.Args[2])
 
 	// =================================================
 	// Check addresses
 	// =================================================
-	ctxSM := ctxTable[SM]
-	fmt.Println(ctxTable)
-	addrSM, err := ctxSM.Session.AddrSM()
+	err = checkSuperAccount()
 	if err != nil { panic(err) }
-	fmt.Println("Address of SM: " + addrSM.Hex())
-
-	addrSP, err := ctxSM.Session.AddrSP()
-	if err != nil { panic(err) }
-	fmt.Println("Address of SP: " + addrSP.Hex())
-
-	addrTPA, err := ctxSM.Session.AddrTPA()
-	if err != nil { panic(err) }
-	fmt.Println("Address of TPA: " + addrTPA.Hex())
+	fmt.Println(colorText(GREEN, "checkSuperAccount: ok"))
 
 	// =================================================
-	// Enroll service users
+	// Register param
 	// =================================================
-
-	addrSU1 := getAddress(SU1)
-	_, err = ctxSM.Session.EnrollAccount(addrSU1, "PUBKEY_1")
+	para, err := registerPara()
 	if err != nil { panic(err) }
+	fmt.Println(colorText(GREEN, "registerPara: ok"))
 
-	addrSU2 := getAddress(SU2)
-	_, err = ctxSM.Session.EnrollAccount(addrSU2, "PUBKEY_2")
+	// =================================================
+	// Check param
+	// =================================================
+	err = checkPara(para)
 	if err != nil { panic(err) }
+	fmt.Println(colorText(GREEN, "checkPara: ok"))
 
-	addrSU3 := getAddress(SU3)
-	_, err = ctxSM.Session.EnrollAccount(addrSU3, "PUBKEY_3")
+	// =================================================
+	// Enroll user accounts
+	// =================================================
+	err = enrollUserAccount()
 	if err != nil { panic(err) }
+	fmt.Println(colorText(GREEN, "enrollUserAccount: ok"))
+
+	// =================================================
+	// Check user accounts
+	// =================================================
+	err = checkUserAccount()
+	if err != nil { panic(err) }
+	fmt.Println(colorText(GREEN, "checkUserAccount: ok"))
 
 	// =================================================
 	// Upload phase (New file)
 	// =================================================
-
-	/*
-	test_data := big.NewInt(10)
-
-	_, err = setCount(&session, test_data)
-	if err != nil { panic(err) }
-
-	_, err = increment(&session)
-	if err != nil { panic(err) }
-
-	ans, err := getNumber(&session)
-	if err != nil { panic(err) }
-
-	expected := new(big.Int).Add(test_data, big.NewInt(1))
-	if expected.Cmp(ans) == 0 {
-		fmt.Println(colorText(GREEN, "Success"))
-	} else {
-		fmt.Println(colorText(RED, "Failure"))
-	}
-	*/
 }
