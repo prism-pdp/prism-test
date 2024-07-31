@@ -224,10 +224,8 @@ func checkUserAccount() error {
 	return nil
 }
 
-func main() {
+func runSetupPhase() {
 	var err error
-
-	setup(os.Args[1], os.Args[2])
 
 	// =================================================
 	// Check addresses
@@ -267,4 +265,16 @@ func main() {
 	// =================================================
 	// Upload phase (New file)
 	// =================================================
+}
+
+func main() {
+
+	setup(os.Args[1], os.Args[2])
+
+	command := os.Args[3]
+
+	switch command {
+	case "setup":
+		runSetupPhase()
+	}
 }

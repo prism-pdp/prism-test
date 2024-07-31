@@ -45,8 +45,8 @@ harness/shell:
 setup:
 	$(MAKE) show-accounts > accounts.env
 
-harness/run:
-	$(MAKE) docker-run SERVICE="harness" CMD='go run main.go http://testnet:8545 $(file < cache/contract.addr)'
+harness/run-setup:
+	$(MAKE) docker-run SERVICE="harness" CMD='go run main.go http://testnet:8545 $(file < cache/contract.addr) setup'
 
 harness/clean:
 	rm -rf ./harness/app/cache/*
