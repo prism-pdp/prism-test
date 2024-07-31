@@ -36,6 +36,9 @@ testnet/test:
 testnet/shell:
 	$(MAKE) docker-run SERVICE="testnet" CMD="sh"
 
+testnet/login:
+	$(MAKE) docker-exec SERVICE="testnet" CMD="sh"
+
 harness/shell:
 	$(MAKE) docker-run SERVICE="harness" CMD="bash"
 
