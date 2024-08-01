@@ -9,8 +9,8 @@ shell:
 test:
 	$(MAKE) testnet/shutdown
 	$(MAKE) testnet/startup
-	$(MAKE) harness/run
-	$(MAKE) testnet/shutdown
+	$(MAKE) harness@build
+	$(MAKE) harness@run
 
 test-clean:
 	rm -rf ./cache/*
@@ -45,11 +45,18 @@ harness/shell:
 setup:
 	$(MAKE) show-accounts > accounts.env
 
-harness/run-setup:
-	$(MAKE) docker-run SERVICE="harness" CMD="go run main.go sp.go su.go http://testnet:8545 $(file < cache/contract.addr) setup"
+harness@build:
+	$(MAKE) docker-run SERVICE="harness" CMD="go build ."
 
-harness/run-upload:
-	$(MAKE) docker-run SERVICE="harness" CMD="go run main.go sp.go su.go http://testnet:8545 $(file < cache/contract.addr) upload"
+harness@run:
+	$(MAKE) harness@run-setup
+	$(MAKE) harness@run-upload
+
+harness@run-setup:
+	$(MAKE) docker-run SERVICE="harness" CMD="./harness http://testnet:8545 $(file < cache/contract.addr) setup"
+
+harness@run-upload:
+	$(MAKE) docker-run SERVICE="harness" CMD="./harness http://testnet:8545 $(file < cache/contract.addr) upload"
 
 harness/clean:
 	rm -rf ./harness/app/cache/*
