@@ -2,7 +2,6 @@ package main
 
 import (
 	"crypto/ecdsa"
-	"crypto/sha256"
 	"fmt"
 	"math/big"
 	"os"
@@ -38,7 +37,6 @@ const (
 )
 
 var data []byte
-var hash [32]byte
 var chunkSize uint32
 
 var param pdp.PairingParam
@@ -134,8 +132,6 @@ func setup(_server string, _contractAddr string) {
 		0x50, 0x51, 0x52, 0x53,
 	}
 
-	hash = sha256.Sum256(data)
-
 	chunkSize = uint32(10)
 
 	param.Gen()
@@ -176,7 +172,7 @@ func checkSuperAccount() error {
 func registerPara() (*pdp.XZ21Para, error) {
 	xz21Para := param.ToXZ21Para()
 	_, err := ctxTable[SM].Session.RegisterPara(
-		xz21Para.Pairing,
+		xz21Para.Param,
 		xz21Para.G,
 		xz21Para.U,
 	)
@@ -188,7 +184,7 @@ func checkPara(_para *pdp.XZ21Para) error {
 	para, err := ctxTable[SM].Session.GetPara()
 	if err != nil { return err }
 
-	if para.Pairing != _para.Pairing {
+	if para.Param != _para.Param {
 		return fmt.Errorf("Invalid pairing")
 	}
 	if !reflect.DeepEqual(para.U, _para.U) {
@@ -308,36 +304,24 @@ func uploadAlg(_privKey *pbc.Element, _data []byte) (*pdp.Metadata, error) {
 
 func runUploadPhase(_entity int) {
 
-	ram := getRamSU(_entity)
-
 	// =================================================
 	// SU
 	// =================================================
-	isFound, err := ctxTable[_entity].Session.SearchFile(hash)
-	fmt.Println(isFound)
-	if err != nil { panic(err) }
-	if isFound {
-		fmt.Println(colorText(GREEN, "runUploadPhase_New: dedup"))
-	} else {
-		fmt.Println(colorText(GREEN, "runUploadPhase_New: new"))
-	}
-
-	meta, err := uploadAlg(ram.key.PrivateKey, data)
+	ram := getRamSU(_entity)
+	isNewFile, meta, err := reqUpload(ctxTable[_entity], data, chunkSize, ram)
 	if err != nil { panic(err) }
 
 	//-- Send data and meta to SP --//
 
-	// =================================================
-	// SP
-	// =================================================
-	isFound, err = ctxTable[SP].Session.SearchFile(hash)
-	if err != nil { panic(err) }
-	if isFound {
-		//-- Do dedup challenge --//
-		ramSP.AppendOwner(_entity, hash, meta)
+	if isNewFile {
+		acceptNewFile(ctxTable[SP], data, meta, ram.addr, ram.key.PublicKey, ramSP)
 	} else {
-		ramSP.NewFile(_entity, hash, data, meta)
-		ctxTable[SP].Session.RegisterFile(hash, ram.addr)
+		// SP
+		chal := genDedupChallen(ctxTable[SP], data, ramSP)
+		// SU
+		proof := genDedupProof(ctxTable[_entity], chal, data, chunkSize)
+		// SP
+		fmt.Println(proof)
 	}
 }
 
@@ -351,9 +335,8 @@ func main() {
 	case "setup":
 		runSetupPhase()
 	case "upload":
-		fmt.Println("A")
 		runUploadPhase(SU1)
-		fmt.Println("B")
 		runUploadPhase(SU2)
+		ramSP.Save("./cache/ram-sp.json")
 	}
 }
