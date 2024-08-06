@@ -24,5 +24,9 @@ services:
     hostname: harness
     volumes:
       - ./harness/app:/app
+      - go_cache:/root/.cache/go-build
     env_file:
       - accounts.env
+
+volumes:
+  go_cache:
