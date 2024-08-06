@@ -3,17 +3,16 @@ package main
 import (
 	"crypto/ecdsa"
 	"fmt"
-	"math/big"
 	"os"
-	"reflect"
-
-	pdp "github.com/dpduado/dpduado-go/xz21"
 
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/crypto"
-	"github.com/ethereum/go-ethereum/ethclient"
-	"github.com/Nik-U/pbc"
+
+	pdp "github.com/dpduado/dpduado-go/xz21"
+
+	"github.com/dpduado/dpduado-test/harness/manager"
+	"github.com/dpduado/dpduado-test/harness/provider"
+	"github.com/dpduado/dpduado-test/harness/user"
 )
 
 const escape = "\x1b"
@@ -37,17 +36,13 @@ const (
 )
 
 var data []byte
-var chunkSize uint32
+var chunkNum uint32
 
-var param pdp.PairingParam
-
-// var keySU1 pdp.PairingKey
-// var keySU2 pdp.PairingKey
-// var keySU3 pdp.PairingKey
-var ramSP  *RamSP
-var ramSU1 *RamSU
-var ramSU2 *RamSU
-var ramSU3 *RamSU
+var sm manager.Manager
+var sp provider.Provider
+var su1 user.User
+var su2 user.User
+var su3 user.User
 
 type Account struct {
 	Address string `json:'Address'`
@@ -82,47 +77,7 @@ type Context struct {
 	Session pdp.XZ21Session
 }
 
-var ctxTable [6]*Context
-
-func setupContext(_entity int, _contract *pdp.XZ21) {
-	var err error
-
-	var ctx Context
-
-	ctx.PrivKey, err = crypto.HexToECDSA(getPrivKey(_entity))
-	if err != nil { panic(err) }
-
-	ctx.Auth, err = bind.NewKeyedTransactorWithChainID(ctx.PrivKey, big.NewInt(31337))
-	if err != nil { panic(err) }
-
-	ctx.Session = pdp.XZ21Session{
-		Contract: _contract,
-		CallOpts: bind.CallOpts{
-			Pending: true,
-		},
-		TransactOpts: bind.TransactOpts{
-			From: ctx.Auth.From,
-			Signer: ctx.Auth.Signer,
-		},
-	}
-
-	ctxTable[_entity] = &ctx
-}
-
-func setup(_server string, _contractAddr string) {
-	cl, err := ethclient.Dial(_server)
-	if err != nil { panic(err) }
-
-	contract, err := pdp.NewXZ21(common.HexToAddress(_contractAddr), cl)
-	if err != nil { panic(err) }
-
-	setupContext(SM, contract)
-	setupContext(SP, contract)
-	setupContext(TPA, contract)
-	setupContext(SU1, contract)
-	setupContext(SU2, contract)
-	setupContext(SU3, contract)
-
+func setup() {
 	data = []byte{
 		0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09,
 		0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19,
@@ -132,211 +87,89 @@ func setup(_server string, _contractAddr string) {
 		0x50, 0x51, 0x52, 0x53,
 	}
 
-	chunkSize = uint32(10)
-
-	param.Gen()
-
-	ramSP  = GenRamSP()
-	ramSU1 = GenRamSU(&param, getAddress(SU1))
-	ramSU2 = GenRamSU(&param, getAddress(SU2))
-	ramSU3 = GenRamSU(&param, getAddress(SU3))
+	chunkNum = uint32(5)
 }
 
-func checkSuperAccount() error {
-	ctx := ctxTable[SM]
-
-	addrSM1 := getAddress(SM)
-	addrSM2, err := ctx.Session.AddrSM()
-	if err != nil { return err }
-	if addrSM1 != addrSM2 {
-		return fmt.Errorf("Invalid SM address (%s, %s)", addrSM1.Hex(), addrSM2.Hex())
-	}
-
-	addrSP1 := getAddress(SP)
-	addrSP2, err := ctx.Session.AddrSP()
-	if err != nil { panic(err) }
-	if addrSP1 != addrSP2 {
-		return fmt.Errorf("Invalid SP address (%s, %s)", addrSP1.Hex(), addrSP2.Hex())
-	}
-
-	addrTPA1 := getAddress(TPA)
-	addrTPA2, err := ctx.Session.AddrTPA()
-	if err != nil { panic(err) }
-	if addrTPA1 != addrTPA2 {
-		return fmt.Errorf("Invalid TPA address (%s, %s)", addrTPA1.Hex(), addrTPA2.Hex())
-	}
-	
-	return nil
-}
-
-func registerPara() (*pdp.XZ21Para, error) {
-	xz21Para := param.ToXZ21Para()
-	_, err := ctxTable[SM].Session.RegisterPara(
-		xz21Para.Param,
-		xz21Para.G,
-		xz21Para.U,
-	)
-
-	return xz21Para, err
-}
-
-func checkPara(_para *pdp.XZ21Para) error {
-	para, err := ctxTable[SM].Session.GetPara()
-	if err != nil { return err }
-
-	if para.Param != _para.Param {
-		return fmt.Errorf("Invalid pairing")
-	}
-	if !reflect.DeepEqual(para.U, _para.U) {
-		return fmt.Errorf("Invalid U")
-	}
-	if !reflect.DeepEqual(para.G, _para.G) {
-		return fmt.Errorf("Invalid G")
-	}
-
-	return nil
-}
-
-func enrollUserAccount() error {
+func runSetupPhase(_server string, _contractAddr string) {
 	var err error
 
-	ctx := ctxTable[SM]
-
-	addrSU1 := getAddress(SU1)
-	_, err = ctx.Session.EnrollAccount(addrSU1, "PUBKEY_1")
-	if err != nil { return err }
-
-	addrSU2 := getAddress(SU2)
-	_, err = ctx.Session.EnrollAccount(addrSU2, "PUBKEY_2")
-	if err != nil { return err }
-
-	addrSU3 := getAddress(SU3)
-	_, err = ctx.Session.EnrollAccount(addrSU3, "PUBKEY_3")
-	if err != nil { return err }
-
-	return nil
-}
-
-func checkUserAccount() error {
-	var err error
-
-	addrSU1 := getAddress(SU1)
-	accountSU1, err := ctxTable[SU1].Session.GetAccount(addrSU1)
-	if err != nil { return err }
-	if len(accountSU1.PubKey) == 0 { return fmt.Errorf("SU1 is missing.") }
-
-	addrSU2 := getAddress(SU2)
-	accountSU2, err := ctxTable[SU2].Session.GetAccount(addrSU2)
-	if err != nil { return err }
-	if len(accountSU2.PubKey) == 0 { return fmt.Errorf("SU2 is missing.") }
-
-	addrSU3 := getAddress(SU3)
-	accountSU3, err := ctxTable[SU3].Session.GetAccount(addrSU3)
-	if err != nil { return err }
-	if len(accountSU3.PubKey) == 0 { return fmt.Errorf("SU3 is missing.") }
-
-	return nil
-}
-
-func runSetupPhase() {
-	var err error
-
-	// =================================================
-	// Check addresses
-	// =================================================
-	err = checkSuperAccount()
-	if err != nil { panic(err) }
-	fmt.Println(colorText(GREEN, "checkSuperAccount: ok"))
+	sm  = manager.GenManager(_server, _contractAddr, getPrivKey(SM))
+	sp  = provider.GenProvider(_server, _contractAddr, getPrivKey(SP))
+	su1 = user.GenUser(_server, _contractAddr, getAddress(SU1), getPrivKey(SU1), &sm.Param)
+	su2 = user.GenUser(_server, _contractAddr, getAddress(SU2), getPrivKey(SU2), &sm.Param)
+	su3 = user.GenUser(_server, _contractAddr, getAddress(SU3), getPrivKey(SU3), &sm.Param)
 
 	// =================================================
 	// Register param
 	// =================================================
-	para, err := registerPara()
+	err = sm.RegisterPara()
 	if err != nil { panic(err) }
 	fmt.Println(colorText(GREEN, "registerPara: ok"))
 
 	// =================================================
-	// Check param
-	// =================================================
-	err = checkPara(para)
-	if err != nil { panic(err) }
-	fmt.Println(colorText(GREEN, "checkPara: ok"))
-
-	// =================================================
 	// Enroll user accounts
 	// =================================================
-	err = enrollUserAccount()
+	err = sm.EnrollUser(su1.Addr, su1.PublicKeyData.Key)
 	if err != nil { panic(err) }
-	fmt.Println(colorText(GREEN, "enrollUserAccount: ok"))
+	fmt.Println(colorText(GREEN, "Enroll SU1: ok"))
 
-	// =================================================
-	// Check user accounts
-	// =================================================
-	err = checkUserAccount()
+	err = sm.EnrollUser(su2.Addr, su2.PublicKeyData.Key)
 	if err != nil { panic(err) }
-	fmt.Println(colorText(GREEN, "checkUserAccount: ok"))
+	fmt.Println(colorText(GREEN, "Enroll SU2: ok"))
 
-	// =================================================
-	// Upload phase (New file)
-	// =================================================
+	err = sm.EnrollUser(su3.Addr, su3.PublicKeyData.Key)
+	if err != nil { panic(err) }
+	fmt.Println(colorText(GREEN, "Enroll SU3: ok"))
 }
 
-func getRamSU(_entity int) *RamSU {
-	switch _entity {
-	case SU1:
-		return ramSU1
-	case SU2:
-		return ramSU2
-	case SU3:
-		return ramSU3
-	}
-	return nil
-}
-
-func uploadAlg(_privKey *pbc.Element, _data []byte) (*pdp.Metadata, error) {
-	chunk, err := pdp.SplitData(data, chunkSize)
-	if err != nil { return nil, err }
-
-	meta := pdp.GenMetadata(&param, _privKey, chunk)
-
-	return meta, nil
-}
-
-func runUploadPhase(_entity int) {
+func runUploadPhase(_su *user.User) {
 
 	// =================================================
 	// SU
 	// =================================================
-	ram := getRamSU(_entity)
-	isNewFile, meta, err := reqUpload(ctxTable[_entity], data, chunkSize, ram)
-	if err != nil { panic(err) }
-
-	//-- Send data and meta to SP --//
-
-	if isNewFile {
-		acceptNewFile(ctxTable[SP], data, meta, ram.addr, ram.key.PublicKey, ramSP)
+	// SU checks whether data is uploaded.
+	isUploaded := _su.IsUploaded(data)
+	if isUploaded {
+		// SP generates a challenge for deduplication.
+		chalData, id := sp.GenDedupChallen(data, _su.Addr)
+		// SP sends the challenge to SU.
+		// SU generates a proof to prove ownership of the data to be uploaded.
+		proofData := _su.GenDedupProof(&chalData, data, chunkNum)
+		// SP verifies the proof.
+		isVerified := sp.VerifyDedupProof(id, &chalData, &proofData)
+		if isVerified {
+			sp.AppendOwner(_su, data)
+		}
 	} else {
-		// SP
-		chal := genDedupChallen(ctxTable[SP], data, ramSP)
 		// SU
-		proof := genDedupProof(ctxTable[_entity], chal, data, chunkSize)
+		tags, _ := _su.PrepareUpload(data, chunkNum)
 		// SP
-		fmt.Println(proof)
+		sp.UploadNewFile(data, &tags, _su.Addr, &_su.PublicKeyData)
 	}
 }
 
 func main() {
 
-	setup(os.Args[1], os.Args[2])
+	setup()
 
 	command := os.Args[3]
 
 	switch command {
 	case "setup":
-		runSetupPhase()
+		runSetupPhase(os.Args[1], os.Args[2])
+		sp.Dump("./cache/setup-sp.json")
+		su1.Dump("./cache/setup-su1.json")
+		su2.Dump("./cache/setup-su2.json")
+		su3.Dump("./cache/setup-su3.json")
 	case "upload":
-		runUploadPhase(SU1)
-		runUploadPhase(SU2)
-		ramSP.Save("./cache/ram-sp.json")
+		sp = provider.LoadProvider("./cache/setup-sp.json", os.Args[1], os.Args[2], getPrivKey(SP))
+		su1 = user.LoadUser("./cache/setup-su1.json", os.Args[1], os.Args[2], getPrivKey(SU1))
+		su2 = user.LoadUser("./cache/setup-su2.json", os.Args[1], os.Args[2], getPrivKey(SU2))
+		su3 = user.LoadUser("./cache/setup-su3.json", os.Args[1], os.Args[2], getPrivKey(SU3))
+
+		runUploadPhase(&su1)
+		runUploadPhase(&su2)
+
+		sp.SaveStorage("./cache/upload-sp.json")
 	}
 }

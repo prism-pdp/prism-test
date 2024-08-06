@@ -1,4 +1,4 @@
-module harness
+module github.com/dpduado/dpduado-test/harness
 
 go 1.22.2
 
@@ -15,7 +15,7 @@ require (
 	github.com/crate-crypto/go-kzg-4844 v1.1.0 // indirect
 	github.com/deckarep/golang-set/v2 v2.6.0 // indirect
 	github.com/decred/dcrd/dcrec/secp256k1/v4 v4.3.0 // indirect
-	github.com/dpduado/dpduado-go v0.0.0-20240801033533-bbf01ef35670 // indirect
+	github.com/dpduado/dpduado-go v0.0.0-20240806091400-fea0105f4760 // indirect
 	github.com/ethereum/c-kzg-4844 v1.0.3 // indirect
 	github.com/fsnotify/fsnotify v1.7.0 // indirect
 	github.com/go-ole/go-ole v1.3.0 // indirect
