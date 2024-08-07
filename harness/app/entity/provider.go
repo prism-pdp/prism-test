@@ -1,4 +1,4 @@
-package provider
+package entity
 
 import (
 	"crypto/sha256"
@@ -14,7 +14,6 @@ import (
 	pdp "github.com/dpduado/dpduado-go/xz21"
 
 	"github.com/dpduado/dpduado-test/harness/helper"
-	"github.com/dpduado/dpduado-test/harness/user"
 )
 
 type Property struct {
@@ -120,21 +119,6 @@ func (this *Provider) NewFile(_addr string, _hash [32]byte, _data []byte, _tags 
 	this.Storage.Files = append(this.Storage.Files, &file)
 }
 
-// func (this *RamSP) appendOwner(_ctx *Context, _ram *RamSP, _addr string, _hash [32]byte, _meta *pdp.Metadata) {
-// 	var owner Owner
-// 	owner.Addr  = _addr
-// 	for i := range _meta.Tags {
-// 		owner.Tags = append(owner.Tags, _meta.Tags[i].Bytes())
-// 	}
-
-// 	for _, v := range this.Storage {
-// 		if v.Hash == _hash {
-// 			v.Owners = append(v.Owners, owner)
-// 			break
-// 		}
-// 	}
-// }
-
 func (this *Provider) SaveStorage(_path string) {
 	tmp, err := json.MarshalIndent(this.Storage, "", "\t")
 	if err != nil { panic(err) }
@@ -170,7 +154,7 @@ func (this *Provider) UploadNewFile(_data []byte, _tags *pdp.Tags, _addrSU commo
 	return nil
 }
 
-func (this *Provider) AppendOwner(_su *user.User, _data []byte) {
+func (this *Provider) AppendOwner(_su *User, _data []byte) {
 	hash := sha256.Sum256(_data)
 	file := this.searchFile(hash)
 

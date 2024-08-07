@@ -1,4 +1,4 @@
-package manager
+package entity
 
 import (
 	"github.com/ethereum/go-ethereum/common"

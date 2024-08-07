@@ -10,9 +10,7 @@ import (
 
 	pdp "github.com/dpduado/dpduado-go/xz21"
 
-	"github.com/dpduado/dpduado-test/harness/manager"
-	"github.com/dpduado/dpduado-test/harness/provider"
-	"github.com/dpduado/dpduado-test/harness/user"
+	"github.com/dpduado/dpduado-test/harness/entity"
 )
 
 const escape = "\x1b"
@@ -38,11 +36,11 @@ const (
 var data []byte
 var chunkNum uint32
 
-var sm manager.Manager
-var sp provider.Provider
-var su1 user.User
-var su2 user.User
-var su3 user.User
+var sm entity.Manager
+var sp entity.Provider
+var su1 entity.User
+var su2 entity.User
+var su3 entity.User
 
 type Account struct {
 	Address string `json:'Address'`
@@ -93,11 +91,11 @@ func setup() {
 func runSetupPhase(_server string, _contractAddr string) {
 	var err error
 
-	sm  = manager.GenManager(_server, _contractAddr, getPrivKey(SM))
-	sp  = provider.GenProvider(_server, _contractAddr, getPrivKey(SP))
-	su1 = user.GenUser(_server, _contractAddr, getAddress(SU1), getPrivKey(SU1), &sm.Param)
-	su2 = user.GenUser(_server, _contractAddr, getAddress(SU2), getPrivKey(SU2), &sm.Param)
-	su3 = user.GenUser(_server, _contractAddr, getAddress(SU3), getPrivKey(SU3), &sm.Param)
+	sm  = entity.GenManager(_server, _contractAddr, getPrivKey(SM))
+	sp  = entity.GenProvider(_server, _contractAddr, getPrivKey(SP))
+	su1 = entity.GenUser(_server, _contractAddr, getAddress(SU1), getPrivKey(SU1), &sm.Param)
+	su2 = entity.GenUser(_server, _contractAddr, getAddress(SU2), getPrivKey(SU2), &sm.Param)
+	su3 = entity.GenUser(_server, _contractAddr, getAddress(SU3), getPrivKey(SU3), &sm.Param)
 
 	// =================================================
 	// Register param
@@ -122,28 +120,30 @@ func runSetupPhase(_server string, _contractAddr string) {
 	fmt.Println(colorText(GREEN, "Enroll SU3: ok"))
 }
 
-func runUploadPhase(_su *user.User) {
-
-	// =================================================
-	// SU
-	// =================================================
+func runUploadPhase(_su *entity.User) {
 	// SU checks whether data is uploaded.
 	isUploaded := _su.IsUploaded(data)
+
+	// Processing differs depending on whether the file has already been uploaded or not.
 	if isUploaded {
 		// SP generates a challenge for deduplication.
 		chalData, id := sp.GenDedupChallen(data, _su.Addr)
+
 		// SP sends the challenge to SU.
+
 		// SU generates a proof to prove ownership of the data to be uploaded.
 		proofData := _su.GenDedupProof(&chalData, data, chunkNum)
+
 		// SP verifies the proof.
 		isVerified := sp.VerifyDedupProof(id, &chalData, &proofData)
 		if isVerified {
 			sp.AppendOwner(_su, data)
 		}
 	} else {
-		// SU
+		// SU uploads the file.
 		tags, _ := _su.PrepareUpload(data, chunkNum)
-		// SP
+
+		// SP accepts the file.
 		sp.UploadNewFile(data, &tags, _su.Addr, &_su.PublicKeyData)
 	}
 }
@@ -162,10 +162,10 @@ func main() {
 		su2.Dump("./cache/setup-su2.json")
 		su3.Dump("./cache/setup-su3.json")
 	case "upload":
-		sp = provider.LoadProvider("./cache/setup-sp.json", os.Args[1], os.Args[2], getPrivKey(SP))
-		su1 = user.LoadUser("./cache/setup-su1.json", os.Args[1], os.Args[2], getPrivKey(SU1))
-		su2 = user.LoadUser("./cache/setup-su2.json", os.Args[1], os.Args[2], getPrivKey(SU2))
-		su3 = user.LoadUser("./cache/setup-su3.json", os.Args[1], os.Args[2], getPrivKey(SU3))
+		sp = entity.LoadProvider("./cache/setup-sp.json", os.Args[1], os.Args[2], getPrivKey(SP))
+		su1 = entity.LoadUser("./cache/setup-su1.json", os.Args[1], os.Args[2], getPrivKey(SU1))
+		su2 = entity.LoadUser("./cache/setup-su2.json", os.Args[1], os.Args[2], getPrivKey(SU2))
+		su3 = entity.LoadUser("./cache/setup-su3.json", os.Args[1], os.Args[2], getPrivKey(SU3))
 
 		runUploadPhase(&su1)
 		runUploadPhase(&su2)
