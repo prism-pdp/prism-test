@@ -46,17 +46,17 @@ setup:
 	$(MAKE) show-accounts > accounts.env
 
 harness@build:
-	$(MAKE) docker-run SERVICE="harness" CMD="go build ."
+	$(MAKE) docker-run SERVICE="harness" CMD="go build -o bin/harness ."
 
 harness@run:
 	$(MAKE) harness@run-setup
 	$(MAKE) harness@run-upload
 
 harness@run-setup:
-	$(MAKE) docker-run SERVICE="harness" CMD="./harness http://testnet:8545 $(file < cache/contract.addr) setup"
+	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness http://testnet:8545 $(file < cache/contract.addr) setup"
 
 harness@run-upload:
-	$(MAKE) docker-run SERVICE="harness" CMD="./harness http://testnet:8545 $(file < cache/contract.addr) upload"
+	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness http://testnet:8545 $(file < cache/contract.addr) upload"
 
 harness/clean:
 	rm -rf ./harness/app/cache/*
