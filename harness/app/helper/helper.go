@@ -1,12 +1,12 @@
 package helper
 
 import (
-	"math/big"
-
+	"encoding/hex"
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/ethclient"
+	"math/big"
 
 	pdp "github.com/dpduado/dpduado-go/xz21"
 )
@@ -45,4 +45,8 @@ func FetchPairingParam(_session *pdp.XZ21Session) pdp.PairingParam {
 	param := pdp.GenParamFromXZ21Para(&xz21Para)
 
 	return param
+}
+
+func Hex(_data []byte) string {
+	return hex.EncodeToString(_data)
 }

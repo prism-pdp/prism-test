@@ -3,7 +3,6 @@ package entity
 import (
 	"crypto/sha256"
 	"encoding/json"
-	"encoding/hex"
 	"fmt"
 	"io/ioutil"
 	"math/rand"
@@ -16,24 +15,9 @@ import (
 	"github.com/dpduado/dpduado-test/harness/helper"
 )
 
-type Property struct {
-	TagsData pdp.TagsData `json:'tags'`
-	KeyData pdp.PublicKeyData `json:'key'`
-}
-
-func (this *Property) numTags() uint32 {
-	return uint32(len(this.TagsData.Tags))
-}
-
-type Owner struct {
-	Addr string   `json:'addr'`
-}
-
 type File struct {
-	Hash [32]byte  `json:'hash'`
 	Data []byte    `json:'data'`
-	Prop *Property  `json:'property'`
-	Owners []*Owner `json:'owners'`
+	Owners []common.Address `json:'owners'`
 }
 
 type DedupState struct {
@@ -41,36 +25,34 @@ type DedupState struct {
 	Hash [32]byte `json:'hash'`
 }
 
-type Storage struct {
-	Files []*File `json:'files'`
-}
-
 type Provider struct {
-	Storage Storage `json:'storage'`
-	State map[uint32]DedupState `json:'state'`
+	Files map[string]*File `json:'files'`
+	State map[uint32]*DedupState `json:'state'`
 
+	ledger  *FakeLedger
 	session *pdp.XZ21Session
 }
 
 func (this *Provider) searchFile(_hash [32]byte) *File {
-	for _, v := range this.Storage.Files {
-		if v.Hash == _hash {
-			return v
-		}
+	if v, ok := this.Files[helper.Hex(_hash[:])]; ok {
+		return v
 	}
 	return nil
 }
 
-func GenProvider(_server string, _contractAddr string, _privKey string) Provider {
+func GenProvider(_server string, _contractAddr string, _privKey string, _ledger *FakeLedger) Provider {
 	var provider Provider
 
-	provider.State = make(map[uint32]DedupState, 1)
+	provider.Files = make(map[string]*File)
+	provider.State = make(map[uint32]*DedupState)
+
+	provider.ledger = _ledger
 	provider.session = helper.GenSession(_server, _contractAddr, _privKey)
 
 	return provider
 }
 
-func LoadProvider(_path string, _server string, _contractAddr string, _privKey string) Provider {
+func LoadProvider(_path string, _server string, _contractAddr string, _privKey string, _ledger *FakeLedger) Provider {
 	f, err := os.Open(_path)
 	if err != nil { panic(err) }
 	defer f.Close()
@@ -81,17 +63,21 @@ func LoadProvider(_path string, _server string, _contractAddr string, _privKey s
 	var sp Provider
 	json.Unmarshal(s, sp)
 
+	if sp.Files == nil {
+		sp.Files = make(map[string]*File)
+	}
 	if sp.State == nil {
-		sp.State = make(map[uint32]DedupState )
+		sp.State = make(map[uint32]*DedupState)
 	}
 
+	sp.ledger = _ledger
 	sp.session = helper.GenSession(_server, _contractAddr, _privKey)
 
 	return sp
 }
 
 func (this *Provider) Dump(_path string) {
-	s, err := json.Marshal(this)
+	s, err := json.MarshalIndent(this, "", "\t")
 	if err != nil { panic(err) }
 
 	f, err := os.Create(_path)
@@ -102,41 +88,23 @@ func (this *Provider) Dump(_path string) {
 	if err != nil { panic(err) }
 }
 
-func (this *Provider) NewFile(_addr string, _hash [32]byte, _data []byte, _tags *pdp.Tags, _pubKey *pdp.PublicKeyData) {
-	var owner Owner
-	owner.Addr = _addr
-
-	var prop Property
-	prop.TagsData = _tags.Export()
-	prop.KeyData = *_pubKey
-
+func (this *Provider) NewFile(_addr common.Address, _hash [32]byte, _data []byte, _tags *pdp.Tags, _pubKey *pdp.PublicKeyData) {
 	var file File
-	file.Hash = _hash
 	file.Data = _data
-	file.Prop = &prop
-	file.Owners = append(file.Owners, &owner)
+	file.Owners = append(file.Owners, _addr)
 
-	this.Storage.Files = append(this.Storage.Files, &file)
-}
+	this.Files[helper.Hex(_hash[:])] = &file
 
-func (this *Provider) SaveStorage(_path string) {
-	tmp, err := json.MarshalIndent(this.Storage, "", "\t")
-	if err != nil { panic(err) }
-
-	f, err := os.Create(_path)
-	defer f.Close()
-	if err != nil { panic(err) }
-
-	_, err = f.WriteString(string(tmp))
-	if err != nil { panic(err) }
+	tagsData := _tags.Export()
+	this.ledger.RegisterFile(_hash, &tagsData, _addr)
 }
 
 func (this *Provider) IsUploaded(_data []byte) bool {
 	hash := sha256.Sum256(_data)
-	isUploaded, err := this.session.SearchFile(hash)
-	if err != nil { panic(err) }
+	fileProp := this.ledger.SearchFile(hash)
+	if fileProp == nil { return false }
 
-	return isUploaded
+	return true
 }
 
 func (this *Provider) UploadNewFile(_data []byte, _tags *pdp.Tags, _addrSU common.Address, _pubKeySU *pdp.PublicKeyData) error {
@@ -145,9 +113,9 @@ func (this *Provider) UploadNewFile(_data []byte, _tags *pdp.Tags, _addrSU commo
 	isUploaded := this.IsUploaded(_data)
 
 	if isUploaded {
-		return fmt.Errorf("File is already uploaded. (hash:%s)", hex.EncodeToString(hash[:]))
+		return fmt.Errorf("File is already uploaded. (hash:%s)", helper.Hex(hash[:]))
 	} else {
-		this.NewFile(_addrSU.Hex(), hash, _data, _tags, _pubKeySU)
+		this.NewFile(_addrSU, hash, _data, _tags, _pubKeySU)
 		this.session.RegisterFile(hash, _addrSU)
 	}
 
@@ -158,20 +126,19 @@ func (this *Provider) AppendOwner(_su *User, _data []byte) {
 	hash := sha256.Sum256(_data)
 	file := this.searchFile(hash)
 
-	var owner Owner
-	owner.Addr = _su.Addr.Hex()
-
-	file.Owners = append(file.Owners, &owner)
+	file.Owners = append(file.Owners, _su.Addr)
+	this.ledger.AppendAccount(hash, _su.Addr)
 }
 
 func (this *Provider) GenDedupChallen(_data []byte, _addrSU common.Address) (pdp.ChalData, uint32) {
 	params := helper.FetchPairingParam(this.session)
 
 	hash := sha256.Sum256(_data)
-	file := this.searchFile(hash)
-	if file == nil { panic(fmt.Errorf("File is not found.")) }
+	// file := this.searchFile(hash)
+	// if file == nil { panic(fmt.Errorf("File is not found.")) }
+	numTags := this.ledger.GetNumTags(hash)
 
-	chal := pdp.GenChal(&params, file.Prop.numTags())
+	chal := pdp.GenChal(&params, numTags)
 	chalData := chal.Export()
 
 	//
@@ -180,7 +147,7 @@ func (this *Provider) GenDedupChallen(_data []byte, _addrSU common.Address) (pdp
 	s.Hash = hash
 
 	id := rand.Uint32()
-	this.State[id] = s
+	this.State[id] = &s
 
 	return chalData, id
 }
@@ -189,21 +156,28 @@ func (this *Provider) VerifyDedupProof(_id uint32, _chalData *pdp.ChalData, _pro
 	params := helper.FetchPairingParam(this.session)
 
 	state := this.State[_id]
+
+	fileProp := this.ledger.SearchFile(state.Hash)
+	if fileProp == nil { panic(fmt.Errorf("File property is not found.")) }
+
 	file := this.searchFile(state.Hash)
 	if file == nil { panic(fmt.Errorf("File is not found.")) }
 
-	pk := file.Prop.KeyData.Import(&params)
+	pkData := this.ledger.SearchPublicKey(fileProp.Creator)
+	if pkData == nil { panic(fmt.Errorf("Account is not found.")) }
 
 	// TODO: function VerifyProof内で必要なタグだけ復元するのがよい
-	tags := file.Prop.TagsData.Import(&params)
+	tags := fileProp.Tags.Import(&params)
 
-	chunks, err := pdp.SplitData(file.Data, file.Prop.numTags())
+	chunks, err := pdp.SplitData(file.Data, fileProp.GetNumTags())
 	if err != nil { panic(err) }
 
 	hashChunks := pdp.HashChunks(chunks)
 
 	chal := _chalData.Import(&params)
 	proof := _proofData.Import(&params)
+	pk := pkData.Import(&params)
+
 	isVerified := pdp.VerifyProof(&params, &tags, hashChunks, &chal, &proof, pk.Key)
 
 	return isVerified

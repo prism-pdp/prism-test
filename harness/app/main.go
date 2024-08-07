@@ -36,6 +36,8 @@ const (
 var data []byte
 var chunkNum uint32
 
+var ledger entity.FakeLedger
+
 var sm entity.Manager
 var sp entity.Provider
 var su1 entity.User
@@ -91,33 +93,37 @@ func setup() {
 func runSetupPhase(_server string, _contractAddr string) {
 	var err error
 
+	ledger = entity.GenFakeLedger()
 	sm  = entity.GenManager(_server, _contractAddr, getPrivKey(SM))
-	sp  = entity.GenProvider(_server, _contractAddr, getPrivKey(SP))
-	su1 = entity.GenUser(_server, _contractAddr, getAddress(SU1), getPrivKey(SU1), &sm.Param)
-	su2 = entity.GenUser(_server, _contractAddr, getAddress(SU2), getPrivKey(SU2), &sm.Param)
-	su3 = entity.GenUser(_server, _contractAddr, getAddress(SU3), getPrivKey(SU3), &sm.Param)
+	sp  = entity.GenProvider(_server, _contractAddr, getPrivKey(SP), &ledger)
+	su1 = entity.GenUser(_server, _contractAddr, getAddress(SU1), getPrivKey(SU1), &sm.Param, &ledger)
+	su2 = entity.GenUser(_server, _contractAddr, getAddress(SU2), getPrivKey(SU2), &sm.Param, &ledger)
+	su3 = entity.GenUser(_server, _contractAddr, getAddress(SU3), getPrivKey(SU3), &sm.Param, &ledger)
 
 	// =================================================
 	// Register param
 	// =================================================
 	err = sm.RegisterPara()
 	if err != nil { panic(err) }
-	fmt.Println(colorText(GREEN, "registerPara: ok"))
+	fmt.Println(colorText(GREEN, "registerPara: OK"))
 
 	// =================================================
 	// Enroll user accounts
 	// =================================================
+	ledger.RegisterAccount(su1.Addr, &su1.PublicKeyData)
 	err = sm.EnrollUser(su1.Addr, su1.PublicKeyData.Key)
 	if err != nil { panic(err) }
-	fmt.Println(colorText(GREEN, "Enroll SU1: ok"))
+	fmt.Println(colorText(GREEN, "Enroll SU1: OK"))
 
+	ledger.RegisterAccount(su2.Addr, &su2.PublicKeyData)
 	err = sm.EnrollUser(su2.Addr, su2.PublicKeyData.Key)
 	if err != nil { panic(err) }
-	fmt.Println(colorText(GREEN, "Enroll SU2: ok"))
+	fmt.Println(colorText(GREEN, "Enroll SU2: OK"))
 
+	ledger.RegisterAccount(su3.Addr, &su3.PublicKeyData)
 	err = sm.EnrollUser(su3.Addr, su3.PublicKeyData.Key)
 	if err != nil { panic(err) }
-	fmt.Println(colorText(GREEN, "Enroll SU3: ok"))
+	fmt.Println(colorText(GREEN, "Enroll SU3: OK"))
 }
 
 func runUploadPhase(_su *entity.User) {
@@ -138,6 +144,9 @@ func runUploadPhase(_su *entity.User) {
 		isVerified := sp.VerifyDedupProof(id, &chalData, &proofData)
 		if isVerified {
 			sp.AppendOwner(_su, data)
+			fmt.Println(colorText(GREEN, "Append: OK"))
+		} else {
+			fmt.Println(colorText(RED, "Append: NG"))
 		}
 	} else {
 		// SU uploads the file.
@@ -145,8 +154,18 @@ func runUploadPhase(_su *entity.User) {
 
 		// SP accepts the file.
 		sp.UploadNewFile(data, &tags, _su.Addr, &_su.PublicKeyData)
+
+		fmt.Println(colorText(GREEN, "New file: OK"))
 	}
 }
+
+// func runAuditingPhase(_su *entity.User) {
+// 	// SU generates challenge and requests to audit the file
+// 	// TODO: Search for his/her own files and generate a challenge by specifying the ID of the file.
+// 	chalData := _su.GenAuditChallen(data)
+
+// 	//
+// }
 
 func main() {
 
@@ -157,19 +176,22 @@ func main() {
 	switch command {
 	case "setup":
 		runSetupPhase(os.Args[1], os.Args[2])
+		ledger.Dump("./cache/setup-ledger.json")
 		sp.Dump("./cache/setup-sp.json")
 		su1.Dump("./cache/setup-su1.json")
 		su2.Dump("./cache/setup-su2.json")
 		su3.Dump("./cache/setup-su3.json")
 	case "upload":
-		sp = entity.LoadProvider("./cache/setup-sp.json", os.Args[1], os.Args[2], getPrivKey(SP))
-		su1 = entity.LoadUser("./cache/setup-su1.json", os.Args[1], os.Args[2], getPrivKey(SU1))
-		su2 = entity.LoadUser("./cache/setup-su2.json", os.Args[1], os.Args[2], getPrivKey(SU2))
-		su3 = entity.LoadUser("./cache/setup-su3.json", os.Args[1], os.Args[2], getPrivKey(SU3))
+		ledger = entity.LoadFakeLedger("./cache/setup-ledger.json")
+		sp = entity.LoadProvider("./cache/setup-sp.json", os.Args[1], os.Args[2], getPrivKey(SP), &ledger)
+		su1 = entity.LoadUser("./cache/setup-su1.json", os.Args[1], os.Args[2], getPrivKey(SU1), &ledger)
+		su2 = entity.LoadUser("./cache/setup-su2.json", os.Args[1], os.Args[2], getPrivKey(SU2), &ledger)
+		su3 = entity.LoadUser("./cache/setup-su3.json", os.Args[1], os.Args[2], getPrivKey(SU3), &ledger)
 
 		runUploadPhase(&su1)
 		runUploadPhase(&su2)
 
-		sp.SaveStorage("./cache/upload-sp.json")
+		ledger.Dump("./cache/upload-ledger.json")
+		sp.Dump("./cache/upload-sp.json")
 	}
 }

@@ -18,10 +18,11 @@ type User struct {
 	PublicKeyData pdp.PublicKeyData `json:'publicKey'`
 	PrivateKeyData pdp.PrivateKeyData `json:'privateKey'`
 
+	ledger *FakeLedger
 	session *pdp.XZ21Session
 }
 
-func GenUser(_server string, _contractAddr string, _ethAddr common.Address, _ethKey string, _param *pdp.PairingParam) User {
+func GenUser(_server string, _contractAddr string, _ethAddr common.Address, _ethKey string, _param *pdp.PairingParam, _ledger *FakeLedger) User {
 	var user User
 
 	user.Addr = _ethAddr
@@ -30,12 +31,13 @@ func GenUser(_server string, _contractAddr string, _ethAddr common.Address, _eth
 	user.PublicKeyData = pk.Export()
 	user.PrivateKeyData = sk.Export()
 
+	user.ledger = _ledger
 	user.session = helper.GenSession(_server, _contractAddr, _ethKey)
 
 	return user
 }
 
-func LoadUser(_path string, _server string, _contractAddr string, _ethKey string) User {
+func LoadUser(_path string, _server string, _contractAddr string, _ethKey string, _ledger *FakeLedger) User {
 	f, err := os.Open(_path)
 	if err != nil { panic(err) }
 	defer f.Close()
@@ -46,13 +48,14 @@ func LoadUser(_path string, _server string, _contractAddr string, _ethKey string
 	var su User
 	json.Unmarshal(s, &su)
 
+	su.ledger = _ledger
 	su.session = helper.GenSession(_server, _contractAddr, _ethKey)
 
 	return su
 }
 
 func (this *User) Dump(_path string) {
-	s, err := json.Marshal(this)
+	s, err := json.MarshalIndent(this, "", "\t")
 	if err != nil { panic(err) }
 
 	f, err := os.Create(_path)
@@ -65,10 +68,10 @@ func (this *User) Dump(_path string) {
 
 func (this *User) IsUploaded(_data []byte) bool {
 	hash := sha256.Sum256(_data)
-	isUploaded, err := this.session.SearchFile(hash)
-	if err != nil { panic(err) }
+	fileProp := this.ledger.SearchFile(hash)
+	if fileProp == nil { return false }
 
-	return isUploaded
+	return true
 }
 
 func (this *User) PrepareUpload(_data []byte, _chunkNum uint32) (pdp.Tags, uint32) {
@@ -95,3 +98,17 @@ func (this *User) GenDedupProof(_chal *pdp.ChalData, _data []byte, _chunkNum uin
 
 	return proofData
 }
+
+// func (this *Provider) GenAuditChallen(_data []byte) (pdp.ChalData, uint32) {
+// 	params := helper.FetchPairingParam(this.session)
+
+// 	hash := sha256.Sum256(_data)
+// 	// file := this.searchFile(hash)
+// 	fileProp := this.ledger.SearchFile(hash)
+// 	if fileProp == nil { panic(fmt.Errorf("File property is not found.")) }
+
+// 	chal := pdp.GenChal(&params, fileProp.GetNumTags())
+// 	chalData := chal.Export()
+
+// 	return chalData
+// }
