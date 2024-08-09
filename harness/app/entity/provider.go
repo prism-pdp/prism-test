@@ -88,15 +88,15 @@ func (this *Provider) Dump(_path string) {
 	if err != nil { panic(err) }
 }
 
-func (this *Provider) NewFile(_addr common.Address, _hash [32]byte, _data []byte, _tags *pdp.Tags, _pubKey *pdp.PublicKeyData) {
+func (this *Provider) NewFile(_addr common.Address, _hash [32]byte, _data []byte, _tag *pdp.Tag, _pubKey *pdp.PublicKeyData) {
 	var file File
 	file.Data = _data
 	file.Owners = append(file.Owners, _addr)
 
 	this.Files[helper.Hex(_hash[:])] = &file
 
-	tagsData := _tags.Export()
-	this.ledger.RegisterFile(_hash, &tagsData, _addr)
+	tagData := _tag.Export()
+	this.ledger.RegisterFile(_hash, &tagData, _addr)
 }
 
 func (this *Provider) IsUploaded(_data []byte) bool {
@@ -107,7 +107,7 @@ func (this *Provider) IsUploaded(_data []byte) bool {
 	return true
 }
 
-func (this *Provider) UploadNewFile(_data []byte, _tags *pdp.Tags, _addrSU common.Address, _pubKeySU *pdp.PublicKeyData) error {
+func (this *Provider) UploadNewFile(_data []byte, _tag *pdp.Tag, _addrSU common.Address, _pubKeySU *pdp.PublicKeyData) error {
 	hash := sha256.Sum256(_data)
 
 	isUploaded := this.IsUploaded(_data)
@@ -115,7 +115,7 @@ func (this *Provider) UploadNewFile(_data []byte, _tags *pdp.Tags, _addrSU commo
 	if isUploaded {
 		return fmt.Errorf("File is already uploaded. (hash:%s)", helper.Hex(hash[:]))
 	} else {
-		this.NewFile(_addrSU, hash, _data, _tags, _pubKeySU)
+		this.NewFile(_addrSU, hash, _data, _tag, _pubKeySU)
 		this.session.RegisterFile(hash, _addrSU)
 	}
 
@@ -136,9 +136,9 @@ func (this *Provider) GenDedupChallen(_data []byte, _addrSU common.Address) (pdp
 	hash := sha256.Sum256(_data)
 	// file := this.searchFile(hash)
 	// if file == nil { panic(fmt.Errorf("File is not found.")) }
-	numTags := this.ledger.GetNumTags(hash)
+	tagSize := this.ledger.GetTagSize(hash)
 
-	chal := pdp.GenChal(&params, numTags)
+	chal := pdp.GenChal(&params, tagSize)
 	chalData := chal.Export()
 
 	//
@@ -167,9 +167,9 @@ func (this *Provider) VerifyDedupProof(_id uint32, _chalData *pdp.ChalData, _pro
 	if pkData == nil { panic(fmt.Errorf("Account is not found.")) }
 
 	// TODO: function VerifyProof内で必要なタグだけ復元するのがよい
-	tags := fileProp.Tags.Import(&params)
+	tag := fileProp.Tag.Import(&params)
 
-	chunks, err := pdp.SplitData(file.Data, fileProp.GetNumTags())
+	chunks, err := pdp.SplitData(file.Data, fileProp.Tag.Size)
 	if err != nil { panic(err) }
 
 	hashChunks := pdp.HashChunks(chunks)
@@ -178,7 +178,7 @@ func (this *Provider) VerifyDedupProof(_id uint32, _chalData *pdp.ChalData, _pro
 	proof := _proofData.Import(&params)
 	pk := pkData.Import(&params)
 
-	isVerified := pdp.VerifyProof(&params, &tags, hashChunks, &chal, &proof, pk.Key)
+	isVerified := pdp.VerifyProof(&params, &tag, hashChunks, &chal, &proof, pk.Key)
 
 	return isVerified
 }

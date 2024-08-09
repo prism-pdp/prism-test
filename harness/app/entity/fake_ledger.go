@@ -12,7 +12,7 @@ import (
 )
 
 type FileProperty struct {
-	Tags    pdp.TagsData `json:'tags'`
+	Tag    pdp.TagData `json:'tag'`
 	Owners []common.Address `json:'owners'`
 }
 
@@ -42,9 +42,9 @@ func LoadFakeLedger(_path string) FakeLedger {
 	return ledger
 }
 
-func (this *FakeLedger) RegisterFile(_hash [32]byte, _tags *pdp.TagsData, _addr common.Address) {
+func (this *FakeLedger) RegisterFile(_hash [32]byte, _tag *pdp.TagData, _addr common.Address) {
 	var p FileProperty
-	p.Tags = *_tags
+	p.Tag = *_tag
 	p.Owners = append(p.Owners, _addr)
 	this.FileProperties[helper.Hex(_hash[:])] = &p
 }
@@ -63,13 +63,9 @@ func (this *FakeLedger) AppendAccount(_hash [32]byte, _addr common.Address) {
 	}
 }
 
-func (this *FileProperty) GetNumTags() uint32 {
-	return uint32(len(this.Tags.Tags))
-}
-
-func (this *FakeLedger) GetNumTags(_hash [32]byte) uint32 {
+func (this *FakeLedger) GetTagSize(_hash [32]byte) uint32 {
 	if v, ok := this.FileProperties[helper.Hex(_hash[:])]; ok {
-		return v.GetNumTags()
+		return v.Tag.Size
 	}
 	return 0
 }

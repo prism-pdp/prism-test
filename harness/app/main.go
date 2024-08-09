@@ -150,10 +150,10 @@ func runUploadPhase(_su *entity.User) {
 		}
 	} else {
 		// SU uploads the file.
-		tags, _ := _su.PrepareUpload(data, chunkNum)
+		tag := _su.PrepareUpload(data, chunkNum)
 
 		// SP accepts the file.
-		sp.UploadNewFile(data, &tags, _su.Addr, &_su.PublicKeyData)
+		sp.UploadNewFile(data, &tag, _su.Addr, &_su.PublicKeyData)
 
 		fmt.Println(colorText(GREEN, "New file: OK"))
 	}

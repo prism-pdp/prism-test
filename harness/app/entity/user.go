@@ -74,15 +74,15 @@ func (this *User) IsUploaded(_data []byte) bool {
 	return true
 }
 
-func (this *User) PrepareUpload(_data []byte, _chunkNum uint32) (pdp.Tags, uint32) {
+func (this *User) PrepareUpload(_data []byte, _chunkNum uint32) pdp.Tag {
 	param := helper.FetchPairingParam(this.session)
 
 	chunks, err := pdp.SplitData(_data, _chunkNum)
 	if err != nil { panic(err) }
 
 	sk := this.PrivateKeyData.Import(&param)
-	tags, _, numTags := pdp.GenTags(&param, sk.Key, chunks)
-	return tags, numTags
+	tag, _ := pdp.GenTag(&param, sk.Key, chunks)
+	return tag
 }
 
 func (this *User) GenDedupProof(_chal *pdp.ChalData, _data []byte, _chunkNum uint32) pdp.ProofData {
