@@ -13,7 +13,6 @@ import (
 
 type FileProperty struct {
 	Tags    pdp.TagsData `json:'tags'`
-	Creator common.Address `json:'creator'`
 	Owners []common.Address `json:'owners'`
 }
 
@@ -46,9 +45,12 @@ func LoadFakeLedger(_path string) FakeLedger {
 func (this *FakeLedger) RegisterFile(_hash [32]byte, _tags *pdp.TagsData, _addr common.Address) {
 	var p FileProperty
 	p.Tags = *_tags
-	p.Creator = _addr
-	// p.Owners = make([]common.Address)
+	p.Owners = append(p.Owners, _addr)
 	this.FileProperties[helper.Hex(_hash[:])] = &p
+}
+
+func (this *FileProperty) GetCreatorAddr() common.Address {
+	return this.Owners[0]
 }
 
 func (this *FakeLedger) RegisterAccount(_addr common.Address, _key *pdp.PublicKeyData) {

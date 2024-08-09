@@ -163,7 +163,7 @@ func (this *Provider) VerifyDedupProof(_id uint32, _chalData *pdp.ChalData, _pro
 	file := this.searchFile(state.Hash)
 	if file == nil { panic(fmt.Errorf("File is not found.")) }
 
-	pkData := this.ledger.SearchPublicKey(fileProp.Creator)
+	pkData := this.ledger.SearchPublicKey(fileProp.GetCreatorAddr())
 	if pkData == nil { panic(fmt.Errorf("Account is not found.")) }
 
 	// TODO: function VerifyProof内で必要なタグだけ復元するのがよい
