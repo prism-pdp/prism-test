@@ -1,6 +1,7 @@
 package entity
 
 import (
+	"fmt"
 	"crypto/sha256"
 	"encoding/json"
 	"io/ioutil"
@@ -85,6 +86,8 @@ func (this *User) PrepareUpload(_data []byte, _chunkNum uint32) pdp.Tag {
 
 func (this *User) GenDedupProof(_chal *pdp.ChalData, _data []byte, _chunkNum uint32) pdp.ProofData {
 	xz21Params, err := this.session.GetPara()
+	if err != nil { panic(err) }
+
 	params := pdp.GenParamFromXZ21Para(&xz21Params)
 
 	chunks, err := pdp.SplitData(_data, _chunkNum)
@@ -97,16 +100,18 @@ func (this *User) GenDedupProof(_chal *pdp.ChalData, _data []byte, _chunkNum uin
 	return proofData
 }
 
-// func (this *Provider) GenAuditChallen(_data []byte) (pdp.ChalData, uint32) {
-// 	params := helper.FetchPairingParam(this.session)
+func (this *User) GenAuditChallen(_data []byte) pdp.ChalData {
+	xz21Params, err := this.session.GetPara()
+	if err != nil { panic(err) }
 
-// 	hash := sha256.Sum256(_data)
-// 	// file := this.searchFile(hash)
-// 	fileProp := this.ledger.SearchFile(hash)
-// 	if fileProp == nil { panic(fmt.Errorf("File property is not found.")) }
+	params := pdp.GenParamFromXZ21Para(&xz21Params)
 
-// 	chal := pdp.GenChal(&params, fileProp.GetNumTags())
-// 	chalData := chal.Export()
+	hash := sha256.Sum256(_data)
+	fileProp := this.session.SearchFile(hash)
+	if fileProp == nil { panic(fmt.Errorf("File property is not found.")) }
 
-// 	return chalData
-// }
+	chal := pdp.GenChal(&params, fileProp.SplitNum)
+	chalData := chal.Export()
+
+	return chalData
+}

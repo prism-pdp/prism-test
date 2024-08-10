@@ -138,13 +138,14 @@ func runUploadPhase(_su *entity.User) {
 	}
 }
 
-// func runAuditingPhase(_su *entity.User) {
-// 	// SU generates challenge and requests to audit the file
-// 	// TODO: Search for his/her own files and generate a challenge by specifying the ID of the file.
-// 	chalData := _su.GenAuditChallen(data)
+func runAuditingPhase(_su *entity.User) {
+	// SU generates challenge and requests to audit the file
+	// TODO: Search for his/her own files and generate a challenge by specifying the ID of the file.
+	chalData := _su.GenAuditChallen(data)
 
-// 	//
-// }
+	fmt.Println(chalData)
+	//
+}
 
 func main() {
 
@@ -167,6 +168,15 @@ func main() {
 
 		runUploadPhase(&su1)
 		runUploadPhase(&su2)
+	case "audit":
+		s = session.LoadSession("sim", "./cache/session.json")
+		sp = entity.LoadProvider("./cache/sp.json", os.Args[1], os.Args[2], getPrivKey(SP), s)
+		su1 = entity.LoadUser("./cache/su1.json", os.Args[1], os.Args[2], getPrivKey(SU1), s)
+		su2 = entity.LoadUser("./cache/su2.json", os.Args[1], os.Args[2], getPrivKey(SU2), s)
+		su3 = entity.LoadUser("./cache/su3.json", os.Args[1], os.Args[2], getPrivKey(SU3), s)
+
+		runAuditingPhase(&su1)
+		runAuditingPhase(&su2)
 	}
 
 	sp.Dump("./cache/sp.json")

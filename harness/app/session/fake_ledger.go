@@ -45,8 +45,9 @@ func LoadFakeLedger(_path string) FakeLedger {
 	return ledger
 }
 
-func (this *FakeLedger) RegisterFile(_hash [32]byte, _addr common.Address) {
+func (this *FakeLedger) RegisterFileProperty(_hash [32]byte, _splitNum uint32, _addr common.Address) {
 	var p pdp.XZ21FileProperty
+	p.SplitNum = _splitNum
 	p.Owners = append(p.Owners, _addr)
 	this.FileProperties[helper.Hex(_hash[:])] = &p
 }

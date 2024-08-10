@@ -95,7 +95,7 @@ func (this *Provider) NewFile(_addr common.Address, _hash [32]byte, _data []byte
 
 	this.Files[helper.Hex(_hash[:])] = &file
 
-	this.session.RegisterFile(_hash, _addr)
+	this.session.RegisterFileProperty(_hash, _tag.Size, _addr)
 }
 
 func (this *Provider) IsUploaded(_data []byte) bool {

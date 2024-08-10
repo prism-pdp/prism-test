@@ -32,8 +32,8 @@ func (this *SimSession) RegisterPara(_params string, _g []byte, _u []byte) {
 	this.Ledger.Params.U = _u
 }
 
-func (this *SimSession) RegisterFile(_hash [32]byte, _owner common.Address) {
-	this.Ledger.RegisterFile(_hash, _owner)
+func (this *SimSession) RegisterFileProperty(_hash [32]byte, _splitNum uint32, _owner common.Address) {
+	this.Ledger.RegisterFileProperty(_hash, _splitNum, _owner)
 }
 
 func (this *SimSession) SearchFile(_hash [32]byte) *pdp.XZ21FileProperty {
