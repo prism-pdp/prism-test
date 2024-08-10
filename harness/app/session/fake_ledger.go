@@ -58,10 +58,10 @@ func (this *FileProperty) GetCreatorAddr() common.Address {
 	return this.Owners[0]
 }
 
-func (this *FileProperty) ToXZ21File() pdp.XZ21File {
-	var to pdp.XZ21File
-	to.Owners = this.Owners
-	return to
+func (this *FileProperty) ToXZ21FileProperty() pdp.XZ21FileProperty {
+	var fileProp pdp.XZ21FileProperty
+	fileProp.Owners = this.Owners
+	return fileProp
 }
 
 func (this *FakeLedger) EnrollAccount(_addr common.Address, _key []byte) {
@@ -76,10 +76,10 @@ func (this *FakeLedger) AppendAccount(_hash [32]byte, _addr common.Address) {
 	}
 }
 
-func (this *FakeLedger) SearchFile(_hash [32]byte) *pdp.XZ21File {
+func (this *FakeLedger) SearchFile(_hash [32]byte) *pdp.XZ21FileProperty {
 	if v, ok := this.FileProperties[helper.Hex(_hash[:])]; ok {
-		tmp := v.ToXZ21File()
-		return &tmp
+		fileProp := v.ToXZ21FileProperty()
+		return &fileProp
 	}
 	return nil
 }

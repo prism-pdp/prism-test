@@ -10,7 +10,7 @@ type Session interface {
 	GetPara() (pdp.XZ21Para, error)
 	RegisterPara(_params string, _g []byte, _u []byte)
 	RegisterFile(_hash [32]byte, _owner common.Address)
-	SearchFile(_hash [32]byte) *pdp.XZ21File
+	SearchFile(_hash [32]byte) *pdp.XZ21FileProperty
 	SearchPublicKey(_addr common.Address) ([]byte, bool)
 	EnrollAccount(_addr common.Address, _pubKey []byte)
 	AppendAccount(_hash [32]byte, _owner common.Address)

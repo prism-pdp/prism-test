@@ -36,7 +36,7 @@ func (this *SimSession) RegisterFile(_hash [32]byte, _owner common.Address) {
 	this.Ledger.RegisterFile(_hash, _owner)
 }
 
-func (this *SimSession) SearchFile(_hash [32]byte) *pdp.XZ21File {
+func (this *SimSession) SearchFile(_hash [32]byte) *pdp.XZ21FileProperty {
 	return this.Ledger.SearchFile(_hash)
 }
 
