@@ -10,7 +10,7 @@ import (
 
 	pdp "github.com/dpduado/dpduado-go/xz21"
 
-	"github.com/dpduado/dpduado-test/harness/helper"
+	"github.com/dpduado/dpduado-test/harness/session"
 )
 
 type User struct {
@@ -18,11 +18,10 @@ type User struct {
 	PublicKeyData pdp.PublicKeyData `json:'publicKey'`
 	PrivateKeyData pdp.PrivateKeyData `json:'privateKey'`
 
-	ledger *FakeLedger
-	session *pdp.XZ21Session
+	session session.Session
 }
 
-func GenUser(_server string, _contractAddr string, _ethAddr common.Address, _ethKey string, _param *pdp.PairingParam, _ledger *FakeLedger) User {
+func GenUser(_server string, _contractAddr string, _ethAddr common.Address, _ethKey string, _param *pdp.PairingParam, _session session.Session) User {
 	var user User
 
 	user.Addr = _ethAddr
@@ -31,13 +30,12 @@ func GenUser(_server string, _contractAddr string, _ethAddr common.Address, _eth
 	user.PublicKeyData = pk.Export()
 	user.PrivateKeyData = sk.Export()
 
-	user.ledger = _ledger
-	user.session = helper.GenSession(_server, _contractAddr, _ethKey)
+	user.session = _session
 
 	return user
 }
 
-func LoadUser(_path string, _server string, _contractAddr string, _ethKey string, _ledger *FakeLedger) User {
+func LoadUser(_path string, _server string, _contractAddr string, _ethKey string, _session session.Session) User {
 	f, err := os.Open(_path)
 	if err != nil { panic(err) }
 	defer f.Close()
@@ -48,8 +46,7 @@ func LoadUser(_path string, _server string, _contractAddr string, _ethKey string
 	var su User
 	json.Unmarshal(s, &su)
 
-	su.ledger = _ledger
-	su.session = helper.GenSession(_server, _contractAddr, _ethKey)
+	su.session = _session
 
 	return su
 }
@@ -68,20 +65,21 @@ func (this *User) Dump(_path string) {
 
 func (this *User) IsUploaded(_data []byte) bool {
 	hash := sha256.Sum256(_data)
-	fileProp := this.ledger.SearchFile(hash)
-	if fileProp == nil { return false }
-
-	return true
+	found := this.session.SearchFile(hash)
+	return !(found == nil)
 }
 
 func (this *User) PrepareUpload(_data []byte, _chunkNum uint32) pdp.Tag {
-	param := helper.FetchPairingParam(this.session)
+	xz21Para, err := this.session.GetPara()
+	if err != nil { panic(err) }
+
+	params := pdp.GenParamFromXZ21Para(&xz21Para)
 
 	chunks, err := pdp.SplitData(_data, _chunkNum)
 	if err != nil { panic(err) }
 
-	sk := this.PrivateKeyData.Import(&param)
-	tag, _ := pdp.GenTag(&param, sk.Key, chunks)
+	sk := this.PrivateKeyData.Import(&params)
+	tag, _ := pdp.GenTag(&params, sk.Key, chunks)
 	return tag
 }
 

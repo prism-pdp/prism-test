@@ -1,4 +1,4 @@
-package entity
+package session
 
 import (
 	"encoding/json"
@@ -11,12 +11,18 @@ import (
 	"github.com/dpduado/dpduado-test/harness/helper"
 )
 
+type Params struct {
+	Params string `json:'params'`
+	G []byte `json:'G'`
+	U []byte `json:'U'`
+}
+
 type FileProperty struct {
-	Tag    pdp.TagData `json:'tag'`
 	Owners []common.Address `json:'owners'`
 }
 
 type FakeLedger struct {
+	Params Params `json:'params'`
 	FileProperties map[string]*FileProperty `json:'fileProperties'`
 	Accounts map[common.Address]pdp.PublicKeyData `json:'accounts'`
 }
@@ -42,9 +48,8 @@ func LoadFakeLedger(_path string) FakeLedger {
 	return ledger
 }
 
-func (this *FakeLedger) RegisterFile(_hash [32]byte, _tag *pdp.TagData, _addr common.Address) {
+func (this *FakeLedger) RegisterFile(_hash [32]byte, _addr common.Address) {
 	var p FileProperty
-	p.Tag = *_tag
 	p.Owners = append(p.Owners, _addr)
 	this.FileProperties[helper.Hex(_hash[:])] = &p
 }
@@ -53,8 +58,16 @@ func (this *FileProperty) GetCreatorAddr() common.Address {
 	return this.Owners[0]
 }
 
-func (this *FakeLedger) RegisterAccount(_addr common.Address, _key *pdp.PublicKeyData) {
-	this.Accounts[_addr] = *_key
+func (this *FileProperty) ToXZ21File() pdp.XZ21File {
+	var to pdp.XZ21File
+	to.Owners = this.Owners
+	return to
+}
+
+func (this *FakeLedger) EnrollAccount(_addr common.Address, _key []byte) {
+	var pkData pdp.PublicKeyData
+	pkData.Key = _key
+	this.Accounts[_addr] = pkData
 }
 
 func (this *FakeLedger) AppendAccount(_hash [32]byte, _addr common.Address) {
@@ -63,16 +76,10 @@ func (this *FakeLedger) AppendAccount(_hash [32]byte, _addr common.Address) {
 	}
 }
 
-func (this *FakeLedger) GetTagSize(_hash [32]byte) uint32 {
+func (this *FakeLedger) SearchFile(_hash [32]byte) *pdp.XZ21File {
 	if v, ok := this.FileProperties[helper.Hex(_hash[:])]; ok {
-		return v.Tag.Size
-	}
-	return 0
-}
-
-func (this *FakeLedger) SearchFile(_hash [32]byte) *FileProperty {
-	if v, ok := this.FileProperties[helper.Hex(_hash[:])]; ok {
-		return v
+		tmp := v.ToXZ21File()
+		return &tmp
 	}
 	return nil
 }

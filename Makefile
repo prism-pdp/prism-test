@@ -6,9 +6,7 @@ CONTRACT = XZ21
 shell:
 	docker compose run $(SERVICE) bash
 
-test:
-	$(MAKE) testnet/shutdown
-	$(MAKE) testnet/startup
+test/sim:
 	$(MAKE) harness@build
 	$(MAKE) harness@run
 

@@ -13,10 +13,13 @@ import (
 	pdp "github.com/dpduado/dpduado-go/xz21"
 
 	"github.com/dpduado/dpduado-test/harness/helper"
+	"github.com/dpduado/dpduado-test/harness/session"
 )
 
 type File struct {
 	Data []byte    `json:'data'`
+	TagSize uint32 `json:'tagSize'`
+	TagData pdp.TagData `json:'tag'`
 	Owners []common.Address `json:'owners'`
 }
 
@@ -29,8 +32,7 @@ type Provider struct {
 	Files map[string]*File `json:'files'`
 	State map[uint32]*DedupState `json:'state'`
 
-	ledger  *FakeLedger
-	session *pdp.XZ21Session
+	session session.Session
 }
 
 func (this *Provider) searchFile(_hash [32]byte) *File {
@@ -40,19 +42,18 @@ func (this *Provider) searchFile(_hash [32]byte) *File {
 	return nil
 }
 
-func GenProvider(_server string, _contractAddr string, _privKey string, _ledger *FakeLedger) Provider {
+func GenProvider(_server string, _contractAddr string, _privKey string, _session session.Session) Provider {
 	var provider Provider
 
 	provider.Files = make(map[string]*File)
 	provider.State = make(map[uint32]*DedupState)
 
-	provider.ledger = _ledger
-	provider.session = helper.GenSession(_server, _contractAddr, _privKey)
+	provider.session = _session
 
 	return provider
 }
 
-func LoadProvider(_path string, _server string, _contractAddr string, _privKey string, _ledger *FakeLedger) Provider {
+func LoadProvider(_path string, _server string, _contractAddr string, _privKey string, _session session.Session) Provider {
 	f, err := os.Open(_path)
 	if err != nil { panic(err) }
 	defer f.Close()
@@ -70,8 +71,7 @@ func LoadProvider(_path string, _server string, _contractAddr string, _privKey s
 		sp.State = make(map[uint32]*DedupState)
 	}
 
-	sp.ledger = _ledger
-	sp.session = helper.GenSession(_server, _contractAddr, _privKey)
+	sp.session = _session
 
 	return sp
 }
@@ -91,17 +91,18 @@ func (this *Provider) Dump(_path string) {
 func (this *Provider) NewFile(_addr common.Address, _hash [32]byte, _data []byte, _tag *pdp.Tag, _pubKey *pdp.PublicKeyData) {
 	var file File
 	file.Data = _data
+	file.TagSize = _tag.Size
+	file.TagData = _tag.Export()
 	file.Owners = append(file.Owners, _addr)
 
 	this.Files[helper.Hex(_hash[:])] = &file
 
-	tagData := _tag.Export()
-	this.ledger.RegisterFile(_hash, &tagData, _addr)
+	this.session.RegisterFile(_hash, _addr)
 }
 
 func (this *Provider) IsUploaded(_data []byte) bool {
 	hash := sha256.Sum256(_data)
-	fileProp := this.ledger.SearchFile(hash)
+	fileProp := this.session.SearchFile(hash)
 	if fileProp == nil { return false }
 
 	return true
@@ -116,7 +117,6 @@ func (this *Provider) UploadNewFile(_data []byte, _tag *pdp.Tag, _addrSU common.
 		return fmt.Errorf("File is already uploaded. (hash:%s)", helper.Hex(hash[:]))
 	} else {
 		this.NewFile(_addrSU, hash, _data, _tag, _pubKeySU)
-		this.session.RegisterFile(hash, _addrSU)
 	}
 
 	return nil
@@ -127,16 +127,26 @@ func (this *Provider) AppendOwner(_su *User, _data []byte) {
 	file := this.searchFile(hash)
 
 	file.Owners = append(file.Owners, _su.Addr)
-	this.ledger.AppendAccount(hash, _su.Addr)
+	this.session.AppendAccount(hash, _su.Addr)
+}
+
+func (this *Provider) GetTagSize(_hash [32]byte) uint32 {
+	file := this.searchFile(_hash)
+	if file == nil { panic(fmt.Errorf("File is not found.")) }
+
+	return file.TagSize
 }
 
 func (this *Provider) GenDedupChallen(_data []byte, _addrSU common.Address) (pdp.ChalData, uint32) {
-	params := helper.FetchPairingParam(this.session)
+	xz21Para, err := this.session.GetPara()
+	if err != nil { panic(err) }
+
+	params := pdp.GenParamFromXZ21Para(&xz21Para)
 
 	hash := sha256.Sum256(_data)
 	// file := this.searchFile(hash)
 	// if file == nil { panic(fmt.Errorf("File is not found.")) }
-	tagSize := this.ledger.GetTagSize(hash)
+	tagSize := this.GetTagSize(hash)
 
 	chal := pdp.GenChal(&params, tagSize)
 	chalData := chal.Export()
@@ -153,23 +163,27 @@ func (this *Provider) GenDedupChallen(_data []byte, _addrSU common.Address) (pdp
 }
 
 func (this *Provider) VerifyDedupProof(_id uint32, _chalData *pdp.ChalData, _proofData *pdp.ProofData) bool {
-	params := helper.FetchPairingParam(this.session)
+	xz21Para, err := this.session.GetPara()
+	if err != nil { panic(err) }
+
+	params := pdp.GenParamFromXZ21Para(&xz21Para)
 
 	state := this.State[_id]
 
-	fileProp := this.ledger.SearchFile(state.Hash)
+	fileProp := this.session.SearchFile(state.Hash)
 	if fileProp == nil { panic(fmt.Errorf("File property is not found.")) }
 
 	file := this.searchFile(state.Hash)
 	if file == nil { panic(fmt.Errorf("File is not found.")) }
 
-	pkData := this.ledger.SearchPublicKey(fileProp.GetCreatorAddr())
-	if pkData == nil { panic(fmt.Errorf("Account is not found.")) }
+	pkHex, found := this.session.SearchPublicKey(fileProp.Owners[0])
+	pkData := pdp.PublicKeyData{pkHex}
+	if found == false { panic(fmt.Errorf("Account is not found.")) }
 
 	// TODO: function VerifyProof内で必要なタグだけ復元するのがよい
-	tag := fileProp.Tag.Import(&params)
+	tag := file.TagData.Import(&params)
 
-	chunks, err := pdp.SplitData(file.Data, fileProp.Tag.Size)
+	chunks, err := pdp.SplitData(file.Data, file.TagSize)
 	if err != nil { panic(err) }
 
 	hashChunks := pdp.HashChunks(chunks)

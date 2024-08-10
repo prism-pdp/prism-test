@@ -38,15 +38,6 @@ func GenSession(_server string, _contractAddr string, _privKey string) *pdp.XZ21
 	return &session
 }
 
-func FetchPairingParam(_session *pdp.XZ21Session) pdp.PairingParam {
-	xz21Para, err := _session.GetPara()
-	if err != nil { panic(err) }
-
-	param := pdp.GenParamFromXZ21Para(&xz21Para)
-
-	return param
-}
-
 func Hex(_data []byte) string {
 	return hex.EncodeToString(_data)
 }

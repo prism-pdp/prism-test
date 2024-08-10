@@ -1,16 +1,13 @@
 package main
 
 import (
-	"crypto/ecdsa"
 	"fmt"
 	"os"
 
-	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
 
-	pdp "github.com/dpduado/dpduado-go/xz21"
-
 	"github.com/dpduado/dpduado-test/harness/entity"
+	"github.com/dpduado/dpduado-test/harness/session"
 )
 
 const escape = "\x1b"
@@ -35,8 +32,6 @@ const (
 
 var data []byte
 var chunkNum uint32
-
-var ledger entity.FakeLedger
 
 var sm entity.Manager
 var sp entity.Provider
@@ -71,13 +66,7 @@ func colorText(_color int, _text string) string {
 	return color(_color) + _text + color(NONE)
 }
 
-type Context struct {
-	PrivKey *ecdsa.PrivateKey
-	Auth *bind.TransactOpts
-	Session pdp.XZ21Session
-}
-
-func setup() {
+func setup(_mode string) {
 	data = []byte{
 		0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09,
 		0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19,
@@ -90,39 +79,29 @@ func setup() {
 	chunkNum = uint32(5)
 }
 
-func runSetupPhase(_server string, _contractAddr string) {
-	var err error
-
-	ledger = entity.GenFakeLedger()
-	sm  = entity.GenManager(_server, _contractAddr, getPrivKey(SM))
-	sp  = entity.GenProvider(_server, _contractAddr, getPrivKey(SP), &ledger)
-	su1 = entity.GenUser(_server, _contractAddr, getAddress(SU1), getPrivKey(SU1), &sm.Param, &ledger)
-	su2 = entity.GenUser(_server, _contractAddr, getAddress(SU2), getPrivKey(SU2), &sm.Param, &ledger)
-	su3 = entity.GenUser(_server, _contractAddr, getAddress(SU3), getPrivKey(SU3), &sm.Param, &ledger)
+func runSetupPhase(_server string, _contractAddr string, _session session.Session) {
+	sm  = entity.GenManager(_server, _contractAddr, getPrivKey(SM), _session)
+	sp  = entity.GenProvider(_server, _contractAddr, getPrivKey(SP), _session)
+	su1 = entity.GenUser(_server, _contractAddr, getAddress(SU1), getPrivKey(SU1), &sm.Param, _session)
+	su2 = entity.GenUser(_server, _contractAddr, getAddress(SU2), getPrivKey(SU2), &sm.Param, _session)
+	su3 = entity.GenUser(_server, _contractAddr, getAddress(SU3), getPrivKey(SU3), &sm.Param, _session)
 
 	// =================================================
 	// Register param
 	// =================================================
-	err = sm.RegisterPara()
-	if err != nil { panic(err) }
+	sm.RegisterPara()
 	fmt.Println(colorText(GREEN, "registerPara: OK"))
 
 	// =================================================
 	// Enroll user accounts
 	// =================================================
-	ledger.RegisterAccount(su1.Addr, &su1.PublicKeyData)
-	err = sm.EnrollUser(su1.Addr, su1.PublicKeyData.Key)
-	if err != nil { panic(err) }
+	sm.EnrollUser(su1.Addr, su1.PublicKeyData.Key)
 	fmt.Println(colorText(GREEN, "Enroll SU1: OK"))
 
-	ledger.RegisterAccount(su2.Addr, &su2.PublicKeyData)
-	err = sm.EnrollUser(su2.Addr, su2.PublicKeyData.Key)
-	if err != nil { panic(err) }
+	sm.EnrollUser(su2.Addr, su2.PublicKeyData.Key)
 	fmt.Println(colorText(GREEN, "Enroll SU2: OK"))
 
-	ledger.RegisterAccount(su3.Addr, &su3.PublicKeyData)
-	err = sm.EnrollUser(su3.Addr, su3.PublicKeyData.Key)
-	if err != nil { panic(err) }
+	sm.EnrollUser(su3.Addr, su3.PublicKeyData.Key)
 	fmt.Println(colorText(GREEN, "Enroll SU3: OK"))
 }
 
@@ -169,29 +148,30 @@ func runUploadPhase(_su *entity.User) {
 
 func main() {
 
-	setup()
+	var s session.Session
+
+	setup("sim")
 
 	command := os.Args[3]
 
 	switch command {
 	case "setup":
-		runSetupPhase(os.Args[1], os.Args[2])
-		ledger.Dump("./cache/setup-ledger.json")
-		sp.Dump("./cache/setup-sp.json")
-		su1.Dump("./cache/setup-su1.json")
-		su2.Dump("./cache/setup-su2.json")
-		su3.Dump("./cache/setup-su3.json")
+		s = session.NewSession("sim")
+		runSetupPhase(os.Args[1], os.Args[2], s)
 	case "upload":
-		ledger = entity.LoadFakeLedger("./cache/setup-ledger.json")
-		sp = entity.LoadProvider("./cache/setup-sp.json", os.Args[1], os.Args[2], getPrivKey(SP), &ledger)
-		su1 = entity.LoadUser("./cache/setup-su1.json", os.Args[1], os.Args[2], getPrivKey(SU1), &ledger)
-		su2 = entity.LoadUser("./cache/setup-su2.json", os.Args[1], os.Args[2], getPrivKey(SU2), &ledger)
-		su3 = entity.LoadUser("./cache/setup-su3.json", os.Args[1], os.Args[2], getPrivKey(SU3), &ledger)
+		s = session.LoadSession("sim", "./cache/session.json")
+		sp = entity.LoadProvider("./cache/sp.json", os.Args[1], os.Args[2], getPrivKey(SP), s)
+		su1 = entity.LoadUser("./cache/su1.json", os.Args[1], os.Args[2], getPrivKey(SU1), s)
+		su2 = entity.LoadUser("./cache/su2.json", os.Args[1], os.Args[2], getPrivKey(SU2), s)
+		su3 = entity.LoadUser("./cache/su3.json", os.Args[1], os.Args[2], getPrivKey(SU3), s)
 
 		runUploadPhase(&su1)
 		runUploadPhase(&su2)
-
-		ledger.Dump("./cache/upload-ledger.json")
-		sp.Dump("./cache/upload-sp.json")
 	}
+
+	sp.Dump("./cache/sp.json")
+	su1.Dump("./cache/su1.json")
+	su2.Dump("./cache/su2.json")
+	su3.Dump("./cache/su3.json")
+	s.Dump("./cache/session.json")
 }

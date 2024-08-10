@@ -5,40 +5,43 @@ import (
 
 	pdp "github.com/dpduado/dpduado-go/xz21"
 
-	"github.com/dpduado/dpduado-test/harness/helper"
+	"github.com/dpduado/dpduado-test/harness/session"
 )
 
 type Manager struct {
 	Param pdp.PairingParam
-	session *pdp.XZ21Session
+
+	session session.Session
 }
 
-func GenManager(_server string, _contractAddr string, _privKey string) Manager {
+func GenManager(_server string, _contractAddr string, _privKey string, _session session.Session) Manager {
 	var manager Manager
 	manager.Param = pdp.GenPairingParam()
-	manager.session = helper.GenSession(_server, _contractAddr, _privKey)
+	manager.session = _session
 	return manager
 }
 
-func LoadManager(_server string, _contractAddr string, _privKey string) *Manager {
+func LoadManager(_server string, _contractAddr string, _privKey string, _session session.Session) *Manager {
 	manager := new(Manager)
-	manager.session = helper.GenSession(_server, _contractAddr, _privKey)
-	manager.Param = helper.FetchPairingParam(manager.session)
+	manager.session = _session
+
+	xz21Para, err := manager.session.GetPara()
+	if err != nil { panic(err) }
+
+	manager.Param = pdp.GenParamFromXZ21Para(&xz21Para)
+
 	return manager
 }
 
-func (this *Manager) RegisterPara() error {
+func (this *Manager) RegisterPara() {
 	xz21Para := this.Param.ToXZ21Para()
-	_, err := this.session.RegisterPara(
+	this.session.RegisterPara(
 		xz21Para.Params,
 		xz21Para.G,
 		xz21Para.U,
 	)
-
-	return err
 }
 
-func (this *Manager) EnrollUser(_addr common.Address, _pubKey []byte) error {
-	_, err := this.session.EnrollAccount(_addr, _pubKey)
-	return err
+func (this *Manager) EnrollUser(_addr common.Address, _pubKey []byte)  {
+	this.session.EnrollAccount(_addr, _pubKey)
 }
