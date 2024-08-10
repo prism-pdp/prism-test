@@ -7,6 +7,7 @@ shell:
 	docker compose run $(SERVICE) bash
 
 test/sim:
+	rm -rf ./harness/app/cache/*
 	$(MAKE) harness@build
 	$(MAKE) harness@run
 
