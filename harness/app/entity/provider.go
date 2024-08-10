@@ -174,7 +174,7 @@ func (this *Provider) VerifyDedupProof(_id uint32, _chalData *pdp.ChalData, _pro
 	file := this.searchFile(state.Hash)
 	if file == nil { panic(fmt.Errorf("File is not found.")) }
 
-	pkHex, found := this.session.SearchPublicKey(fileProp.Owners[0])
+	pkHex, found := this.session.SearchPublicKey(helper.GetCreatorAddr(fileProp))
 	pkData := pdp.PublicKeyData{pkHex}
 	if found == false { panic(fmt.Errorf("Account is not found.")) }
 

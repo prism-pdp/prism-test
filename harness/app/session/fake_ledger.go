@@ -17,19 +17,16 @@ type Params struct {
 	U []byte `json:'U'`
 }
 
-type FileProperty struct {
-	Owners []common.Address `json:'owners'`
-}
 
 type FakeLedger struct {
 	Params Params `json:'params'`
-	FileProperties map[string]*FileProperty `json:'fileProperties'`
+	FileProperties map[string]*pdp.XZ21FileProperty `json:'fileProperties'`
 	Accounts map[common.Address]pdp.PublicKeyData `json:'accounts'`
 }
 
 func GenFakeLedger() FakeLedger {
 	var ledger FakeLedger
-	ledger.FileProperties = make(map[string]*FileProperty)
+	ledger.FileProperties = make(map[string]*pdp.XZ21FileProperty)
 	ledger.Accounts = make(map[common.Address]pdp.PublicKeyData)
 	return ledger
 }
@@ -49,19 +46,9 @@ func LoadFakeLedger(_path string) FakeLedger {
 }
 
 func (this *FakeLedger) RegisterFile(_hash [32]byte, _addr common.Address) {
-	var p FileProperty
+	var p pdp.XZ21FileProperty
 	p.Owners = append(p.Owners, _addr)
 	this.FileProperties[helper.Hex(_hash[:])] = &p
-}
-
-func (this *FileProperty) GetCreatorAddr() common.Address {
-	return this.Owners[0]
-}
-
-func (this *FileProperty) ToXZ21FileProperty() pdp.XZ21FileProperty {
-	var fileProp pdp.XZ21FileProperty
-	fileProp.Owners = this.Owners
-	return fileProp
 }
 
 func (this *FakeLedger) EnrollAccount(_addr common.Address, _key []byte) {
@@ -78,8 +65,7 @@ func (this *FakeLedger) AppendAccount(_hash [32]byte, _addr common.Address) {
 
 func (this *FakeLedger) SearchFile(_hash [32]byte) *pdp.XZ21FileProperty {
 	if v, ok := this.FileProperties[helper.Hex(_hash[:])]; ok {
-		fileProp := v.ToXZ21FileProperty()
-		return &fileProp
+		return v
 	}
 	return nil
 }
