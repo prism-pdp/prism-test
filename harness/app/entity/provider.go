@@ -18,7 +18,6 @@ import (
 
 type File struct {
 	Data []byte    `json:'data'`
-	TagSize uint32 `json:'tagSize'`
 	TagData pdp.TagData `json:'tag'`
 	Owners []common.Address `json:'owners'`
 }
@@ -91,7 +90,6 @@ func (this *Provider) Dump(_path string) {
 func (this *Provider) NewFile(_addr common.Address, _hash [32]byte, _data []byte, _tag *pdp.Tag, _pubKey *pdp.PublicKeyData) {
 	var file File
 	file.Data = _data
-	file.TagSize = _tag.Size
 	file.TagData = _tag.Export()
 	file.Owners = append(file.Owners, _addr)
 
@@ -134,7 +132,7 @@ func (this *Provider) GetTagSize(_hash [32]byte) uint32 {
 	file := this.searchFile(_hash)
 	if file == nil { panic(fmt.Errorf("File is not found.")) }
 
-	return file.TagSize
+	return file.TagData.Size
 }
 
 func (this *Provider) GenDedupChallen(_data []byte, _addrSU common.Address) (pdp.ChalData, uint32) {
@@ -183,7 +181,7 @@ func (this *Provider) VerifyDedupProof(_id uint32, _chalData *pdp.ChalData, _pro
 	// TODO: function VerifyProof内で必要なタグだけ復元するのがよい
 	tag := file.TagData.Import(&params)
 
-	chunks, err := pdp.SplitData(file.Data, file.TagSize)
+	chunks, err := pdp.SplitData(file.Data, tag.Size)
 	if err != nil { panic(err) }
 
 	hashChunks := pdp.HashChunks(chunks)
