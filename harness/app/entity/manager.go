@@ -1,6 +1,9 @@
 package entity
 
 import (
+	"encoding/json"
+	"io"
+	"os"
 	"github.com/ethereum/go-ethereum/common"
 
 	pdp "github.com/dpduado/dpduado-go/xz21"
@@ -9,28 +12,32 @@ import (
 )
 
 type Manager struct {
-	Param pdp.PairingParam
+	Param pdp.PairingParam // TODO: Use Params struct (same with fake ledger)
 
 	session session.Session
 }
 
-func GenManager(_server string, _contractAddr string, _privKey string, _session session.Session) Manager {
-	var manager Manager
+func GenManager(_server string, _contractAddr string, _privKey string, _session session.Session) *Manager {
+	manager := new(Manager)
 	manager.Param = pdp.GenPairingParam()
 	manager.session = _session
 	return manager
 }
 
-func LoadManager(_server string, _contractAddr string, _privKey string, _session session.Session) *Manager {
-	manager := new(Manager)
-	manager.session = _session
+func LoadManager(_path string, _server string, _contractAddr string, _ethKey string, _session session.Session) *Manager {
+	f, err := os.Open(_path)
+	if err != nil { panic(err) }
+	defer f.Close()
 
-	xz21Para, err := manager.session.GetPara()
+	s, err := io.ReadAll(f)
 	if err != nil { panic(err) }
 
-	manager.Param = pdp.GenParamFromXZ21Para(&xz21Para)
+	sm := new(Manager)
+	json.Unmarshal(s, &sm)
 
-	return manager
+	sm.session = _session
+
+	return sm
 }
 
 func (this *Manager) RegisterPara() {
@@ -44,4 +51,17 @@ func (this *Manager) RegisterPara() {
 
 func (this *Manager) EnrollUser(_addr common.Address, _pubKey []byte)  {
 	this.session.EnrollAccount(_addr, _pubKey)
+}
+
+func (this *Manager) Dump(_path string) {
+	s, err := json.MarshalIndent(this, "", "\t")
+	if err != nil { panic(err) }
+
+	f, err := os.Create(_path)
+	if err != nil { panic(err) }
+	defer f.Close()
+
+	_, err = f.Write(s)
+
+	if err != nil { panic(err) }
 }

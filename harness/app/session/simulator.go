@@ -1,21 +1,22 @@
 package session
 
 import (
-	"encoding/json"
-	"io"
-	"os"
-
 	"github.com/ethereum/go-ethereum/common"
+	"golang.org/x/exp/slices"
 
 	pdp "github.com/dpduado/dpduado-go/xz21"
+
+	"github.com/dpduado/dpduado-test/harness/helper"
 )
 
 type SimSession struct {
-	Ledger FakeLedger `json:'ledger'`
+	Addr common.Address `json:'addr'`
+	Ledger *FakeLedger  `json:'ledger'`
 }
 
-func (this *SimSession) Setup() {
-	this.Ledger = GenFakeLedger()
+func (this *SimSession) Setup(_addr common.Address, _ledger *FakeLedger) {
+	this.Addr = _addr
+	this.Ledger = _ledger
 }
 
 func (this *SimSession) GetPara() (pdp.XZ21Para, error) {
@@ -34,6 +35,18 @@ func (this *SimSession) RegisterPara(_params string, _g []byte, _u []byte) {
 
 func (this *SimSession) RegisterFileProperty(_hash [32]byte, _splitNum uint32, _owner common.Address) {
 	this.Ledger.RegisterFileProperty(_hash, _splitNum, _owner)
+}
+
+func (this *SimSession) FetchFileList() [][32]byte {
+	var fileList [][32]byte
+	for hashHex, prop := range this.Ledger.FileProperties {
+		if slices.Contains(prop.Owners, this.Addr) {
+			hash, err := helper.DecodeHex(hashHex)
+			if err != nil { panic(err) }
+			fileList = append(fileList, [32]byte(hash))
+		}
+	}
+	return fileList
 }
 
 func (this *SimSession) SearchFile(_hash [32]byte) *pdp.XZ21FileProperty {
@@ -55,25 +68,10 @@ func (this *SimSession) AppendAccount(_hash [32]byte, _addr common.Address) {
 	this.Ledger.AppendAccount(_hash, _addr)
 }
 
-func (this *SimSession) Dump(_path string) {
-	s, err := json.MarshalIndent(this, "", "\t")
-	if err != nil { panic(err) }
+func (this *SimSession) UploadChallen(_hash [32]byte, _chalBytes []byte) {
+	var log AuditLog
 
-	f, err := os.Create(_path)
-	if err != nil { panic(err) }
-	defer f.Close()
-
-	_, err = f.Write(s)
-	if err != nil { panic(err) }
-}
-
-func (this *SimSession) Load(_path string) {
-	f, err := os.Open(_path)
-	if err != nil { panic(err) }
-	defer f.Close()
-
-	b, err := io.ReadAll(f)
-	if err != nil { panic(err) }
-
-	json.Unmarshal(b, this)
+	log.ChalData = _chalBytes
+	hashHex := helper.Hex(_hash[:])
+	this.Ledger.Logs[hashHex] = append(this.Ledger.Logs[hashHex], &log)
 }

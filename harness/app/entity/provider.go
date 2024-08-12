@@ -41,8 +41,8 @@ func (this *Provider) searchFile(_hash [32]byte) *File {
 	return nil
 }
 
-func GenProvider(_server string, _contractAddr string, _privKey string, _session session.Session) Provider {
-	var provider Provider
+func GenProvider(_server string, _contractAddr string, _privKey string, _session session.Session) *Provider {
+	provider := new(Provider)
 
 	provider.Files = make(map[string]*File)
 	provider.State = make(map[uint32]*DedupState)
@@ -52,7 +52,7 @@ func GenProvider(_server string, _contractAddr string, _privKey string, _session
 	return provider
 }
 
-func LoadProvider(_path string, _server string, _contractAddr string, _privKey string, _session session.Session) Provider {
+func LoadProvider(_path string, _server string, _contractAddr string, _privKey string, _session session.Session) *Provider {
 	f, err := os.Open(_path)
 	if err != nil { panic(err) }
 	defer f.Close()
@@ -60,7 +60,7 @@ func LoadProvider(_path string, _server string, _contractAddr string, _privKey s
 	s, err := ioutil.ReadAll(f)
 	if err != nil { panic(err) }
 
-	var sp Provider
+	sp := new(Provider)
 	json.Unmarshal(s, sp)
 
 	if sp.Files == nil {

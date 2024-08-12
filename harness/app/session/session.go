@@ -10,30 +10,19 @@ type Session interface {
 	GetPara() (pdp.XZ21Para, error)
 	RegisterPara(_params string, _g []byte, _u []byte)
 	RegisterFileProperty(_hash [32]byte, _splitNum uint32, _owner common.Address)
+	FetchFileList() [][32]byte
 	SearchFile(_hash [32]byte) *pdp.XZ21FileProperty
 	SearchPublicKey(_addr common.Address) ([]byte, bool)
 	EnrollAccount(_addr common.Address, _pubKey []byte)
 	AppendAccount(_hash [32]byte, _owner common.Address)
-	Dump(_path string)
-	Load(_path string)
+	UploadChallen(_hash [32]byte, _chalBytes []byte)
 }
 
-func NewSession(_mode string) Session {
+func NewSession(_mode string, _ledger *FakeLedger, _addr common.Address) Session {
 	switch _mode {
 	case "sim":
 		var simSession SimSession
-		simSession.Setup()
-		return &simSession
-	}
-
-	return nil
-}
-
-func LoadSession(_mode string, _path string) Session {
-	switch _mode {
-	case "sim":
-		var simSession SimSession
-		simSession.Load(_path)
+		simSession.Setup(_addr, _ledger)
 		return &simSession
 	}
 

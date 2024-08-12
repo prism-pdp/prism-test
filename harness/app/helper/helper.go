@@ -39,7 +39,11 @@ func GenSession(_server string, _contractAddr string, _privKey string) *pdp.XZ21
 }
 
 func Hex(_data []byte) string {
-	return hex.EncodeToString(_data)
+	return "0x" + hex.EncodeToString(_data)
+}
+
+func DecodeHex(_s string) ([]byte, error) {
+	return hex.DecodeString(_s[2:])
 }
 
 func GetCreatorAddr(_prop *pdp.XZ21FileProperty) common.Address {

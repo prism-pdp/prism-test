@@ -50,12 +50,16 @@ harness@build:
 harness@run:
 	$(MAKE) harness@run-setup
 	$(MAKE) harness@run-upload
+	$(MAKE) harness@run-audit
 
 harness@run-setup:
-	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness http://testnet:8545 $(file < cache/contract.addr) setup"
+	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness http://testnet:8545 $(file < cache/contract.addr) setup sim"
 
 harness@run-upload:
-	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness http://testnet:8545 $(file < cache/contract.addr) upload"
+	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness http://testnet:8545 $(file < cache/contract.addr) upload sim"
+
+harness@run-audit:
+	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness http://testnet:8545 $(file < cache/contract.addr) audit sim"
 
 harness/clean:
 	rm -rf ./harness/app/cache/*

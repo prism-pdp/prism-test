@@ -33,11 +33,11 @@ const (
 var data []byte
 var chunkNum uint32
 
-var sm entity.Manager
-var sp entity.Provider
-var su1 entity.User
-var su2 entity.User
-var su3 entity.User
+var sm *entity.Manager
+var sp *entity.Provider
+var su1 *entity.User
+var su2 *entity.User
+var su3 *entity.User
 
 type Account struct {
 	Address string `json:'Address'`
@@ -66,7 +66,7 @@ func colorText(_color int, _text string) string {
 	return color(_color) + _text + color(NONE)
 }
 
-func setup(_mode string) {
+func setup() {
 	data = []byte{
 		0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09,
 		0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19,
@@ -75,17 +75,10 @@ func setup(_mode string) {
 		0x40, 0x41, 0x42, 0x43, 0x44, 0x45, 0x46, 0x47, 0x48, 0x49,
 		0x50, 0x51, 0x52, 0x53,
 	}
-
 	chunkNum = uint32(5)
 }
 
-func runSetupPhase(_server string, _contractAddr string, _session session.Session) {
-	sm  = entity.GenManager(_server, _contractAddr, getPrivKey(SM), _session)
-	sp  = entity.GenProvider(_server, _contractAddr, getPrivKey(SP), _session)
-	su1 = entity.GenUser(_server, _contractAddr, getAddress(SU1), getPrivKey(SU1), &sm.Param, _session)
-	su2 = entity.GenUser(_server, _contractAddr, getAddress(SU2), getPrivKey(SU2), &sm.Param, _session)
-	su3 = entity.GenUser(_server, _contractAddr, getAddress(SU3), getPrivKey(SU3), &sm.Param, _session)
-
+func runSetupPhase(_server string, _contractAddr string) {
 	// =================================================
 	// Register param
 	// =================================================
@@ -139,49 +132,70 @@ func runUploadPhase(_su *entity.User) {
 }
 
 func runAuditingPhase(_su *entity.User) {
+	// SU gets the list of his/her files.
+	fileList := _su.FetchFileList()
 	// SU generates challenge and requests to audit the file
-	// TODO: Search for his/her own files and generate a challenge by specifying the ID of the file.
-	chalData := _su.GenAuditChallen(data)
-
-	fmt.Println(chalData)
-	//
+	chalData := _su.GenAuditChallen(fileList[0])
+	_su.UploadChallen(fileList[0], &chalData)
+	fmt.Println(colorText(GREEN, "Upload chal: OK"))
 }
 
 func main() {
 
-	var s session.Session
+	setup()
 
-	setup("sim")
-
+	server := os.Args[1]
+	contractAddr := os.Args[2]
 	command := os.Args[3]
+	mode := os.Args[4]
+
+	var ledger session.FakeLedger
+	if mode == "sim" {
+		if command == "setup" {
+			ledger = session.GenFakeLedger()
+		} else {
+			ledger = session.LoadFakeLedger("./cache/fake-ledger.json")
+		}
+	}
+
+	sessionSM  := session.NewSession(mode, &ledger, getAddress(SM))
+	sessionSP  := session.NewSession(mode, &ledger, getAddress(SP))
+	// sessionTPA := session.NewSession(mode, &ledger, getAddress(TPA))
+	sessionSU1 := session.NewSession(mode, &ledger, getAddress(SU1))
+	sessionSU2 := session.NewSession(mode, &ledger, getAddress(SU2))
+	sessionSU3 := session.NewSession(mode, &ledger, getAddress(SU3))
+
+	if command == "setup" {
+		sm  = entity.GenManager(server, contractAddr, getPrivKey(SM), sessionSM)
+		sp  = entity.GenProvider(server, contractAddr, getPrivKey(SP), sessionSP)
+		su1 = entity.GenUser(server, contractAddr, getAddress(SU1), getPrivKey(SU1), &sm.Param, sessionSU1)
+		su2 = entity.GenUser(server, contractAddr, getAddress(SU2), getPrivKey(SU2), &sm.Param, sessionSU2)
+		su3 = entity.GenUser(server, contractAddr, getAddress(SU3), getPrivKey(SU3), &sm.Param, sessionSU3)
+	} else {
+		sm = entity.LoadManager("./cache/sm.json", os.Args[1], os.Args[2], getPrivKey(SM), sessionSM)
+		sp = entity.LoadProvider("./cache/sp.json", os.Args[1], os.Args[2], getPrivKey(SP), sessionSP)
+		su1 = entity.LoadUser("./cache/su1.json", os.Args[1], os.Args[2], getPrivKey(SU1), sessionSU1)
+		su2 = entity.LoadUser("./cache/su2.json", os.Args[1], os.Args[2], getPrivKey(SU2), sessionSU2)
+		su3 = entity.LoadUser("./cache/su3.json", os.Args[1], os.Args[2], getPrivKey(SU3), sessionSU3)
+	}
 
 	switch command {
 	case "setup":
-		s = session.NewSession("sim")
-		runSetupPhase(os.Args[1], os.Args[2], s)
+		runSetupPhase(os.Args[1], os.Args[2])
 	case "upload":
-		s = session.LoadSession("sim", "./cache/session.json")
-		sp = entity.LoadProvider("./cache/sp.json", os.Args[1], os.Args[2], getPrivKey(SP), s)
-		su1 = entity.LoadUser("./cache/su1.json", os.Args[1], os.Args[2], getPrivKey(SU1), s)
-		su2 = entity.LoadUser("./cache/su2.json", os.Args[1], os.Args[2], getPrivKey(SU2), s)
-		su3 = entity.LoadUser("./cache/su3.json", os.Args[1], os.Args[2], getPrivKey(SU3), s)
-
-		runUploadPhase(&su1)
-		runUploadPhase(&su2)
+		runUploadPhase(su1)
+		runUploadPhase(su2)
 	case "audit":
-		s = session.LoadSession("sim", "./cache/session.json")
-		sp = entity.LoadProvider("./cache/sp.json", os.Args[1], os.Args[2], getPrivKey(SP), s)
-		su1 = entity.LoadUser("./cache/su1.json", os.Args[1], os.Args[2], getPrivKey(SU1), s)
-		su2 = entity.LoadUser("./cache/su2.json", os.Args[1], os.Args[2], getPrivKey(SU2), s)
-		su3 = entity.LoadUser("./cache/su3.json", os.Args[1], os.Args[2], getPrivKey(SU3), s)
-
-		runAuditingPhase(&su1)
-		runAuditingPhase(&su2)
+		runAuditingPhase(su1)
+		runAuditingPhase(su2)
 	}
 
+	sm.Dump("./cache/sm.json")
 	sp.Dump("./cache/sp.json")
 	su1.Dump("./cache/su1.json")
 	su2.Dump("./cache/su2.json")
 	su3.Dump("./cache/su3.json")
-	s.Dump("./cache/session.json")
+	if mode == "sim" {
+		ledger.Dump("./cache/fake-ledger.json")
+	}
 }
