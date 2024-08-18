@@ -69,9 +69,30 @@ func (this *SimSession) AppendAccount(_hash [32]byte, _addr common.Address) {
 }
 
 func (this *SimSession) UploadChallen(_hash [32]byte, _chalBytes []byte) {
-	var log AuditLog
+	var req AuditReq
 
-	log.ChalData = _chalBytes
+	req.ChalData = _chalBytes
 	hashHex := helper.Hex(_hash[:])
-	this.Ledger.Logs[hashHex] = append(this.Ledger.Logs[hashHex], &log)
+	this.Ledger.Reqs[hashHex] = &req
+}
+
+func (this *SimSession) DownloadChallen() ([][32]byte, []pdp.ChalData) {
+	hashList := make([][32]byte, 0)
+	chalDataList := make([]pdp.ChalData, 0)
+	for k, v := range this.Ledger.Reqs {
+		if len(v.ProofData) == 0 {
+			h, err := helper.DecodeHex(k)
+			if err != nil { panic(err) }
+			hashList = append(hashList, [32]byte(h))
+
+			chalData, err := pdp.DecodeToChalData(v.ChalData)
+			if err != nil { panic(err) }
+			chalDataList = append(chalDataList, chalData)
+		}
+	}
+	return hashList, chalDataList
+}
+
+func (this *SimSession) UploadProof(_hash [32]byte, _proofBytes []byte) {
+	this.Ledger.Reqs[helper.Hex(_hash[:])].ProofData = _proofBytes
 }

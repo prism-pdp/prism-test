@@ -194,3 +194,33 @@ func (this *Provider) VerifyDedupProof(_id uint32, _chalData *pdp.ChalData, _pro
 
 	return isVerified
 }
+
+func (this *Provider) DownloadChallen() ([][32]byte, []pdp.ChalData) {
+	hashList, chalDataList := this.session.DownloadChallen()
+	return hashList, chalDataList
+}
+
+func (this *Provider) GenAuditProof(_hash [32]byte, _chal *pdp.ChalData) pdp.ProofData {
+	xz21Params, err := this.session.GetPara()
+	if err != nil { panic(err) }
+
+	params := pdp.GenParamFromXZ21Para(&xz21Params)
+
+	f := this.searchFile(_hash)
+	if f == nil { panic(fmt.Errorf("Unknown file: %s", helper.Hex(_hash[:]))) }
+
+	chunks, err := pdp.SplitData(f.Data, f.TagData.Size)
+	if err != nil { panic(err) }
+
+	chal := _chal.Import(&params)
+	proof := pdp.GenProof(&params, &chal, chunks)
+	proofData := proof.Export()
+
+	return proofData
+}
+
+func (this *Provider) UploadProof(_hash [32]byte, _proofData *pdp.ProofData) {
+	proofBytes, err := _proofData.Encode()
+	if err != nil { panic(err) }
+	this.session.UploadProof(_hash, proofBytes)
+}

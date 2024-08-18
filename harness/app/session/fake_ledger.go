@@ -23,10 +23,16 @@ type AuditLog struct {
 	Result bool `json:'result'`
 }
 
+type AuditReq struct {
+	ChalData []byte `json:'chal'` // TODO: ChalBytes
+	ProofData []byte `json:'proof'` // TODO: ProofBytes
+}
+
 type FakeLedger struct {
 	Params Params `json:'params'`
 	FileProperties map[string]*pdp.XZ21FileProperty `json:'fileProperties'`
 	Accounts map[common.Address]pdp.PublicKeyData `json:'accounts'`
+	Reqs map[string]*AuditReq `json:'auditReqs'`
 	Logs map[string][]*AuditLog `json:'auditLogs'`
 }
 
@@ -34,6 +40,7 @@ func GenFakeLedger() FakeLedger {
 	var ledger FakeLedger
 	ledger.FileProperties = make(map[string]*pdp.XZ21FileProperty)
 	ledger.Accounts = make(map[common.Address]pdp.PublicKeyData)
+	ledger.Reqs = make(map[string]*AuditReq)
 	ledger.Logs = make(map[string][]*AuditLog)
 	return ledger
 }

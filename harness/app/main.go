@@ -138,6 +138,13 @@ func runAuditingPhase(_su *entity.User) {
 	chalData := _su.GenAuditChallen(fileList[0])
 	_su.UploadChallen(fileList[0], &chalData)
 	fmt.Println(colorText(GREEN, "Upload chal: OK"))
+
+	// SP gets challenge from blockchain.
+	hashList, chalDataList := sp.DownloadChallen()
+	for i, h := range hashList {
+		proofData := sp.GenAuditProof(h, &chalDataList[i])
+		sp.UploadProof(h, &proofData)
+	}
 }
 
 func main() {
@@ -187,7 +194,7 @@ func main() {
 		runUploadPhase(su2)
 	case "audit":
 		runAuditingPhase(su1)
-		runAuditingPhase(su2)
+		// runAuditingPhase(su2)
 	}
 
 	sm.Dump("./cache/sm.json")

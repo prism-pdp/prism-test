@@ -16,6 +16,8 @@ type Session interface {
 	EnrollAccount(_addr common.Address, _pubKey []byte)
 	AppendAccount(_hash [32]byte, _owner common.Address)
 	UploadChallen(_hash [32]byte, _chalBytes []byte)
+	DownloadChallen() ([][32]byte, []pdp.ChalData)
+	UploadProof(_hash [32]byte, _proofBytes []byte)
 }
 
 func NewSession(_mode string, _ledger *FakeLedger, _addr common.Address) Session {
