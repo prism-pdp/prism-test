@@ -34,7 +34,7 @@ type Provider struct {
 	session session.Session
 }
 
-func (this *Provider) searchFile(_hash [32]byte) *File {
+func (this *Provider) SearchFile(_hash [32]byte) *File {
 	if v, ok := this.Files[helper.Hex(_hash[:])]; ok {
 		return v
 	}
@@ -122,14 +122,14 @@ func (this *Provider) UploadNewFile(_data []byte, _tag *pdp.Tag, _addrSU common.
 
 func (this *Provider) AppendOwner(_su *User, _data []byte) {
 	hash := sha256.Sum256(_data)
-	file := this.searchFile(hash)
+	file := this.SearchFile(hash)
 
 	file.Owners = append(file.Owners, _su.Addr)
 	this.session.AppendAccount(hash, _su.Addr)
 }
 
 func (this *Provider) GetTagSize(_hash [32]byte) uint32 {
-	file := this.searchFile(_hash)
+	file := this.SearchFile(_hash)
 	if file == nil { panic(fmt.Errorf("File is not found.")) }
 
 	return file.TagData.Size
@@ -171,7 +171,7 @@ func (this *Provider) VerifyDedupProof(_id uint32, _chalData *pdp.ChalData, _pro
 	fileProp := this.session.SearchFile(state.Hash)
 	if fileProp == nil { panic(fmt.Errorf("File property is not found.")) }
 
-	file := this.searchFile(state.Hash)
+	file := this.SearchFile(state.Hash)
 	if file == nil { panic(fmt.Errorf("File is not found.")) }
 
 	pkHex, found := this.session.SearchPublicKey(helper.GetCreatorAddr(fileProp))
@@ -206,7 +206,7 @@ func (this *Provider) GenAuditProof(_hash [32]byte, _chal *pdp.ChalData) pdp.Pro
 
 	params := pdp.GenParamFromXZ21Para(&xz21Params)
 
-	f := this.searchFile(_hash)
+	f := this.SearchFile(_hash)
 	if f == nil { panic(fmt.Errorf("Unknown file: %s", helper.Hex(_hash[:]))) }
 
 	chunks, err := pdp.SplitData(f.Data, f.TagData.Size)
