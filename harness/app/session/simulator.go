@@ -96,3 +96,25 @@ func (this *SimSession) DownloadChallen() ([][32]byte, []pdp.ChalData) {
 func (this *SimSession) UploadProof(_hash [32]byte, _proofBytes []byte) {
 	this.Ledger.Reqs[helper.Hex(_hash[:])].ProofData = _proofBytes
 }
+
+func (this *SimSession) DownloadAuditChallenAndProof() ([][32]byte, []pdp.ChalData, []pdp.ProofData) {
+	hashList := make([][32]byte, 0)
+	chalDataList := make([]pdp.ChalData, 0)
+	proofDataList := make([]pdp.ProofData, 0)
+	for k, v := range this.Ledger.Reqs {
+		if len(v.ProofData) > 0 {
+			h, err := helper.DecodeHex(k)
+			if err != nil { panic(err) }
+			hashList = append(hashList, [32]byte(h))
+
+			chalData, err := pdp.DecodeToChalData(v.ChalData)
+			if err != nil { panic(err) }
+			chalDataList = append(chalDataList, chalData)
+
+			proofData, err := pdp.DecodeToProofData(v.ProofData)
+			if err != nil { panic(err) }
+			proofDataList = append(proofDataList, proofData)
+		}
+	}
+	return hashList, chalDataList, proofDataList
+}

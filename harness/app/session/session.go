@@ -18,6 +18,7 @@ type Session interface {
 	UploadChallen(_hash [32]byte, _chalBytes []byte)
 	DownloadChallen() ([][32]byte, []pdp.ChalData)
 	UploadProof(_hash [32]byte, _proofBytes []byte)
+	DownloadAuditChallenAndProof() ([][32]byte, []pdp.ChalData, []pdp.ProofData)
 }
 
 func NewSession(_mode string, _ledger *FakeLedger, _addr common.Address) Session {

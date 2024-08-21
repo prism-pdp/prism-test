@@ -6,6 +6,8 @@ import (
 
 	"github.com/ethereum/go-ethereum/common"
 
+	pdp "github.com/dpduado/dpduado-go/xz21"
+
 	"github.com/dpduado/dpduado-test/harness/entity"
 	"github.com/dpduado/dpduado-test/harness/session"
 )
@@ -35,6 +37,7 @@ var chunkNum uint32
 
 var sm *entity.Manager
 var sp *entity.Provider
+var tpa *entity.Auditor
 var su1 *entity.User
 var su2 *entity.User
 var su3 *entity.User
@@ -145,6 +148,24 @@ func runAuditingPhase(_su *entity.User) {
 		proofData := sp.GenAuditProof(h, &chalDataList[i])
 		sp.UploadProof(h, &proofData)
 	}
+
+	// TPA gets challenge and proof from blockchain.
+	hashList, chalDataList, proofDataList := tpa.DownloadAuditProof()
+	for i, h := range hashList {
+		// TPA gets M (list of hash of chunks) from SP.
+		f := sp.SearchFile(h)
+		chunk, _ := pdp.SplitData(f.Data, f.TagData.Size)
+		hashChunks := pdp.HashChunks(chunk)
+
+		// TPA verifies proof.
+		result, err := tpa.VerifyAuditProof(&f.TagData, hashChunks, &chalDataList[i], &proofDataList[i], f.Owners[0])
+		if err != nil { panic(err) }
+		if result {
+			fmt.Println(colorText(GREEN, "Verify proof: OK"))
+		} else {
+			fmt.Println(colorText(RED, "Verify proof: NG"))
+		}
+	}
 }
 
 func main() {
@@ -167,7 +188,7 @@ func main() {
 
 	sessionSM  := session.NewSession(mode, &ledger, getAddress(SM))
 	sessionSP  := session.NewSession(mode, &ledger, getAddress(SP))
-	// sessionTPA := session.NewSession(mode, &ledger, getAddress(TPA))
+	sessionTPA := session.NewSession(mode, &ledger, getAddress(TPA))
 	sessionSU1 := session.NewSession(mode, &ledger, getAddress(SU1))
 	sessionSU2 := session.NewSession(mode, &ledger, getAddress(SU2))
 	sessionSU3 := session.NewSession(mode, &ledger, getAddress(SU3))
@@ -175,12 +196,14 @@ func main() {
 	if command == "setup" {
 		sm  = entity.GenManager(server, contractAddr, getPrivKey(SM), sessionSM)
 		sp  = entity.GenProvider(server, contractAddr, getPrivKey(SP), sessionSP)
+		tpa = entity.GenAuditor(sessionTPA)
 		su1 = entity.GenUser(server, contractAddr, getAddress(SU1), getPrivKey(SU1), &sm.Param, sessionSU1)
 		su2 = entity.GenUser(server, contractAddr, getAddress(SU2), getPrivKey(SU2), &sm.Param, sessionSU2)
 		su3 = entity.GenUser(server, contractAddr, getAddress(SU3), getPrivKey(SU3), &sm.Param, sessionSU3)
 	} else {
 		sm = entity.LoadManager("./cache/sm.json", os.Args[1], os.Args[2], getPrivKey(SM), sessionSM)
 		sp = entity.LoadProvider("./cache/sp.json", os.Args[1], os.Args[2], getPrivKey(SP), sessionSP)
+		tpa = entity.LoadAuditor("./cache/tpa.json", sessionTPA)
 		su1 = entity.LoadUser("./cache/su1.json", os.Args[1], os.Args[2], getPrivKey(SU1), sessionSU1)
 		su2 = entity.LoadUser("./cache/su2.json", os.Args[1], os.Args[2], getPrivKey(SU2), sessionSU2)
 		su3 = entity.LoadUser("./cache/su3.json", os.Args[1], os.Args[2], getPrivKey(SU3), sessionSU3)
@@ -199,6 +222,7 @@ func main() {
 
 	sm.Dump("./cache/sm.json")
 	sp.Dump("./cache/sp.json")
+	tpa.Dump("./cache/tpa.json")
 	su1.Dump("./cache/su1.json")
 	su2.Dump("./cache/su2.json")
 	su3.Dump("./cache/su3.json")
