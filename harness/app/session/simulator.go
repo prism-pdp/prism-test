@@ -118,3 +118,13 @@ func (this *SimSession) DownloadAuditChallenAndProof() ([][32]byte, []pdp.ChalDa
 	}
 	return hashList, chalDataList, proofDataList
 }
+
+func (this *SimSession) FetchAuditingReqList() [][32]byte {
+	var fileList [][32]byte
+	for hashHex, _ := range this.Ledger.Reqs {
+		hash, err := helper.DecodeHex(hashHex)
+		if err != nil { panic(err) }
+		fileList = append(fileList, [32]byte(hash))
+	}
+	return fileList
+}

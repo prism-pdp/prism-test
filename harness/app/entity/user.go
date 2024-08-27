@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"crypto/sha256"
 	"encoding/json"
+	"golang.org/x/exp/slices"
 	"io/ioutil"
 	"os"
 
@@ -115,10 +116,19 @@ func (this *User) GenAuditChallen(_hash [32]byte) pdp.ChalData {
 	return chalData
 }
 
-func (this *User) UploadChallen(_hash [32]byte, _chalData *pdp.ChalData) {
+// Return true when upload is success.
+// Return false when the file is under auditing.
+func (this *User) UploadChallen(_hash [32]byte, _chalData *pdp.ChalData) bool {
+	reqList := this.session.FetchAuditingReqList()
+	if slices.Contains(reqList, _hash) {
+		return false
+	}
+
 	chalBytes, err := _chalData.Encode()
 	if err != nil { panic(err) }
 	this.session.UploadChallen(_hash, chalBytes)
+
+	return true
 }
 
 func (this *User) FetchFileList() [][32]byte {

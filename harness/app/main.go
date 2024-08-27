@@ -146,10 +146,16 @@ func runUploadPhase(_su *entity.User, _data []byte) {
 func runUploadChallen(_su *entity.User) {
 	// SU gets the list of his/her files.
 	fileList := _su.FetchFileList()
-	// SU generates challenge and requests to audit the file
-	chalData := _su.GenAuditChallen(fileList[0])
-	_su.UploadChallen(fileList[0], &chalData)
-	fmt.Println(colorText(GREEN, "Upload chal: OK"))
+	// SU generates challenge and requests to audit each file
+	for _, f := range fileList {
+		chalData := _su.GenAuditChallen(f)
+		result := _su.UploadChallen(f, &chalData)
+		if result {
+			fmt.Println(colorText(GREEN, "Upload chal: OK"))
+		} else {
+			fmt.Println(colorText(GREEN, "Upload chal: Skip (Under auditing)"))
+		}
+	}
 }
 
 func runUploadProof() {
@@ -236,7 +242,7 @@ func main() {
 		runSetupPhase(os.Args[1], os.Args[2])
 	case "upload":
 		runUploadPhase(su1, data1)
-		runUploadPhase(su1, data1)
+		runUploadPhase(su2, data1)
 		runUploadPhase(su2, data2)
 	case "audit":
 		runAuditingPhase()
