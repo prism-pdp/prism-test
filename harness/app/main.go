@@ -32,7 +32,8 @@ const (
 	SU3
 )
 
-var data []byte
+var data1 []byte
+var data2 []byte
 var chunkNum uint32
 
 var sm *entity.Manager
@@ -70,13 +71,21 @@ func colorText(_color int, _text string) string {
 }
 
 func setup() {
-	data = []byte{
+	data1 = []byte{
 		0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09,
 		0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19,
 		0x20, 0x21, 0x22, 0x23, 0x24, 0x25, 0x26, 0x27, 0x28, 0x29,
 		0x30, 0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39,
 		0x40, 0x41, 0x42, 0x43, 0x44, 0x45, 0x46, 0x47, 0x48, 0x49,
 		0x50, 0x51, 0x52, 0x53,
+	}
+	data2 = []byte{
+		0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F,
+		0x1A, 0x1B, 0x1C, 0x1D, 0x1E, 0x1F,
+		0x2A, 0x2B, 0x2C, 0x2D, 0x2E, 0x2F,
+		0x3A, 0x3B, 0x3C, 0x3D, 0x3E, 0x3F,
+		0x4A, 0x4B, 0x4C, 0x4D, 0x4E, 0x4F,
+		0x5A, 0x5B, 0x5C, 0x5D,
 	}
 	chunkNum = uint32(5)
 }
@@ -101,54 +110,58 @@ func runSetupPhase(_server string, _contractAddr string) {
 	fmt.Println(colorText(GREEN, "Enroll SU3: OK"))
 }
 
-func runUploadPhase(_su *entity.User) {
+func runUploadPhase(_su *entity.User, _data []byte) {
 	// SU checks whether data is uploaded.
-	isUploaded := _su.IsUploaded(data)
+	isUploaded := _su.IsUploaded(_data)
 
 	// Processing differs depending on whether the file has already been uploaded or not.
 	if isUploaded {
 		// SP generates a challenge for deduplication.
-		chalData, id := sp.GenDedupChallen(data, _su.Addr)
+		chalData, id := sp.GenDedupChallen(_data, _su.Addr)
 
 		// SP sends the challenge to SU.
 
 		// SU generates a proof to prove ownership of the data to be uploaded.
-		proofData := _su.GenDedupProof(&chalData, data, chunkNum)
+		proofData := _su.GenDedupProof(&chalData, _data, chunkNum)
 
 		// SP verifies the proof.
 		isVerified := sp.VerifyDedupProof(id, &chalData, &proofData)
 		if isVerified {
-			sp.AppendOwner(_su, data)
+			sp.AppendOwner(_su, _data)
 			fmt.Println(colorText(GREEN, "Append: OK"))
 		} else {
 			fmt.Println(colorText(RED, "Append: NG"))
 		}
 	} else {
 		// SU uploads the file.
-		tag := _su.PrepareUpload(data, chunkNum)
+		tag := _su.PrepareUpload(_data, chunkNum)
 
 		// SP accepts the file.
-		sp.UploadNewFile(data, &tag, _su.Addr, &_su.PublicKeyData)
+		sp.UploadNewFile(_data, &tag, _su.Addr, &_su.PublicKeyData)
 
 		fmt.Println(colorText(GREEN, "New file: OK"))
 	}
 }
 
-func runAuditingPhase(_su *entity.User) {
+func runUploadChallen(_su *entity.User) {
 	// SU gets the list of his/her files.
 	fileList := _su.FetchFileList()
 	// SU generates challenge and requests to audit the file
 	chalData := _su.GenAuditChallen(fileList[0])
 	_su.UploadChallen(fileList[0], &chalData)
 	fmt.Println(colorText(GREEN, "Upload chal: OK"))
+}
 
+func runUploadProof() {
 	// SP gets challenge from blockchain.
 	hashList, chalDataList := sp.DownloadChallen()
 	for i, h := range hashList {
 		proofData := sp.GenAuditProof(h, &chalDataList[i])
 		sp.UploadProof(h, &proofData)
 	}
+}
 
+func runVerifyAuditProof() {
 	// TPA gets challenge and proof from blockchain.
 	hashList, chalDataList, proofDataList := tpa.DownloadAuditProof()
 	for i, h := range hashList {
@@ -166,6 +179,15 @@ func runAuditingPhase(_su *entity.User) {
 			fmt.Println(colorText(RED, "Verify proof: NG"))
 		}
 	}
+}
+
+func runAuditingPhase() {
+	runUploadChallen(su1)
+	runUploadChallen(su2)
+
+	runUploadProof()
+
+	runVerifyAuditProof()
 }
 
 func main() {
@@ -213,11 +235,11 @@ func main() {
 	case "setup":
 		runSetupPhase(os.Args[1], os.Args[2])
 	case "upload":
-		runUploadPhase(su1)
-		runUploadPhase(su2)
+		runUploadPhase(su1, data1)
+		runUploadPhase(su1, data1)
+		runUploadPhase(su2, data2)
 	case "audit":
-		runAuditingPhase(su1)
-		// runAuditingPhase(su2)
+		runAuditingPhase()
 	}
 
 	sm.Dump("./cache/sm.json")
