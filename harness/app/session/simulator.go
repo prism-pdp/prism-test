@@ -1,6 +1,7 @@
 package session
 
 import (
+	"fmt"
 	"github.com/ethereum/go-ethereum/common"
 	"golang.org/x/exp/slices"
 
@@ -117,6 +118,29 @@ func (this *SimSession) DownloadAuditChallenAndProof() ([][32]byte, []pdp.ChalDa
 		}
 	}
 	return hashList, chalDataList, proofDataList
+}
+
+func (this *SimSession) UploadAuditResult(_hash [32]byte, _result bool) error {
+	hashHex := helper.Hex(_hash[:])
+
+	req, ok := this.Ledger.Reqs[hashHex]
+	if ok == false {
+		return fmt.Errorf("Invalid request")
+	}
+
+	if len(req.ChalData) <= 0 && len(req.ProofData) <= 0 {
+		return fmt.Errorf("Invalid status")
+	}
+
+	var log AuditLog
+	log.ChalData = req.ChalData
+	log.ProofData = req.ProofData
+	log.Result = _result
+	this.Ledger.Logs[hashHex] = append(this.Ledger.Logs[hashHex], &log)
+
+	delete(this.Ledger.Reqs, hashHex)
+
+	return nil
 }
 
 func (this *SimSession) FetchAuditingReqList() [][32]byte {

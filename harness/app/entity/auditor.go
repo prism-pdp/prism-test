@@ -64,6 +64,11 @@ func (this *Auditor) VerifyAuditProof(_tagData *pdp.TagData, _hashChunks [][]byt
 	return result, nil
 }
 
+func (this *Auditor) UploadAuditResult(_hash [32]byte, _result bool) {
+	err := this.session.UploadAuditResult(_hash, _result)
+	if err != nil { panic(err) }
+}
+
 func (this *Auditor) Dump(_path string) {
 	s, err := json.MarshalIndent(this, "", "\t")
 	if err != nil { panic(err) }

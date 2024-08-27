@@ -184,6 +184,8 @@ func runVerifyAuditProof() {
 		} else {
 			fmt.Println(colorText(RED, "Verify proof: NG"))
 		}
+
+		tpa.UploadAuditResult(h, result)
 	}
 }
 

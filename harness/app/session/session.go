@@ -19,6 +19,7 @@ type Session interface {
 	DownloadChallen() ([][32]byte, []pdp.ChalData)
 	UploadProof(_hash [32]byte, _proofBytes []byte)
 	DownloadAuditChallenAndProof() ([][32]byte, []pdp.ChalData, []pdp.ProofData)
+	UploadAuditResult(_hash [32]byte, _result bool) error
 	FetchAuditingReqList() [][32]byte
 }
 
