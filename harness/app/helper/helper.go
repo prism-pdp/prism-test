@@ -1,7 +1,9 @@
 package helper
 
 import (
+	"time"
 	"encoding/hex"
+	"fmt"
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/crypto"
@@ -10,6 +12,18 @@ import (
 
 	pdp "github.com/dpduado/dpduado-go/xz21"
 )
+
+const escape = "\x1b"
+
+const (
+	NONE = iota
+	RED
+	GREEN
+	YELLOW
+	BLUE
+	PURPLE
+)
+
 
 func GenSession(_server string, _contractAddr string, _privKey string) *pdp.XZ21Session {
 	cl, err := ethclient.Dial(_server)
@@ -54,4 +68,21 @@ func ToXZ21FileProperty(_from *pdp.XZ21FileProperty) pdp.XZ21FileProperty {
 	var fileProp pdp.XZ21FileProperty
 	fileProp.Owners = _from.Owners
 	return fileProp
+}
+
+func PrintLog(_log string) {
+	t := time.Now().Format(time.DateTime)
+	fmt.Printf("[%s] %s\n", t, _log)
+}
+
+func colorText(_color int, _text string) string {
+	return color(_color) + _text + color(NONE)
+}
+
+func color(c int) string {
+	if c == NONE {
+		return fmt.Sprintf("%s[%dm", escape, c)
+	}
+
+	return fmt.Sprintf("%s[3%dm", escape, c)
 }

@@ -9,18 +9,8 @@ import (
 	pdp "github.com/dpduado/dpduado-go/xz21"
 
 	"github.com/dpduado/dpduado-test/harness/entity"
+	"github.com/dpduado/dpduado-test/harness/helper"
 	"github.com/dpduado/dpduado-test/harness/session"
-)
-
-const escape = "\x1b"
-
-const (
-	NONE = iota
-	RED
-	GREEN
-	YELLOW
-	BLUE
-	PURPLE
 )
 
 const (
@@ -58,18 +48,6 @@ func getPrivKey(_entity int) string {
 	return os.Getenv(tmp)
 }
 
-func color(c int) string {
-	if c == NONE {
-		return fmt.Sprintf("%s[%dm", escape, c)
-	}
-
-	return fmt.Sprintf("%s[3%dm", escape, c)
-}
-
-func colorText(_color int, _text string) string {
-	return color(_color) + _text + color(NONE)
-}
-
 func setup() {
 	data1 = []byte{
 		0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09,
@@ -95,19 +73,19 @@ func runSetupPhase(_server string, _contractAddr string) {
 	// Register param
 	// =================================================
 	sm.RegisterPara()
-	fmt.Println(colorText(GREEN, "registerPara: OK"))
+	helper.PrintLog("registerPara: OK")
 
 	// =================================================
 	// Enroll user accounts
 	// =================================================
 	sm.EnrollUser(su1.Addr, su1.PublicKeyData.Key)
-	fmt.Println(colorText(GREEN, "Enroll SU1: OK"))
+	helper.PrintLog("Enroll SU1: OK")
 
 	sm.EnrollUser(su2.Addr, su2.PublicKeyData.Key)
-	fmt.Println(colorText(GREEN, "Enroll SU2: OK"))
+	helper.PrintLog("Enroll SU2: OK")
 
 	sm.EnrollUser(su3.Addr, su3.PublicKeyData.Key)
-	fmt.Println(colorText(GREEN, "Enroll SU3: OK"))
+	helper.PrintLog("Enroll SU3: OK")
 }
 
 func runUploadPhase(_su *entity.User, _data []byte) {
@@ -128,9 +106,9 @@ func runUploadPhase(_su *entity.User, _data []byte) {
 		isVerified := sp.VerifyDedupProof(id, &chalData, &proofData)
 		if isVerified {
 			sp.AppendOwner(_su, _data)
-			fmt.Println(colorText(GREEN, "Append: OK"))
+			helper.PrintLog("Append: OK")
 		} else {
-			fmt.Println(colorText(RED, "Append: NG"))
+			helper.PrintLog("Append: NG")
 		}
 	} else {
 		// SU uploads the file.
@@ -139,7 +117,7 @@ func runUploadPhase(_su *entity.User, _data []byte) {
 		// SP accepts the file.
 		sp.UploadNewFile(_data, &tag, _su.Addr, &_su.PublicKeyData)
 
-		fmt.Println(colorText(GREEN, "New file: OK"))
+		helper.PrintLog("New file: OK")
 	}
 }
 
@@ -151,9 +129,9 @@ func runUploadChallen(_su *entity.User) {
 		chalData := _su.GenAuditChallen(f)
 		result := _su.UploadChallen(f, &chalData)
 		if result {
-			fmt.Println(colorText(GREEN, "Upload chal: OK"))
+			helper.PrintLog("Upload chal: OK")
 		} else {
-			fmt.Println(colorText(GREEN, "Upload chal: Skip (Under auditing)"))
+			helper.PrintLog("Upload chal: Skip (Under auditing)")
 		}
 	}
 }
@@ -180,9 +158,9 @@ func runVerifyAuditProof() {
 		result, err := tpa.VerifyAuditProof(&f.TagData, hashChunks, &chalDataList[i], &proofDataList[i], f.Owners[0])
 		if err != nil { panic(err) }
 		if result {
-			fmt.Println(colorText(GREEN, "Verify proof: OK"))
+			helper.PrintLog("Verify proof: OK")
 		} else {
-			fmt.Println(colorText(RED, "Verify proof: NG"))
+			helper.PrintLog("Verify proof: NG")
 		}
 
 		tpa.UploadAuditResult(h, result)
