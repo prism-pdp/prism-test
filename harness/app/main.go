@@ -69,26 +69,32 @@ func setup() {
 }
 
 func runSetupPhase(_server string, _contractAddr string) {
+	helper.PrintLog("Start Setup Phase")
+
 	// =================================================
 	// Register param
 	// =================================================
 	sm.RegisterPara()
-	helper.PrintLog("registerPara: OK")
+	helper.PrintLog("Register Parameter: OK")
 
 	// =================================================
 	// Enroll user accounts
 	// =================================================
 	sm.EnrollUser(su1.Addr, su1.PublicKeyData.Key)
-	helper.PrintLog("Enroll SU1: OK")
+	helper.PrintLog("Enroll Service User 1: OK")
 
 	sm.EnrollUser(su2.Addr, su2.PublicKeyData.Key)
-	helper.PrintLog("Enroll SU2: OK")
+	helper.PrintLog("Enroll Service User 2: OK")
 
 	sm.EnrollUser(su3.Addr, su3.PublicKeyData.Key)
-	helper.PrintLog("Enroll SU3: OK")
+	helper.PrintLog("Enroll Service User 3: OK")
+
+	helper.PrintLog("Finish Setup Phase")
 }
 
 func runUploadPhase(_su *entity.User, _data []byte) {
+	helper.PrintLog("Start Upload Phase")
+
 	// SU checks whether data is uploaded.
 	isUploaded := _su.IsUploaded(_data)
 
@@ -106,9 +112,9 @@ func runUploadPhase(_su *entity.User, _data []byte) {
 		isVerified := sp.VerifyDedupProof(id, &chalData, &proofData)
 		if isVerified {
 			sp.AppendOwner(_su, _data)
-			helper.PrintLog("Append: OK")
+			helper.PrintLog("Append Owner: OK")
 		} else {
-			helper.PrintLog("Append: NG")
+			helper.PrintLog("Append Owner: NG")
 		}
 	} else {
 		// SU uploads the file.
@@ -117,8 +123,10 @@ func runUploadPhase(_su *entity.User, _data []byte) {
 		// SP accepts the file.
 		sp.UploadNewFile(_data, &tag, _su.Addr, &_su.PublicKeyData)
 
-		helper.PrintLog("New file: OK")
+		helper.PrintLog("Upload New file: OK")
 	}
+
+	helper.PrintLog("Finish Upload Phase")
 }
 
 func runUploadChallen(_su *entity.User) {
@@ -168,6 +176,8 @@ func runVerifyAuditProof() {
 }
 
 func runAuditingPhase() {
+	helper.PrintLog("Start Auditing Phase")
+
 	// 1st
 	runUploadChallen(su1)
 	runUploadChallen(su2)
@@ -178,6 +188,8 @@ func runAuditingPhase() {
 	runUploadChallen(su2)
 	runUploadProof()
 	runVerifyAuditProof()
+
+	helper.PrintLog("Finish Auditing Phase")
 }
 
 func main() {
