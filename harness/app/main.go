@@ -168,11 +168,15 @@ func runVerifyAuditProof() {
 }
 
 func runAuditingPhase() {
+	// 1st
 	runUploadChallen(su1)
 	runUploadChallen(su2)
-
 	runUploadProof()
-
+	runVerifyAuditProof()
+	// 2nd
+	runUploadChallen(su1)
+	runUploadChallen(su2)
+	runUploadProof()
 	runVerifyAuditProof()
 }
 
