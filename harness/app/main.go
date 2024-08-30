@@ -33,6 +33,13 @@ var su1 *entity.User
 var su2 *entity.User
 var su3 *entity.User
 
+var sessionSM session.Session
+var sessionSP session.Session
+var sessionTPA session.Session
+var sessionSU1 session.Session
+var sessionSU2 session.Session
+var sessionSU3 session.Session
+
 type Account struct {
 	Address string `json:'Address'`
 	PrivKey string `json:'PrivKey'`
@@ -208,14 +215,13 @@ func main() {
 		} else {
 			ledger = session.LoadFakeLedger("./cache/fake-ledger.json")
 		}
+		sessionSM  = session.NewSimSession(mode, &ledger, getAddress(SM))
+		sessionSP  = session.NewSimSession(mode, &ledger, getAddress(SP))
+		sessionTPA = session.NewSimSession(mode, &ledger, getAddress(TPA))
+		sessionSU1 = session.NewSimSession(mode, &ledger, getAddress(SU1))
+		sessionSU2 = session.NewSimSession(mode, &ledger, getAddress(SU2))
+		sessionSU3 = session.NewSimSession(mode, &ledger, getAddress(SU3))
 	}
-
-	sessionSM  := session.NewSession(mode, &ledger, getAddress(SM))
-	sessionSP  := session.NewSession(mode, &ledger, getAddress(SP))
-	sessionTPA := session.NewSession(mode, &ledger, getAddress(TPA))
-	sessionSU1 := session.NewSession(mode, &ledger, getAddress(SU1))
-	sessionSU2 := session.NewSession(mode, &ledger, getAddress(SU2))
-	sessionSU3 := session.NewSession(mode, &ledger, getAddress(SU3))
 
 	if command == "setup" {
 		sm  = entity.GenManager(server, contractAddr, getPrivKey(SM), sessionSM)
