@@ -7,29 +7,32 @@ import (
 )
 
 type Session interface {
-	GetPara() (pdp.XZ21Para, error) // E
-	RegisterPara(_params string, _g []byte, _u []byte) // A
-	RegisterFileProperty(_hash [32]byte, _splitNum uint32, _owner common.Address) // D
-	FetchFileList() [][32]byte
-	SearchFile(_hash [32]byte) *pdp.XZ21FileProperty // C
-	SearchPublicKey(_addr common.Address) ([]byte, bool)
-	EnrollAccount(_addr common.Address, _pubKey []byte) // B
-	AppendAccount(_hash [32]byte, _owner common.Address) // F
-	UploadChallen(_hash [32]byte, _chalBytes []byte) // G
-	DownloadChallen() ([][32]byte, []pdp.ChalData) // H
-	UploadProof(_hash [32]byte, _proofBytes []byte) // I
-	DownloadAuditChallenAndProof() ([][32]byte, []pdp.ChalData, []pdp.ProofData) // J
-	UploadAuditResult(_hash [32]byte, _result bool) error // K
-	FetchAuditingReqList() [][32]byte
+	GetParam() (pdp.XZ21Param, error) // E
+	RegisterParam(_param string, _g []byte, _u []byte) error // A
+	RegisterFile(_hash [32]byte, _splitNum uint32, _owner common.Address) error // D
+	GetFileList(_addr common.Address) ([][32]byte, error)
+	SearchFile(_hash [32]byte) (pdp.XZ21FileProperty, error) // C
+	GetAccount(_addr common.Address) (pdp.XZ21Account, error)
+	EnrollAccount(_addr common.Address, _pubKey []byte) error // B
+	AppendOwner(_hash [32]byte, _owner common.Address) error // F
+	SetChal(_hash [32]byte, _chalBytes []byte) (bool, error) // G
+	GetChalList() ([][32]byte, []pdp.ChalData, error) // H
+	SetProof(_hash [32]byte, _proofBytes []byte) error // I
+	GetAuditingReqList() ([][32]byte, []pdp.XZ21AuditingReq, error) // J
+	SetAuditingResult(_hash [32]byte, _result bool) error // K
+	GetAuditingLogs(_hash [32]byte) ([]pdp.XZ21AuditingLog, error)
 }
 
-func NewSimSession(_mode string, _ledger *FakeLedger, _addr common.Address) Session {
-	switch _mode {
-	case "sim":
-		var simSession SimSession
-		simSession.Setup(_addr, _ledger)
-		return &simSession
-	}
+func NewSession(_server string, _contractAddr string, _privKey string, _addr common.Address) Session {
+	var ethClient EthClient
+	ethClient.Setup(_server, _contractAddr, _privKey, _addr)
+	return &ethClient
+}
+
+func NewSimSession(_ledger *FakeLedger, _addr common.Address) Session {
+	var simSession SimSession
+	simSession.Setup(_addr, _ledger)
+	return &simSession
 
 	return nil
 }

@@ -25,7 +25,7 @@ const (
 )
 
 
-func GenSession(_server string, _contractAddr string, _privKey string) *pdp.XZ21Session {
+func GenSession(_server string, _contractAddr string, _privKey string) pdp.XZ21Session {
 	cl, err := ethclient.Dial(_server)
 	if err != nil { panic(err) }
 
@@ -49,7 +49,7 @@ func GenSession(_server string, _contractAddr string, _privKey string) *pdp.XZ21
 		},
 	}
 
-	return &session
+	return session
 }
 
 func Hex(_data []byte) string {
@@ -61,13 +61,7 @@ func DecodeHex(_s string) ([]byte, error) {
 }
 
 func GetCreatorAddr(_prop *pdp.XZ21FileProperty) common.Address {
-	return _prop.Owners[0]
-}
-
-func ToXZ21FileProperty(_from *pdp.XZ21FileProperty) pdp.XZ21FileProperty {
-	var fileProp pdp.XZ21FileProperty
-	fileProp.Owners = _from.Owners
-	return fileProp
+	return _prop.Creator
 }
 
 func PrintLog(_log string) {
@@ -85,4 +79,10 @@ func color(c int) string {
 	}
 
 	return fmt.Sprintf("%s[3%dm", escape, c)
+}
+
+func IsEmptyFileProperty(_file *pdp.XZ21FileProperty) bool {
+	isEmptySplitNum := (_file.SplitNum == 0)
+	isEmptyCreator  := (_file.Creator.Cmp(common.BytesToAddress([]byte{0})) == 0)
+	return (isEmptySplitNum && isEmptyCreator)
 }

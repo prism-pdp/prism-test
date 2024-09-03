@@ -95,13 +95,14 @@ func (this *Provider) NewFile(_addr common.Address, _hash [32]byte, _data []byte
 
 	this.Files[helper.Hex(_hash[:])] = &file
 
-	this.session.RegisterFileProperty(_hash, _tag.Size, _addr)
+	this.session.RegisterFile(_hash, _tag.Size, _addr)
 }
 
 func (this *Provider) IsUploaded(_data []byte) bool {
 	hash := sha256.Sum256(_data)
-	fileProp := this.session.SearchFile(hash)
-	if fileProp == nil { return false }
+	fileProp, err := this.session.SearchFile(hash)
+	if err != nil { panic(err) }
+	if len(fileProp.Creator.Bytes()) == 0 { return false }
 
 	return true
 }
@@ -125,7 +126,8 @@ func (this *Provider) AppendOwner(_su *User, _data []byte) {
 	file := this.SearchFile(hash)
 
 	file.Owners = append(file.Owners, _su.Addr)
-	this.session.AppendAccount(hash, _su.Addr)
+	err := this.session.AppendOwner(hash, _su.Addr)
+	if err != nil { panic(err) }
 }
 
 func (this *Provider) GetTagSize(_hash [32]byte) uint32 {
@@ -136,17 +138,17 @@ func (this *Provider) GetTagSize(_hash [32]byte) uint32 {
 }
 
 func (this *Provider) GenDedupChallen(_data []byte, _addrSU common.Address) (pdp.ChalData, uint32) {
-	xz21Para, err := this.session.GetPara()
+	xz21Param, err := this.session.GetParam()
 	if err != nil { panic(err) }
 
-	params := pdp.GenParamFromXZ21Para(&xz21Para)
+	param := pdp.GenParamFromXZ21Param(&xz21Param)
 
 	hash := sha256.Sum256(_data)
 	// file := this.searchFile(hash)
 	// if file == nil { panic(fmt.Errorf("File is not found.")) }
 	tagSize := this.GetTagSize(hash)
 
-	chal := pdp.GenChal(&params, tagSize)
+	chal := pdp.GenChal(&param, tagSize)
 	chalData := chal.Export()
 
 	//
@@ -161,22 +163,23 @@ func (this *Provider) GenDedupChallen(_data []byte, _addrSU common.Address) (pdp
 }
 
 func (this *Provider) VerifyDedupProof(_id uint32, _chalData *pdp.ChalData, _proofData *pdp.ProofData) bool {
-	xz21Para, err := this.session.GetPara()
+	xz21Param, err := this.session.GetParam()
 	if err != nil { panic(err) }
 
-	params := pdp.GenParamFromXZ21Para(&xz21Para)
+	params := pdp.GenParamFromXZ21Param(&xz21Param)
 
 	state := this.State[_id]
 
-	fileProp := this.session.SearchFile(state.Hash)
-	if fileProp == nil { panic(fmt.Errorf("File property is not found.")) }
+	fileProp, err := this.session.SearchFile(state.Hash) // TODO: SearchFile -> SearchFileProperty
+	if err != nil { panic(err) }
+	if len(fileProp.Creator.Bytes()) == 0 { panic(fmt.Errorf("File property is not found.")) }
+
+	account, err := this.session.GetAccount(fileProp.Creator)
+	if err != nil { panic(fmt.Errorf("Account is not found.")) }
+	pkData := pdp.PublicKeyData{account.PubKey}
 
 	file := this.SearchFile(state.Hash)
 	if file == nil { panic(fmt.Errorf("File is not found.")) }
-
-	pkHex, found := this.session.SearchPublicKey(helper.GetCreatorAddr(fileProp))
-	pkData := pdp.PublicKeyData{pkHex}
-	if found == false { panic(fmt.Errorf("Account is not found.")) }
 
 	// TODO: function VerifyProof内で必要なタグだけ復元するのがよい
 	tag := file.TagData.Import(&params)
@@ -196,15 +199,16 @@ func (this *Provider) VerifyDedupProof(_id uint32, _chalData *pdp.ChalData, _pro
 }
 
 func (this *Provider) DownloadChallen() ([][32]byte, []pdp.ChalData) {
-	hashList, chalDataList := this.session.DownloadChallen()
+	hashList, chalDataList, err := this.session.GetChalList()
+	if err != nil { panic(err) }
 	return hashList, chalDataList
 }
 
 func (this *Provider) GenAuditProof(_hash [32]byte, _chal *pdp.ChalData) pdp.ProofData {
-	xz21Params, err := this.session.GetPara()
+	xz21Param, err := this.session.GetParam()
 	if err != nil { panic(err) }
 
-	params := pdp.GenParamFromXZ21Para(&xz21Params)
+	params := pdp.GenParamFromXZ21Param(&xz21Param)
 
 	f := this.SearchFile(_hash)
 	if f == nil { panic(fmt.Errorf("Unknown file: %s", helper.Hex(_hash[:]))) }
@@ -222,5 +226,6 @@ func (this *Provider) GenAuditProof(_hash [32]byte, _chal *pdp.ChalData) pdp.Pro
 func (this *Provider) UploadProof(_hash [32]byte, _proofData *pdp.ProofData) {
 	proofBytes, err := _proofData.Encode()
 	if err != nil { panic(err) }
-	this.session.UploadProof(_hash, proofBytes)
+	err = this.session.SetProof(_hash, proofBytes)
+	if err != nil { panic(err) }
 }

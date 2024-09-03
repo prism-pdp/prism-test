@@ -81,7 +81,7 @@ func runSetupPhase(_server string, _contractAddr string) {
 	// =================================================
 	// Register param
 	// =================================================
-	sm.RegisterPara()
+	sm.RegisterParam()
 	helper.PrintLog("Register Parameter: OK")
 
 	// =================================================
@@ -162,7 +162,7 @@ func runUploadProof() {
 
 func runVerifyAuditProof() {
 	// TPA gets challenge and proof from blockchain.
-	hashList, chalDataList, proofDataList := tpa.DownloadAuditProof()
+	hashList, reqList := tpa.GetAuditingReqList()
 	for i, h := range hashList {
 		// TPA gets M (list of hash of chunks) from SP.
 		f := sp.SearchFile(h)
@@ -170,7 +170,7 @@ func runVerifyAuditProof() {
 		hashChunks := pdp.HashChunks(chunk)
 
 		// TPA verifies proof.
-		result, err := tpa.VerifyAuditProof(&f.TagData, hashChunks, &chalDataList[i], &proofDataList[i], f.Owners[0])
+		result, err := tpa.VerifyAuditProof(&f.TagData, hashChunks, &reqList[i].ChalData, &reqList[i].ProofData, f.Owners[0])
 		if err != nil { panic(err) }
 		if result {
 			helper.PrintLog("Verify proof: OK")
@@ -215,12 +215,19 @@ func main() {
 		} else {
 			ledger = session.LoadFakeLedger("./cache/fake-ledger.json")
 		}
-		sessionSM  = session.NewSimSession(mode, &ledger, getAddress(SM))
-		sessionSP  = session.NewSimSession(mode, &ledger, getAddress(SP))
-		sessionTPA = session.NewSimSession(mode, &ledger, getAddress(TPA))
-		sessionSU1 = session.NewSimSession(mode, &ledger, getAddress(SU1))
-		sessionSU2 = session.NewSimSession(mode, &ledger, getAddress(SU2))
-		sessionSU3 = session.NewSimSession(mode, &ledger, getAddress(SU3))
+		sessionSM  = session.NewSimSession(&ledger, getAddress(SM))
+		sessionSP  = session.NewSimSession(&ledger, getAddress(SP))
+		sessionTPA = session.NewSimSession(&ledger, getAddress(TPA))
+		sessionSU1 = session.NewSimSession(&ledger, getAddress(SU1))
+		sessionSU2 = session.NewSimSession(&ledger, getAddress(SU2))
+		sessionSU3 = session.NewSimSession(&ledger, getAddress(SU3))
+	} else {
+		sessionSM  = session.NewSession(server, contractAddr, getPrivKey(SM), getAddress(SM))
+		sessionSP  = session.NewSession(server, contractAddr, getPrivKey(SP), getAddress(SP))
+		sessionTPA = session.NewSession(server, contractAddr, getPrivKey(TPA), getAddress(TPA))
+		sessionSU1 = session.NewSession(server, contractAddr, getPrivKey(SU1), getAddress(SU1))
+		sessionSU2 = session.NewSession(server, contractAddr, getPrivKey(SU2), getAddress(SU2))
+		sessionSU3 = session.NewSession(server, contractAddr, getPrivKey(SU3), getAddress(SU3))
 	}
 
 	if command == "setup" {

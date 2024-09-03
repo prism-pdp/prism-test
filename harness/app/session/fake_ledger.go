@@ -2,6 +2,7 @@ package session
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"github.com/ethereum/go-ethereum/common"
 	"os"
@@ -12,36 +13,25 @@ import (
 )
 
 type Params struct {
-	Params string `json:'params'`
+	P string `json:'params'`
 	G []byte `json:'G'`
 	U []byte `json:'U'`
-}
-
-type AuditLog struct {
-	ChalData []byte `json:'chal'`
-	ProofData []byte `json:'proof'`
-	Result bool `json:'result'`
-}
-
-type AuditReq struct {
-	ChalData []byte `json:'chal'` // TODO: ChalBytes
-	ProofData []byte `json:'proof'` // TODO: ProofBytes
 }
 
 type FakeLedger struct {
 	Params Params `json:'params'`
 	FileProperties map[string]*pdp.XZ21FileProperty `json:'fileProperties'`
-	Accounts map[common.Address]pdp.PublicKeyData `json:'accounts'`
-	Reqs map[string]*AuditReq `json:'auditReqs'`
-	Logs map[string][]*AuditLog `json:'auditLogs'`
+	Accounts map[common.Address]*pdp.XZ21Account `json:'accounts'`
+	Reqs map[string]*pdp.XZ21AuditingReq `json:'auditReqs'`
+	Logs map[string][]*pdp.XZ21AuditingLog `json:'auditLogs'`
 }
 
 func GenFakeLedger() FakeLedger {
 	var ledger FakeLedger
 	ledger.FileProperties = make(map[string]*pdp.XZ21FileProperty)
-	ledger.Accounts = make(map[common.Address]pdp.PublicKeyData)
-	ledger.Reqs = make(map[string]*AuditReq)
-	ledger.Logs = make(map[string][]*AuditLog)
+	ledger.Accounts = make(map[common.Address]*pdp.XZ21Account)
+	ledger.Reqs = make(map[string]*pdp.XZ21AuditingReq)
+	ledger.Logs = make(map[string][]*pdp.XZ21AuditingLog)
 	return ledger
 }
 
@@ -59,37 +49,41 @@ func LoadFakeLedger(_path string) FakeLedger {
 	return ledger
 }
 
-func (this *FakeLedger) RegisterFileProperty(_hash [32]byte, _splitNum uint32, _addr common.Address) {
+func (this *FakeLedger) RegisterFile(_hash [32]byte, _splitNum uint32, _addr common.Address) {
 	var p pdp.XZ21FileProperty
 	p.SplitNum = _splitNum
-	p.Owners = append(p.Owners, _addr)
+	p.Creator = _addr
 	this.FileProperties[helper.Hex(_hash[:])] = &p
+
+	this.Accounts[_addr].FileList = append(this.Accounts[_addr].FileList, _hash)
 }
 
-func (this *FakeLedger) EnrollAccount(_addr common.Address, _key []byte) {
-	var pkData pdp.PublicKeyData
-	pkData.Key = _key
-	this.Accounts[_addr] = pkData
-}
+func (this *FakeLedger) EnrollAccount(_addr common.Address, _key []byte) error {
+	var a pdp.XZ21Account
+	a.PubKey = _key
+	this.Accounts[_addr] = &a
 
-func (this *FakeLedger) AppendAccount(_hash [32]byte, _addr common.Address) {
-	if v, ok := this.FileProperties[helper.Hex(_hash[:])]; ok {
-		v.Owners = append(v.Owners, _addr)
-	}
-}
-
-func (this *FakeLedger) SearchFile(_hash [32]byte) *pdp.XZ21FileProperty {
-	if v, ok := this.FileProperties[helper.Hex(_hash[:])]; ok {
-		return v
-	}
 	return nil
 }
 
-func (this *FakeLedger) SearchPublicKey(_addr common.Address) *pdp.PublicKeyData {
-	if v, ok := this.Accounts[_addr]; ok {
-		return &v
+func (this *FakeLedger) AppendOwner(_hash [32]byte, _addr common.Address) error {
+	if _, ok := this.FileProperties[helper.Hex(_hash[:])]; !ok {
+		return fmt.Errorf("Unknown file")
 	}
+	if _, ok := this.Accounts[_addr]; !ok {
+		return fmt.Errorf("Unknown account")
+	}
+
+	this.Accounts[_addr].FileList = append(this.Accounts[_addr].FileList, _hash)
+
 	return nil
+}
+
+func (this *FakeLedger) SearchFile(_hash [32]byte) (pdp.XZ21FileProperty, error) {
+	if v, ok := this.FileProperties[helper.Hex(_hash[:])]; ok {
+		return *v, nil
+	}
+	return pdp.XZ21FileProperty{}, nil
 }
 
 func (this *FakeLedger) Dump(_path string) {

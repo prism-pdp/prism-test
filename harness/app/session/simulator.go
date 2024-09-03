@@ -3,7 +3,6 @@ package session
 import (
 	"fmt"
 	"github.com/ethereum/go-ethereum/common"
-	"golang.org/x/exp/slices"
 
 	pdp "github.com/dpduado/dpduado-go/xz21"
 
@@ -20,107 +19,91 @@ func (this *SimSession) Setup(_addr common.Address, _ledger *FakeLedger) {
 	this.Ledger = _ledger
 }
 
-func (this *SimSession) GetPara() (pdp.XZ21Para, error) {
-	var xz21Para pdp.XZ21Para
-	xz21Para.Params = this.Ledger.Params.Params
-	xz21Para.G = this.Ledger.Params.G
-	xz21Para.U = this.Ledger.Params.U
-	return xz21Para, nil
+func (this *SimSession) GetParam() (pdp.XZ21Param, error) {
+	var xz21Param pdp.XZ21Param
+	xz21Param.P = this.Ledger.Params.P
+	xz21Param.G = this.Ledger.Params.G
+	xz21Param.U = this.Ledger.Params.U
+	return xz21Param, nil
 }
 
-func (this *SimSession) RegisterPara(_params string, _g []byte, _u []byte) {
-	this.Ledger.Params.Params = _params
+func (this *SimSession) RegisterParam(_params string, _g []byte, _u []byte) error {
+	this.Ledger.Params.P = _params
 	this.Ledger.Params.G = _g
 	this.Ledger.Params.U = _u
+	return nil
 }
 
-func (this *SimSession) RegisterFileProperty(_hash [32]byte, _splitNum uint32, _owner common.Address) {
-	this.Ledger.RegisterFileProperty(_hash, _splitNum, _owner)
+func (this *SimSession) RegisterFile(_hash [32]byte, _splitNum uint32, _owner common.Address) error {
+	this.Ledger.RegisterFile(_hash, _splitNum, _owner)
+	return nil
 }
 
-func (this *SimSession) FetchFileList() [][32]byte {
+func (this *SimSession) GetFileList(_addr common.Address) ([][32]byte, error) {
 	var fileList [][32]byte
 	for hashHex, prop := range this.Ledger.FileProperties {
-		if slices.Contains(prop.Owners, this.Addr) {
+		if prop.Creator == _addr {
 			hash, err := helper.DecodeHex(hashHex)
 			if err != nil { panic(err) }
 			fileList = append(fileList, [32]byte(hash))
 		}
 	}
-	return fileList
+	return fileList, nil
 }
 
-func (this *SimSession) SearchFile(_hash [32]byte) *pdp.XZ21FileProperty {
+func (this *SimSession) SearchFile(_hash [32]byte) (pdp.XZ21FileProperty, error) {
 	return this.Ledger.SearchFile(_hash)
 }
 
-func (this *SimSession) SearchPublicKey(_addr common.Address) ([]byte, bool) {
-	if v, ok := this.Ledger.Accounts[_addr]; ok {
-		return v.Key, true
-	}
-	return []byte{0}, false
+func (this *SimSession) GetAccount(_addr common.Address) (pdp.XZ21Account, error) {
+	return *this.Ledger.Accounts[_addr], nil
 }
 
-func (this *SimSession) EnrollAccount(_addr common.Address, _pubKey []byte) {
+func (this *SimSession) EnrollAccount(_addr common.Address, _pubKey []byte) error {
 	this.Ledger.EnrollAccount(_addr, _pubKey)
+	return nil
 }
 
-func (this *SimSession) AppendAccount(_hash [32]byte, _addr common.Address) {
-	this.Ledger.AppendAccount(_hash, _addr)
+func (this *SimSession) AppendOwner(_hash [32]byte, _addr common.Address) error {
+	return this.Ledger.AppendOwner(_hash, _addr)
 }
 
-func (this *SimSession) UploadChallen(_hash [32]byte, _chalBytes []byte) {
-	var req AuditReq
-
-	req.ChalData = _chalBytes
+func (this *SimSession) SetChal(_hash [32]byte, _chalBytes []byte) (bool, error) {
 	hashHex := helper.Hex(_hash[:])
+	if _, ok := this.Ledger.Reqs[hashHex]; ok {
+		return false, nil
+	}
+
+	var req pdp.XZ21AuditingReq
+	req.Chal = _chalBytes
 	this.Ledger.Reqs[hashHex] = &req
+
+	return true, nil
 }
 
-func (this *SimSession) DownloadChallen() ([][32]byte, []pdp.ChalData) {
+func (this *SimSession) GetChalList() ([][32]byte, []pdp.ChalData, error) {
 	hashList := make([][32]byte, 0)
 	chalDataList := make([]pdp.ChalData, 0)
 	for k, v := range this.Ledger.Reqs {
-		if len(v.ProofData) == 0 {
+		if len(v.Proof) == 0 {
 			h, err := helper.DecodeHex(k)
 			if err != nil { panic(err) }
 			hashList = append(hashList, [32]byte(h))
 
-			chalData, err := pdp.DecodeToChalData(v.ChalData)
+			chalData, err := pdp.DecodeToChalData(v.Chal)
 			if err != nil { panic(err) }
 			chalDataList = append(chalDataList, chalData)
 		}
 	}
-	return hashList, chalDataList
+	return hashList, chalDataList, nil
 }
 
-func (this *SimSession) UploadProof(_hash [32]byte, _proofBytes []byte) {
-	this.Ledger.Reqs[helper.Hex(_hash[:])].ProofData = _proofBytes
+func (this *SimSession) SetProof(_hash [32]byte, _proofBytes []byte) error {
+	this.Ledger.Reqs[helper.Hex(_hash[:])].Proof = _proofBytes
+	return nil
 }
 
-func (this *SimSession) DownloadAuditChallenAndProof() ([][32]byte, []pdp.ChalData, []pdp.ProofData) {
-	hashList := make([][32]byte, 0)
-	chalDataList := make([]pdp.ChalData, 0)
-	proofDataList := make([]pdp.ProofData, 0)
-	for k, v := range this.Ledger.Reqs {
-		if len(v.ProofData) > 0 {
-			h, err := helper.DecodeHex(k)
-			if err != nil { panic(err) }
-			hashList = append(hashList, [32]byte(h))
-
-			chalData, err := pdp.DecodeToChalData(v.ChalData)
-			if err != nil { panic(err) }
-			chalDataList = append(chalDataList, chalData)
-
-			proofData, err := pdp.DecodeToProofData(v.ProofData)
-			if err != nil { panic(err) }
-			proofDataList = append(proofDataList, proofData)
-		}
-	}
-	return hashList, chalDataList, proofDataList
-}
-
-func (this *SimSession) UploadAuditResult(_hash [32]byte, _result bool) error {
+func (this *SimSession) SetAuditingResult(_hash [32]byte, _result bool) error {
 	hashHex := helper.Hex(_hash[:])
 
 	req, ok := this.Ledger.Reqs[hashHex]
@@ -128,13 +111,13 @@ func (this *SimSession) UploadAuditResult(_hash [32]byte, _result bool) error {
 		return fmt.Errorf("Invalid request")
 	}
 
-	if len(req.ChalData) <= 0 && len(req.ProofData) <= 0 {
+	if len(req.Chal) <= 0 && len(req.Proof) <= 0 {
 		return fmt.Errorf("Invalid status")
 	}
 
-	var log AuditLog
-	log.ChalData = req.ChalData
-	log.ProofData = req.ProofData
+	var log pdp.XZ21AuditingLog
+	log.Chal = req.Chal
+	log.Proof = req.Proof
 	log.Result = _result
 	this.Ledger.Logs[hashHex] = append(this.Ledger.Logs[hashHex], &log)
 
@@ -143,12 +126,23 @@ func (this *SimSession) UploadAuditResult(_hash [32]byte, _result bool) error {
 	return nil
 }
 
-func (this *SimSession) FetchAuditingReqList() [][32]byte {
+func (this *SimSession) GetAuditingReqList() ([][32]byte, []pdp.XZ21AuditingReq, error) {
 	var fileList [][32]byte
-	for hashHex, _ := range this.Ledger.Reqs {
+	var reqList []pdp.XZ21AuditingReq
+	for hashHex, req := range this.Ledger.Reqs {
 		hash, err := helper.DecodeHex(hashHex)
 		if err != nil { panic(err) }
 		fileList = append(fileList, [32]byte(hash))
+		reqList = append(reqList, *req)
 	}
-	return fileList
+	return fileList, reqList, nil
+}
+
+func (this *SimSession) GetAuditingLogs(_hash [32]byte) ([]pdp.XZ21AuditingLog, error) {
+	hashHex := helper.Hex(_hash[:])
+	var logs []pdp.XZ21AuditingLog
+	for _, v := range this.Ledger.Logs[hashHex] {
+		logs = append(logs, *v)
+	}
+	return logs, nil
 }

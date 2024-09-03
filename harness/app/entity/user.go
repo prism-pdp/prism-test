@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"crypto/sha256"
 	"encoding/json"
-	"golang.org/x/exp/slices"
 	"io/ioutil"
 	"os"
 
@@ -12,6 +11,7 @@ import (
 
 	pdp "github.com/dpduado/dpduado-go/xz21"
 
+	"github.com/dpduado/dpduado-test/harness/helper"
 	"github.com/dpduado/dpduado-test/harness/session"
 )
 
@@ -67,29 +67,33 @@ func (this *User) Dump(_path string) {
 
 func (this *User) IsUploaded(_data []byte) bool {
 	hash := sha256.Sum256(_data)
-	found := this.session.SearchFile(hash)
-	return !(found == nil)
+	fileProp, err := this.session.SearchFile(hash)
+	if err != nil { panic(err) }
+
+	// if len(fileProp.Creator.Bytes()) == 0 { return false } // TODO: make function
+	if helper.IsEmptyFileProperty(&fileProp) { return false }
+	return true
 }
 
 func (this *User) PrepareUpload(_data []byte, _chunkNum uint32) pdp.Tag {
-	xz21Para, err := this.session.GetPara()
+	xz21Param, err := this.session.GetParam()
 	if err != nil { panic(err) }
 
-	params := pdp.GenParamFromXZ21Para(&xz21Para)
+	param := pdp.GenParamFromXZ21Param(&xz21Param)
 
 	chunks, err := pdp.SplitData(_data, _chunkNum)
 	if err != nil { panic(err) }
 
-	sk := this.PrivateKeyData.Import(&params)
-	tag, _ := pdp.GenTag(&params, sk.Key, chunks)
+	sk := this.PrivateKeyData.Import(&param)
+	tag, _ := pdp.GenTag(&param, sk.Key, chunks)
 	return tag
 }
 
 func (this *User) GenDedupProof(_chal *pdp.ChalData, _data []byte, _chunkNum uint32) pdp.ProofData {
-	xz21Params, err := this.session.GetPara()
+	xz21Param, err := this.session.GetParam()
 	if err != nil { panic(err) }
 
-	params := pdp.GenParamFromXZ21Para(&xz21Params)
+	params := pdp.GenParamFromXZ21Param(&xz21Param)
 
 	chunks, err := pdp.SplitData(_data, _chunkNum)
 	if err != nil { panic(err) }
@@ -102,13 +106,14 @@ func (this *User) GenDedupProof(_chal *pdp.ChalData, _data []byte, _chunkNum uin
 }
 
 func (this *User) GenAuditChallen(_hash [32]byte) pdp.ChalData {
-	xz21Params, err := this.session.GetPara()
+	xz21Param, err := this.session.GetParam()
 	if err != nil { panic(err) }
 
-	params := pdp.GenParamFromXZ21Para(&xz21Params)
+	params := pdp.GenParamFromXZ21Param(&xz21Param)
 
-	fileProp := this.session.SearchFile(_hash)
-	if fileProp == nil { panic(fmt.Errorf("File property is not found.")) }
+	fileProp, err := this.session.SearchFile(_hash)
+	if err != nil { panic(err) }
+	if len(fileProp.Creator.Bytes()) == 0 { panic(fmt.Errorf("File property is not found")) }
 
 	chal := pdp.GenChal(&params, fileProp.SplitNum)
 	chalData := chal.Export()
@@ -119,18 +124,16 @@ func (this *User) GenAuditChallen(_hash [32]byte) pdp.ChalData {
 // Return true when upload is success.
 // Return false when the file is under auditing.
 func (this *User) UploadChallen(_hash [32]byte, _chalData *pdp.ChalData) bool {
-	reqList := this.session.FetchAuditingReqList()
-	if slices.Contains(reqList, _hash) {
-		return false
-	}
-
 	chalBytes, err := _chalData.Encode()
 	if err != nil { panic(err) }
-	this.session.UploadChallen(_hash, chalBytes)
+	success, err := this.session.SetChal(_hash, chalBytes)
+	if err != nil { panic(err) }
 
-	return true
+	return success
 }
 
 func (this *User) FetchFileList() [][32]byte {
-	return this.session.FetchFileList()
+	fileList, err := this.session.GetFileList(this.Addr)
+	if err != nil { panic(err) }
+	return fileList
 }

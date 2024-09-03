@@ -40,12 +40,12 @@ func LoadManager(_path string, _server string, _contractAddr string, _ethKey str
 	return sm
 }
 
-func (this *Manager) RegisterPara() {
-	xz21Para := this.Param.ToXZ21Para()
-	this.session.RegisterPara(
-		xz21Para.Params,
-		xz21Para.G,
-		xz21Para.U,
+func (this *Manager) RegisterParam() {
+	xz21Param := this.Param.ToXZ21Param()
+	this.session.RegisterParam(
+		xz21Param.P,
+		xz21Param.G,
+		xz21Param.U,
 	)
 }
 

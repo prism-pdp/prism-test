@@ -2,7 +2,6 @@ package entity
 
 import (
 	"encoding/json"
-	"fmt"
 	"io"
 	"os"
 	"github.com/ethereum/go-ethereum/common"
@@ -38,25 +37,33 @@ func LoadAuditor(_path string, _session session.Session) *Auditor {
 	return e
 }
 
-func (this *Auditor) DownloadAuditProof() ([][32]byte, []pdp.ChalData, []pdp.ProofData) {
-	hashList, chalDataList, proofDataList := this.session.DownloadAuditChallenAndProof()
-	return hashList, chalDataList, proofDataList
+func (this *Auditor) GetAuditingReqList() ([][32]byte, []pdp.AuditingReq) {
+	hashList, xz21ReqList, err := this.session.GetAuditingReqList()
+	if err != nil { panic(err) }
+
+	var reqList []pdp.AuditingReq
+	for _, v := range xz21ReqList {
+		var req pdp.AuditingReq
+		req.Import(&v)
+		reqList = append(reqList, req)
+	}
+	return hashList, reqList
 }
 
 func (this *Auditor) VerifyAuditProof(_tagData *pdp.TagData, _hashChunks [][]byte, _chalData *pdp.ChalData, _proofData *pdp.ProofData, _owner common.Address) (bool, error) {
-	xz21Params, err := this.session.GetPara()
+	xz21Param, err := this.session.GetParam()
 	if err != nil { return false, err }
 
-	params := pdp.GenParamFromXZ21Para(&xz21Params)
+	params := pdp.GenParamFromXZ21Param(&xz21Param)
 
 	tag := _tagData.Import(&params)
 	chal := _chalData.Import(&params)
 	proof := _proofData.Import(&params)
 
-	pubKeyBytes, found := this.session.SearchPublicKey(_owner)
-	if found == false { return false, fmt.Errorf("Owner is not found.") }
+	account, err := this.session.GetAccount(_owner)
+	if err != nil { panic(err) }
 
-	pubKeyData := pdp.PublicKeyData{pubKeyBytes}
+	pubKeyData := pdp.PublicKeyData{account.PubKey}
 	pubKey := pubKeyData.Import(&params)
 
 	result := pdp.VerifyProof(&params, &tag, _hashChunks, &chal, &proof, pubKey.Key)
@@ -65,7 +72,7 @@ func (this *Auditor) VerifyAuditProof(_tagData *pdp.TagData, _hashChunks [][]byt
 }
 
 func (this *Auditor) UploadAuditResult(_hash [32]byte, _result bool) {
-	err := this.session.UploadAuditResult(_hash, _result)
+	err := this.session.SetAuditingResult(_hash, _result)
 	if err != nil { panic(err) }
 }
 
