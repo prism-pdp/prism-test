@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
-	"math/rand"
 	"os"
 
 	"github.com/ethereum/go-ethereum/common"
@@ -22,14 +21,8 @@ type File struct {
 	Owners []common.Address `json:'owners'`
 }
 
-type DedupState struct {
-	AddrSU string `json:'addr'`
-	Hash [32]byte `json:'hash'`
-}
-
 type Provider struct {
 	Files map[string]*File `json:'files'`
-	State map[uint32]*DedupState `json:'state'`
 
 	session session.Session
 }
@@ -45,7 +38,6 @@ func GenProvider(_server string, _contractAddr string, _privKey string, _session
 	provider := new(Provider)
 
 	provider.Files = make(map[string]*File)
-	provider.State = make(map[uint32]*DedupState)
 
 	provider.session = _session
 
@@ -65,9 +57,6 @@ func LoadProvider(_path string, _server string, _contractAddr string, _privKey s
 
 	if sp.Files == nil {
 		sp.Files = make(map[string]*File)
-	}
-	if sp.State == nil {
-		sp.State = make(map[uint32]*DedupState)
 	}
 
 	sp.session = _session
@@ -121,81 +110,64 @@ func (this *Provider) UploadNewFile(_data []byte, _tag *pdp.Tag, _addrSU common.
 	return nil
 }
 
-func (this *Provider) AppendOwner(_su *User, _data []byte) {
+func (this *Provider) RegisterOwnerToFile(_su *User, _data []byte, _chalData *pdp.ChalData, _proofData *pdp.ProofData) bool {
+	// check file
 	hash := sha256.Sum256(_data)
 	file := this.SearchFile(hash)
-
-	file.Owners = append(file.Owners, _su.Addr)
-	err := this.session.AppendOwner(hash, _su.Addr)
-	if err != nil { panic(err) }
-}
-
-func (this *Provider) GetTagSize(_hash [32]byte) uint32 {
-	file := this.SearchFile(_hash)
 	if file == nil { panic(fmt.Errorf("File is not found.")) }
+	fileProp, err := this.session.SearchFile(hash)
+	if err != nil { panic(err) }
+	if helper.IsEmptyFileProperty(&fileProp) { panic(fmt.Errorf("File property is not found."))}
+	// prepare params
+	xz21Param, err := this.session.GetParam()
+	if err != nil { panic(err) }
+	params := pdp.GenParamFromXZ21Param(&xz21Param)
 
-	return file.TagData.Size
+	// ===================================
+	// Verify chal & proof
+	// ===================================
+	// prepare public key of the creator of the file
+	account, err := this.session.GetAccount(fileProp.Creator)
+	if err != nil { panic(fmt.Errorf("Account is not found.")) }
+	pkData := pdp.PublicKeyData{account.PubKey}
+	pk := pkData.Import(&params)
+	// prepare hash chunks
+	// TODO: function VerifyProof内で必要なタグだけ復元するのがよい
+	tag := file.TagData.Import(&params)
+	chunks, err := pdp.SplitData(file.Data, tag.Size)
+	if err != nil { panic(err) }
+	hashChunks := pdp.HashChunks(chunks)
+	// prepare chal, proof
+	chal := _chalData.Import(&params)
+	proof := _proofData.Import(&params)
+	// verify chal & proof
+	isVerified := pdp.VerifyProof(&params, &tag, hashChunks, &chal, &proof, pk.Key)
+	if !isVerified { return false }
+
+	// ===================================
+	// Verify chal & proof
+	// ===================================
+	file.Owners = append(file.Owners, _su.Addr)
+	err = this.session.AppendOwner(hash, _su.Addr)
+	if err != nil { panic(err) }
+
+	return true
 }
 
-func (this *Provider) GenDedupChallen(_data []byte, _addrSU common.Address) (pdp.ChalData, uint32) {
+func (this *Provider) GenDedupChallen(_data []byte, _addrSU common.Address) (pdp.ChalData) {
 	xz21Param, err := this.session.GetParam()
 	if err != nil { panic(err) }
 
 	param := pdp.GenParamFromXZ21Param(&xz21Param)
 
 	hash := sha256.Sum256(_data)
-	// file := this.searchFile(hash)
-	// if file == nil { panic(fmt.Errorf("File is not found.")) }
-	tagSize := this.GetTagSize(hash)
-
-	chal := pdp.GenChal(&param, tagSize)
-	chalData := chal.Export()
-
-	//
-	var s DedupState
-	s.AddrSU = _addrSU.Hex()
-	s.Hash = hash
-
-	id := rand.Uint32()
-	this.State[id] = &s
-
-	return chalData, id
-}
-
-func (this *Provider) VerifyDedupProof(_id uint32, _chalData *pdp.ChalData, _proofData *pdp.ProofData) bool {
-	xz21Param, err := this.session.GetParam()
-	if err != nil { panic(err) }
-
-	params := pdp.GenParamFromXZ21Param(&xz21Param)
-
-	state := this.State[_id]
-
-	fileProp, err := this.session.SearchFile(state.Hash) // TODO: SearchFile -> SearchFileProperty
-	if err != nil { panic(err) }
-	if len(fileProp.Creator.Bytes()) == 0 { panic(fmt.Errorf("File property is not found.")) }
-
-	account, err := this.session.GetAccount(fileProp.Creator)
-	if err != nil { panic(fmt.Errorf("Account is not found.")) }
-	pkData := pdp.PublicKeyData{account.PubKey}
-
-	file := this.SearchFile(state.Hash)
+	file := this.SearchFile(hash)
 	if file == nil { panic(fmt.Errorf("File is not found.")) }
 
-	// TODO: function VerifyProof内で必要なタグだけ復元するのがよい
-	tag := file.TagData.Import(&params)
+	chal := pdp.GenChal(&param, file.TagData.Size)
+	chalData := chal.Export()
 
-	chunks, err := pdp.SplitData(file.Data, tag.Size)
-	if err != nil { panic(err) }
-
-	hashChunks := pdp.HashChunks(chunks)
-
-	chal := _chalData.Import(&params)
-	proof := _proofData.Import(&params)
-	pk := pkData.Import(&params)
-
-	isVerified := pdp.VerifyProof(&params, &tag, hashChunks, &chal, &proof, pk.Key)
-
-	return isVerified
+	return chalData
 }
 
 func (this *Provider) DownloadChallen() ([][32]byte, []pdp.ChalData) {

@@ -108,7 +108,7 @@ func runUploadPhase(_su *entity.User, _data []byte) {
 	// Processing differs depending on whether the file has already been uploaded or not.
 	if isUploaded {
 		// SP generates a challenge for deduplication.
-		chalData, id := sp.GenDedupChallen(_data, _su.Addr)
+		chalData := sp.GenDedupChallen(_data, _su.Addr)
 
 		// SP sends the challenge to SU.
 
@@ -116,9 +116,8 @@ func runUploadPhase(_su *entity.User, _data []byte) {
 		proofData := _su.GenDedupProof(&chalData, _data, chunkNum)
 
 		// SP verifies the proof.
-		isVerified := sp.VerifyDedupProof(id, &chalData, &proofData)
-		if isVerified {
-			sp.AppendOwner(_su, _data)
+		isRegistered := sp.RegisterOwnerToFile(_su, _data, &chalData, &proofData)
+		if isRegistered {
 			helper.PrintLog("Append Owner: OK")
 		} else {
 			helper.PrintLog("Append Owner: NG")
