@@ -127,7 +127,8 @@ func runUploadPhase(_su *entity.User, _data []byte) {
 		tag := _su.PrepareUpload(_data, chunkNum)
 
 		// SP accepts the file.
-		sp.UploadNewFile(_data, &tag, _su.Addr, &_su.PublicKeyData)
+		err := sp.UploadNewFile(_data, &tag, _su.Addr, &_su.PublicKeyData)
+		if err != nil { panic(err) }
 
 		helper.PrintLog("Upload New file: OK")
 	}

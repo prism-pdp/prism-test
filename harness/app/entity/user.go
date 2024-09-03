@@ -70,7 +70,6 @@ func (this *User) IsUploaded(_data []byte) bool {
 	fileProp, err := this.session.SearchFile(hash)
 	if err != nil { panic(err) }
 
-	// if len(fileProp.Creator.Bytes()) == 0 { return false } // TODO: make function
 	if helper.IsEmptyFileProperty(&fileProp) { return false }
 	return true
 }
@@ -113,7 +112,7 @@ func (this *User) GenAuditChallen(_hash [32]byte) pdp.ChalData {
 
 	fileProp, err := this.session.SearchFile(_hash)
 	if err != nil { panic(err) }
-	if len(fileProp.Creator.Bytes()) == 0 { panic(fmt.Errorf("File property is not found")) }
+	if helper.IsEmptyFileProperty(&fileProp) { panic(fmt.Errorf("File property is not found")) }
 
 	chal := pdp.GenChal(&params, fileProp.SplitNum)
 	chalData := chal.Export()

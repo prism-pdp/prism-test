@@ -91,7 +91,7 @@ func (this *Provider) IsUploaded(_data []byte) bool {
 	hash := sha256.Sum256(_data)
 	fileProp, err := this.session.SearchFile(hash)
 	if err != nil { panic(err) }
-	if len(fileProp.Creator.Bytes()) == 0 { return false }
+	if helper.IsEmptyFileProperty(&fileProp) { return false }
 
 	return true
 }
