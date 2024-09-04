@@ -17,14 +17,14 @@ type Manager struct {
 	session session.Session
 }
 
-func GenManager(_server string, _contractAddr string, _privKey string, _session session.Session) *Manager {
+func GenManager( _session session.Session) *Manager {
 	manager := new(Manager)
 	manager.Param = pdp.GenPairingParam()
 	manager.session = _session
 	return manager
 }
 
-func LoadManager(_path string, _server string, _contractAddr string, _ethKey string, _session session.Session) *Manager {
+func LoadManager(_path string, _session session.Session) *Manager {
 	f, err := os.Open(_path)
 	if err != nil { panic(err) }
 	defer f.Close()

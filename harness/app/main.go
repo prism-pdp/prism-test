@@ -11,16 +11,28 @@ import (
 	"github.com/dpduado/dpduado-test/harness/entity"
 	"github.com/dpduado/dpduado-test/harness/helper"
 	"github.com/dpduado/dpduado-test/harness/session"
+	"github.com/dpduado/dpduado-test/harness/types"
 )
 
 const (
-	SM = iota
+	SM types.EntityType = iota
 	SP
 	TPA
 	SU1
 	SU2
 	SU3
 )
+var EntityList [6]types.EntityType = [6]types.EntityType{
+	SM,
+	SP,
+	TPA,
+	SU1,
+	SU2,
+	SU3,
+}
+
+var mode string
+var command string
 
 var data1 []byte
 var data2 []byte
@@ -33,29 +45,63 @@ var su1 *entity.User
 var su2 *entity.User
 var su3 *entity.User
 
-var sessionSM session.Session
-var sessionSP session.Session
-var sessionTPA session.Session
-var sessionSU1 session.Session
-var sessionSU2 session.Session
-var sessionSU3 session.Session
+var sessionTable map[types.EntityType]session.Session
+
+var ledger session.FakeLedger
 
 type Account struct {
 	Address string `json:'Address'`
 	PrivKey string `json:'PrivKey'`
 }
 
-func getAddress(_entity int) common.Address {
-	tmp := fmt.Sprintf("ADDRESS_%d", _entity)
-	return common.HexToAddress(os.Getenv(tmp))
+func getAddress(_mode string, _entity types.EntityType) common.Address {
+	var addr common.Address
+
+	switch _mode {
+	case "eth":
+		tmp := fmt.Sprintf("ADDRESS_%d", _entity)
+		addr = common.HexToAddress(os.Getenv(tmp))
+	case "sim":
+		tmp := fmt.Sprintf("0x100%d", int(_entity))
+		addr = common.HexToAddress(tmp)
+	}
+
+	return addr
 }
 
-func getPrivKey(_entity int) string {
-	tmp := fmt.Sprintf("PRIVKEY_%d", _entity)
-	return os.Getenv(tmp)
+func getPrivKey(_mode string, _entity types.EntityType) string {
+	var key string
+
+	switch mode {
+	case "eth":
+		tmp := fmt.Sprintf("PRIVKEY_%d", _entity)
+		key = os.Getenv(tmp)
+	default:
+		key = "NA"
+	}
+
+	return key
 }
 
-func setup() {
+// func getName(_entity EntityType) string {
+// 	switch _entity {
+// 	case SM:
+// 		return "SM"
+// 	case SP:
+// 		return "SP"
+// 	case TPA:
+// 		return "TPA"
+// 	case SU1:
+// 		return "SU1"
+// 	case SU2:
+// 		return "SU2"
+// 	case SU3:
+// 		return "SU3"
+// 	}
+// 	return "NA"
+// }
+
+func setup(_opts []string) {
 	data1 = []byte{
 		0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09,
 		0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19,
@@ -73,6 +119,47 @@ func setup() {
 		0x5A, 0x5B, 0x5C, 0x5D,
 	}
 	chunkNum = uint32(5)
+
+	mode = _opts[1]
+	command = _opts[2]
+
+	sesOpts := session.NewSessionOpts()
+
+	for _, e := range EntityList {
+		sesOpts.AddrTable[e] = getAddress(mode, e)
+		sesOpts.PrivKeyTable[e] = getPrivKey(mode, e)
+	}
+
+	if mode == "sim" {
+		// make fake ledger
+		if command == "setup" {
+			ledger = session.GenFakeLedger()
+		} else {
+			ledger = session.LoadFakeLedger("./cache/fake-ledger.json")
+		}
+		sesOpts.Ledger = &ledger
+	}
+
+	sessionTable = make(map[types.EntityType]session.Session)
+	for _, e := range EntityList {
+		sessionTable[e] = session.NewSession(mode, e, &sesOpts)
+	}
+
+	if command == "setup" {
+		sm  = entity.GenManager(sessionTable[SM])
+		sp  = entity.GenProvider(sessionTable[SP])
+		tpa = entity.GenAuditor(sessionTable[TPA])
+		su1 = entity.GenUser(sessionTable[SU1], &sm.Param)
+		su2 = entity.GenUser(sessionTable[SU2], &sm.Param)
+		su3 = entity.GenUser(sessionTable[SU3], &sm.Param)
+	} else {
+		sm = entity.LoadManager("./cache/sm.json", sessionTable[SM])
+		sp = entity.LoadProvider("./cache/sp.json", sessionTable[SP])
+		tpa = entity.LoadAuditor("./cache/tpa.json", sessionTable[TPA])
+		su1 = entity.LoadUser("./cache/su1.json", sessionTable[SU1])
+		su2 = entity.LoadUser("./cache/su2.json", sessionTable[SU2])
+		su3 = entity.LoadUser("./cache/su3.json", sessionTable[SU3])
+	}
 }
 
 func runSetupPhase(_server string, _contractAddr string) {
@@ -201,50 +288,7 @@ func runAuditingPhase() {
 
 func main() {
 
-	setup()
-
-	server := os.Args[1]
-	contractAddr := os.Args[2]
-	command := os.Args[3]
-	mode := os.Args[4]
-
-	var ledger session.FakeLedger
-	if mode == "sim" {
-		if command == "setup" {
-			ledger = session.GenFakeLedger()
-		} else {
-			ledger = session.LoadFakeLedger("./cache/fake-ledger.json")
-		}
-		sessionSM  = session.NewSimSession(&ledger, getAddress(SM))
-		sessionSP  = session.NewSimSession(&ledger, getAddress(SP))
-		sessionTPA = session.NewSimSession(&ledger, getAddress(TPA))
-		sessionSU1 = session.NewSimSession(&ledger, getAddress(SU1))
-		sessionSU2 = session.NewSimSession(&ledger, getAddress(SU2))
-		sessionSU3 = session.NewSimSession(&ledger, getAddress(SU3))
-	} else {
-		sessionSM  = session.NewSession(server, contractAddr, getPrivKey(SM), getAddress(SM))
-		sessionSP  = session.NewSession(server, contractAddr, getPrivKey(SP), getAddress(SP))
-		sessionTPA = session.NewSession(server, contractAddr, getPrivKey(TPA), getAddress(TPA))
-		sessionSU1 = session.NewSession(server, contractAddr, getPrivKey(SU1), getAddress(SU1))
-		sessionSU2 = session.NewSession(server, contractAddr, getPrivKey(SU2), getAddress(SU2))
-		sessionSU3 = session.NewSession(server, contractAddr, getPrivKey(SU3), getAddress(SU3))
-	}
-
-	if command == "setup" {
-		sm  = entity.GenManager(server, contractAddr, getPrivKey(SM), sessionSM)
-		sp  = entity.GenProvider(server, contractAddr, getPrivKey(SP), sessionSP)
-		tpa = entity.GenAuditor(sessionTPA)
-		su1 = entity.GenUser(server, contractAddr, getAddress(SU1), getPrivKey(SU1), &sm.Param, sessionSU1)
-		su2 = entity.GenUser(server, contractAddr, getAddress(SU2), getPrivKey(SU2), &sm.Param, sessionSU2)
-		su3 = entity.GenUser(server, contractAddr, getAddress(SU3), getPrivKey(SU3), &sm.Param, sessionSU3)
-	} else {
-		sm = entity.LoadManager("./cache/sm.json", os.Args[1], os.Args[2], getPrivKey(SM), sessionSM)
-		sp = entity.LoadProvider("./cache/sp.json", os.Args[1], os.Args[2], getPrivKey(SP), sessionSP)
-		tpa = entity.LoadAuditor("./cache/tpa.json", sessionTPA)
-		su1 = entity.LoadUser("./cache/su1.json", os.Args[1], os.Args[2], getPrivKey(SU1), sessionSU1)
-		su2 = entity.LoadUser("./cache/su2.json", os.Args[1], os.Args[2], getPrivKey(SU2), sessionSU2)
-		su3 = entity.LoadUser("./cache/su3.json", os.Args[1], os.Args[2], getPrivKey(SU3), sessionSU3)
-	}
+	setup(os.Args)
 
 	switch command {
 	case "setup":

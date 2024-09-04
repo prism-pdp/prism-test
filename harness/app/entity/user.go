@@ -23,10 +23,10 @@ type User struct {
 	session session.Session
 }
 
-func GenUser(_server string, _contractAddr string, _ethAddr common.Address, _ethKey string, _param *pdp.PairingParam, _session session.Session) *User {
+func GenUser(_session session.Session, _param *pdp.PairingParam) *User {
 	user := new(User)
 
-	user.Addr = _ethAddr
+	user.Addr = _session.GetAddr()
 
 	pk, sk := pdp.GenPairingKey(_param)
 	user.PublicKeyData = pk.Export()
@@ -37,7 +37,7 @@ func GenUser(_server string, _contractAddr string, _ethAddr common.Address, _eth
 	return user
 }
 
-func LoadUser(_path string, _server string, _contractAddr string, _ethKey string, _session session.Session) *User {
+func LoadUser(_path string, _session session.Session) *User {
 	f, err := os.Open(_path)
 	if err != nil { panic(err) }
 	defer f.Close()

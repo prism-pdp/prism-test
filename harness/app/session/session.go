@@ -4,9 +4,13 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 
 	pdp "github.com/dpduado/dpduado-go/xz21"
+
+	"github.com/dpduado/dpduado-test/harness/types"
 )
 
 type Session interface {
+	GetAddr() common.Address
+	// interface of blockchain
 	GetParam() (pdp.XZ21Param, error) // E
 	RegisterParam(_param string, _g []byte, _u []byte) error // A
 	RegisterFile(_hash [32]byte, _splitNum uint32, _owner common.Address) error // D
@@ -23,7 +27,32 @@ type Session interface {
 	GetAuditingLogs(_hash [32]byte) ([]pdp.XZ21AuditingLog, error)
 }
 
-func NewSession(_server string, _contractAddr string, _privKey string, _addr common.Address) Session {
+type SessionOpts struct {
+	Server string
+	ContractAddr string
+
+	AddrTable map[types.EntityType]common.Address
+	PrivKeyTable map[types.EntityType]string
+
+	Ledger *FakeLedger
+}
+
+func NewSessionOpts() SessionOpts {
+	var opts SessionOpts
+	opts.AddrTable = make(map[types.EntityType]common.Address)
+	opts.PrivKeyTable = make(map[types.EntityType]string)
+	return opts
+}
+
+func NewSession(_mode string, _entity types.EntityType, _opts *SessionOpts) Session {
+	switch _mode {
+	case "sim":
+		return NewSimSession(_opts.Ledger, _opts.AddrTable[_entity])
+	}
+	return nil
+}
+
+func NewEthSession(_server string, _contractAddr string, _privKey string, _addr common.Address) Session {
 	var ethClient EthClient
 	ethClient.Setup(_server, _contractAddr, _privKey, _addr)
 	return &ethClient

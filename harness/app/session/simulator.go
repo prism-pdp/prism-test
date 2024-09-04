@@ -19,6 +19,10 @@ func (this *SimSession) Setup(_addr common.Address, _ledger *FakeLedger) {
 	this.Ledger = _ledger
 }
 
+func (this *SimSession) GetAddr() common.Address {
+	return this.Addr
+}
+
 func (this *SimSession) GetParam() (pdp.XZ21Param, error) {
 	var xz21Param pdp.XZ21Param
 	xz21Param.P = this.Ledger.Params.P

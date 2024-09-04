@@ -18,6 +18,10 @@ func (this *EthClient) Setup(_server string, _contractAddr string, _privKey stri
 	this.Session = helper.GenSession(_server, _contractAddr, _privKey)
 }
 
+func (this *EthClient) GetAddr() common.Address {
+	return this.Addr
+}
+
 func (this *EthClient) GetParam() (pdp.XZ21Param, error) {
 	xz21Param, err := this.Session.GetParam()
 	return xz21Param, err
