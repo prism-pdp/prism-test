@@ -112,7 +112,7 @@ func (this *User) GenDedupProof(_chal *pdp.ChalData, _data []byte, _chunkNum uin
 	return proofData
 }
 
-func (this *User) GenAuditChallen(_hash [32]byte) pdp.ChalData {
+func (this *User) GenAuditingChal(_hash [32]byte) pdp.ChalData {
 	xz21Param, err := this.client.GetParam()
 	if err != nil { panic(err) }
 
@@ -130,7 +130,7 @@ func (this *User) GenAuditChallen(_hash [32]byte) pdp.ChalData {
 
 // Return true when upload is success.
 // Return false when the file is under auditing.
-func (this *User) UploadChallen(_hash [32]byte, _chalData *pdp.ChalData) bool {
+func (this *User) UploadAuditingChal(_hash [32]byte, _chalData *pdp.ChalData) bool {
 	chalBytes, err := _chalData.Encode()
 	if err != nil { panic(err) }
 	success, err := this.client.SetChal(_hash, chalBytes)

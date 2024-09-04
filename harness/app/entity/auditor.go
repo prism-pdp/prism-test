@@ -59,7 +59,7 @@ func (this *Auditor) GetAuditingReqList() ([][32]byte, []pdp.AuditingReq) {
 	return hashList, reqList
 }
 
-func (this *Auditor) VerifyAuditProof(_tagData *pdp.TagData, _hashChunks [][]byte, _chalData *pdp.ChalData, _proofData *pdp.ProofData, _owner common.Address) (bool, error) {
+func (this *Auditor) VerifyAuditingProof(_tagData *pdp.TagData, _hashChunks [][]byte, _chalData *pdp.ChalData, _proofData *pdp.ProofData, _owner common.Address) (bool, error) {
 	xz21Param, err := this.client.GetParam()
 	if err != nil { return false, err }
 
@@ -80,7 +80,7 @@ func (this *Auditor) VerifyAuditProof(_tagData *pdp.TagData, _hashChunks [][]byt
 	return result, nil
 }
 
-func (this *Auditor) UploadAuditResult(_hash [32]byte, _result bool) {
+func (this *Auditor) UploadAuditingResult(_hash [32]byte, _result bool) {
 	err := this.client.SetAuditingResult(_hash, _result)
 	if err != nil { panic(err) }
 }

@@ -186,7 +186,7 @@ func runUploadPhase(_su *entity.User, _data []byte) {
 	// Processing differs depending on whether the file has already been uploaded or not.
 	if isUploaded {
 		// SP generates a challenge for deduplication.
-		chalData := sp.GenDedupChallen(_data, _su.Addr)
+		chalData := sp.GenDedupChal(_data, _su.Addr)
 
 		// SP sends the challenge to SU.
 
@@ -214,13 +214,13 @@ func runUploadPhase(_su *entity.User, _data []byte) {
 	helper.PrintLog("Finish Upload Phase")
 }
 
-func runUploadChallen(_su *entity.User) {
+func runUploadAuditingChal(_su *entity.User) {
 	// SU gets the list of his/her files.
 	fileList := _su.FetchFileList()
 	// SU generates challenge and requests to audit each file
 	for _, f := range fileList {
-		chalData := _su.GenAuditChallen(f)
-		result := _su.UploadChallen(f, &chalData)
+		chalData := _su.GenAuditingChal(f)
+		result := _su.UploadAuditingChal(f, &chalData)
 		if result {
 			helper.PrintLog("Upload chal: OK")
 		} else {
@@ -229,16 +229,16 @@ func runUploadChallen(_su *entity.User) {
 	}
 }
 
-func runUploadProof() {
+func runUploadAuditingProof() {
 	// SP gets challenge from blockchain.
-	hashList, chalDataList := sp.DownloadChallen()
+	hashList, chalDataList := sp.DownloadAuditingChal()
 	for i, h := range hashList {
-		proofData := sp.GenAuditProof(h, &chalDataList[i])
-		sp.UploadProof(h, &proofData)
+		proofData := sp.GenAuditingProof(h, &chalDataList[i])
+		sp.UploadAuditingProof(h, &proofData)
 	}
 }
 
-func runVerifyAuditProof() {
+func runVerifyAuditingProof() {
 	// TPA gets challenge and proof from blockchain.
 	hashList, reqList := tpa.GetAuditingReqList()
 	for i, h := range hashList {
@@ -248,7 +248,7 @@ func runVerifyAuditProof() {
 		hashChunks := pdp.HashChunks(chunk)
 
 		// TPA verifies proof.
-		result, err := tpa.VerifyAuditProof(&f.TagData, hashChunks, &reqList[i].ChalData, &reqList[i].ProofData, f.Owners[0])
+		result, err := tpa.VerifyAuditingProof(&f.TagData, hashChunks, &reqList[i].ChalData, &reqList[i].ProofData, f.Owners[0])
 		if err != nil { panic(err) }
 		if result {
 			helper.PrintLog("Verify proof: OK")
@@ -256,7 +256,7 @@ func runVerifyAuditProof() {
 			helper.PrintLog("Verify proof: NG")
 		}
 
-		tpa.UploadAuditResult(h, result)
+		tpa.UploadAuditingResult(h, result)
 	}
 }
 
@@ -264,15 +264,15 @@ func runAuditingPhase() {
 	helper.PrintLog("Start Auditing Phase")
 
 	// 1st
-	runUploadChallen(su1)
-	runUploadChallen(su2)
-	runUploadProof()
-	runVerifyAuditProof()
+	runUploadAuditingChal(su1)
+	runUploadAuditingChal(su2)
+	runUploadAuditingProof()
+	runVerifyAuditingProof()
 	// 2nd
-	runUploadChallen(su1)
-	runUploadChallen(su2)
-	runUploadProof()
-	runVerifyAuditProof()
+	runUploadAuditingChal(su1)
+	runUploadAuditingChal(su2)
+	runUploadAuditingProof()
+	runVerifyAuditingProof()
 
 	helper.PrintLog("Finish Auditing Phase")
 }

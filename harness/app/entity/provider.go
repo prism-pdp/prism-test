@@ -162,7 +162,7 @@ func (this *Provider) RegisterOwnerToFile(_su *User, _data []byte, _chalData *pd
 	return true
 }
 
-func (this *Provider) GenDedupChallen(_data []byte, _addrSU common.Address) (pdp.ChalData) {
+func (this *Provider) GenDedupChal(_data []byte, _addrSU common.Address) (pdp.ChalData) {
 	xz21Param, err := this.client.GetParam()
 	if err != nil { panic(err) }
 
@@ -178,13 +178,13 @@ func (this *Provider) GenDedupChallen(_data []byte, _addrSU common.Address) (pdp
 	return chalData
 }
 
-func (this *Provider) DownloadChallen() ([][32]byte, []pdp.ChalData) {
+func (this *Provider) DownloadAuditingChal() ([][32]byte, []pdp.ChalData) {
 	hashList, chalDataList, err := this.client.GetChalList()
 	if err != nil { panic(err) }
 	return hashList, chalDataList
 }
 
-func (this *Provider) GenAuditProof(_hash [32]byte, _chal *pdp.ChalData) pdp.ProofData {
+func (this *Provider) GenAuditingProof(_hash [32]byte, _chal *pdp.ChalData) pdp.ProofData {
 	xz21Param, err := this.client.GetParam()
 	if err != nil { panic(err) }
 
@@ -203,7 +203,7 @@ func (this *Provider) GenAuditProof(_hash [32]byte, _chal *pdp.ChalData) pdp.Pro
 	return proofData
 }
 
-func (this *Provider) UploadProof(_hash [32]byte, _proofData *pdp.ProofData) {
+func (this *Provider) UploadAuditingProof(_hash [32]byte, _proofData *pdp.ProofData) {
 	proofBytes, err := _proofData.Encode()
 	if err != nil { panic(err) }
 	err = this.client.SetProof(_hash, proofBytes)
