@@ -9,6 +9,7 @@ import (
 	pdp "github.com/dpduado/dpduado-go/xz21"
 
 	"github.com/dpduado/dpduado-test/harness/client"
+	"github.com/dpduado/dpduado-test/harness/helper"
 )
 
 type Manager struct {
@@ -17,7 +18,15 @@ type Manager struct {
 	client client.BaseClient
 }
 
-func GenManager( _client client.BaseClient) *Manager {
+func MakeManager(_path string, _client client.BaseClient) *Manager {
+	if (helper.IsFile(_path)) {
+		return LoadManager(_path, _client)
+	} else {
+		return GenManager(_client)
+	}
+}
+
+func GenManager(_client client.BaseClient) *Manager {
 	manager := new(Manager)
 	manager.Param = pdp.GenPairingParam()
 	manager.client = _client

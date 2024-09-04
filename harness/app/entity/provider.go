@@ -34,6 +34,14 @@ func (this *Provider) SearchFile(_hash [32]byte) *File {
 	return nil
 }
 
+func MakeProvider(_path string, _client client.BaseClient) *Provider {
+	if (helper.IsFile(_path)) {
+		return LoadProvider(_path, _client)
+	} else {
+		return GenProvider(_client)
+	}
+}
+
 func GenProvider(_client client.BaseClient) *Provider {
 	provider := new(Provider)
 

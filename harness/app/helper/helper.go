@@ -9,6 +9,7 @@ import (
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/ethclient"
 	"math/big"
+	"os"
 
 	pdp "github.com/dpduado/dpduado-go/xz21"
 )
@@ -84,4 +85,12 @@ func IsEmptyFileProperty(_file *pdp.XZ21FileProperty) bool {
 	isEmptySplitNum := (_file.SplitNum == 0)
 	isEmptyCreator  := (_file.Creator.Cmp(common.BytesToAddress([]byte{0})) == 0)
 	return (isEmptySplitNum && isEmptyCreator)
+}
+
+func IsFile(_path string) bool {
+    info, err := os.Stat(_path)
+    if err != nil {
+        return false
+    }
+    return !info.IsDir()
 }

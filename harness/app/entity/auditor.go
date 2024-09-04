@@ -9,10 +9,19 @@ import (
 	pdp "github.com/dpduado/dpduado-go/xz21"
 
 	"github.com/dpduado/dpduado-test/harness/client"
+	"github.com/dpduado/dpduado-test/harness/helper"
 )
 
 type Auditor struct {
 	client client.BaseClient
+}
+
+func MakeAuditor(_path string, _client client.BaseClient) *Auditor {
+	if (helper.IsFile(_path)) {
+		return LoadAuditor(_path, _client)
+	} else {
+		return GenAuditor(_client)
+	}
 }
 
 func GenAuditor(_client client.BaseClient) *Auditor {

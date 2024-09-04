@@ -23,6 +23,14 @@ type User struct {
 	client client.BaseClient
 }
 
+func MakeUser(_path string, _client client.BaseClient, _param *pdp.PairingParam) *User {
+	if (helper.IsFile(_path)) {
+		return LoadUser(_path, _client)
+	} else {
+		return GenUser(_client, _param)
+	}
+}
+
 func GenUser(_client client.BaseClient, _param *pdp.PairingParam) *User {
 	user := new(User)
 
