@@ -1,4 +1,4 @@
-package session
+package client
 
 import (
 	"github.com/ethereum/go-ethereum/common"
@@ -15,7 +15,7 @@ type EthClient struct {
 
 func (this *EthClient) Setup(_server string, _contractAddr string, _privKey string, _addr common.Address) {
 	this.Addr = _addr
-	this.Session = helper.GenSession(_server, _contractAddr, _privKey)
+	this.Session = helper.GenXZ21Session(_server, _contractAddr, _privKey)
 }
 
 func (this *EthClient) GetAddr() common.Address {

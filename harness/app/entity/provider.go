@@ -11,8 +11,8 @@ import (
 
 	pdp "github.com/dpduado/dpduado-go/xz21"
 
+	"github.com/dpduado/dpduado-test/harness/client"
 	"github.com/dpduado/dpduado-test/harness/helper"
-	"github.com/dpduado/dpduado-test/harness/session"
 )
 
 type File struct {
@@ -24,7 +24,7 @@ type File struct {
 type Provider struct {
 	Files map[string]*File `json:'files'`
 
-	session session.Session
+	client client.BaseClient
 }
 
 func (this *Provider) SearchFile(_hash [32]byte) *File {
@@ -34,17 +34,17 @@ func (this *Provider) SearchFile(_hash [32]byte) *File {
 	return nil
 }
 
-func GenProvider(_session session.Session) *Provider {
+func GenProvider(_client client.BaseClient) *Provider {
 	provider := new(Provider)
 
 	provider.Files = make(map[string]*File)
 
-	provider.session = _session
+	provider.client = _client
 
 	return provider
 }
 
-func LoadProvider(_path string, _session session.Session) *Provider {
+func LoadProvider(_path string, _client client.BaseClient) *Provider {
 	f, err := os.Open(_path)
 	if err != nil { panic(err) }
 	defer f.Close()
@@ -59,7 +59,7 @@ func LoadProvider(_path string, _session session.Session) *Provider {
 		sp.Files = make(map[string]*File)
 	}
 
-	sp.session = _session
+	sp.client = _client
 
 	return sp
 }
@@ -84,12 +84,12 @@ func (this *Provider) NewFile(_addr common.Address, _hash [32]byte, _data []byte
 
 	this.Files[helper.Hex(_hash[:])] = &file
 
-	this.session.RegisterFile(_hash, _tag.Size, _addr)
+	this.client.RegisterFile(_hash, _tag.Size, _addr)
 }
 
 func (this *Provider) IsUploaded(_data []byte) bool {
 	hash := sha256.Sum256(_data)
-	fileProp, err := this.session.SearchFile(hash)
+	fileProp, err := this.client.SearchFile(hash)
 	if err != nil { panic(err) }
 	if helper.IsEmptyFileProperty(&fileProp) { return false }
 
@@ -115,11 +115,11 @@ func (this *Provider) RegisterOwnerToFile(_su *User, _data []byte, _chalData *pd
 	hash := sha256.Sum256(_data)
 	file := this.SearchFile(hash)
 	if file == nil { panic(fmt.Errorf("File is not found.")) }
-	fileProp, err := this.session.SearchFile(hash)
+	fileProp, err := this.client.SearchFile(hash)
 	if err != nil { panic(err) }
 	if helper.IsEmptyFileProperty(&fileProp) { panic(fmt.Errorf("File property is not found."))}
 	// prepare params
-	xz21Param, err := this.session.GetParam()
+	xz21Param, err := this.client.GetParam()
 	if err != nil { panic(err) }
 	params := pdp.GenParamFromXZ21Param(&xz21Param)
 
@@ -127,7 +127,7 @@ func (this *Provider) RegisterOwnerToFile(_su *User, _data []byte, _chalData *pd
 	// Verify chal & proof
 	// ===================================
 	// prepare public key of the creator of the file
-	account, err := this.session.GetAccount(fileProp.Creator)
+	account, err := this.client.GetAccount(fileProp.Creator)
 	if err != nil { panic(fmt.Errorf("Account is not found.")) }
 	pkData := pdp.PublicKeyData{account.PubKey}
 	pk := pkData.Import(&params)
@@ -148,14 +148,14 @@ func (this *Provider) RegisterOwnerToFile(_su *User, _data []byte, _chalData *pd
 	// Verify chal & proof
 	// ===================================
 	file.Owners = append(file.Owners, _su.Addr)
-	err = this.session.AppendOwner(hash, _su.Addr)
+	err = this.client.AppendOwner(hash, _su.Addr)
 	if err != nil { panic(err) }
 
 	return true
 }
 
 func (this *Provider) GenDedupChallen(_data []byte, _addrSU common.Address) (pdp.ChalData) {
-	xz21Param, err := this.session.GetParam()
+	xz21Param, err := this.client.GetParam()
 	if err != nil { panic(err) }
 
 	param := pdp.GenParamFromXZ21Param(&xz21Param)
@@ -171,13 +171,13 @@ func (this *Provider) GenDedupChallen(_data []byte, _addrSU common.Address) (pdp
 }
 
 func (this *Provider) DownloadChallen() ([][32]byte, []pdp.ChalData) {
-	hashList, chalDataList, err := this.session.GetChalList()
+	hashList, chalDataList, err := this.client.GetChalList()
 	if err != nil { panic(err) }
 	return hashList, chalDataList
 }
 
 func (this *Provider) GenAuditProof(_hash [32]byte, _chal *pdp.ChalData) pdp.ProofData {
-	xz21Param, err := this.session.GetParam()
+	xz21Param, err := this.client.GetParam()
 	if err != nil { panic(err) }
 
 	params := pdp.GenParamFromXZ21Param(&xz21Param)
@@ -198,6 +198,6 @@ func (this *Provider) GenAuditProof(_hash [32]byte, _chal *pdp.ChalData) pdp.Pro
 func (this *Provider) UploadProof(_hash [32]byte, _proofData *pdp.ProofData) {
 	proofBytes, err := _proofData.Encode()
 	if err != nil { panic(err) }
-	err = this.session.SetProof(_hash, proofBytes)
+	err = this.client.SetProof(_hash, proofBytes)
 	if err != nil { panic(err) }
 }

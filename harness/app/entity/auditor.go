@@ -8,20 +8,20 @@ import (
 
 	pdp "github.com/dpduado/dpduado-go/xz21"
 
-	"github.com/dpduado/dpduado-test/harness/session"
+	"github.com/dpduado/dpduado-test/harness/client"
 )
 
 type Auditor struct {
-	session session.Session
+	client client.BaseClient
 }
 
-func GenAuditor(_session session.Session) *Auditor {
+func GenAuditor(_client client.BaseClient) *Auditor {
 	e := new(Auditor)
-	e.session = _session
+	e.client = _client
 	return e
 }
 
-func LoadAuditor(_path string, _session session.Session) *Auditor {
+func LoadAuditor(_path string, _client client.BaseClient) *Auditor {
 	f, err := os.Open(_path)
 	if err != nil { panic(err) }
 	defer f.Close()
@@ -32,13 +32,13 @@ func LoadAuditor(_path string, _session session.Session) *Auditor {
 	e := new(Auditor)
 	json.Unmarshal(s, &e)
 
-	e.session = _session
+	e.client = _client
 
 	return e
 }
 
 func (this *Auditor) GetAuditingReqList() ([][32]byte, []pdp.AuditingReq) {
-	hashList, xz21ReqList, err := this.session.GetAuditingReqList()
+	hashList, xz21ReqList, err := this.client.GetAuditingReqList()
 	if err != nil { panic(err) }
 
 	var reqList []pdp.AuditingReq
@@ -51,7 +51,7 @@ func (this *Auditor) GetAuditingReqList() ([][32]byte, []pdp.AuditingReq) {
 }
 
 func (this *Auditor) VerifyAuditProof(_tagData *pdp.TagData, _hashChunks [][]byte, _chalData *pdp.ChalData, _proofData *pdp.ProofData, _owner common.Address) (bool, error) {
-	xz21Param, err := this.session.GetParam()
+	xz21Param, err := this.client.GetParam()
 	if err != nil { return false, err }
 
 	params := pdp.GenParamFromXZ21Param(&xz21Param)
@@ -60,7 +60,7 @@ func (this *Auditor) VerifyAuditProof(_tagData *pdp.TagData, _hashChunks [][]byt
 	chal := _chalData.Import(&params)
 	proof := _proofData.Import(&params)
 
-	account, err := this.session.GetAccount(_owner)
+	account, err := this.client.GetAccount(_owner)
 	if err != nil { panic(err) }
 
 	pubKeyData := pdp.PublicKeyData{account.PubKey}
@@ -72,7 +72,7 @@ func (this *Auditor) VerifyAuditProof(_tagData *pdp.TagData, _hashChunks [][]byt
 }
 
 func (this *Auditor) UploadAuditResult(_hash [32]byte, _result bool) {
-	err := this.session.SetAuditingResult(_hash, _result)
+	err := this.client.SetAuditingResult(_hash, _result)
 	if err != nil { panic(err) }
 }
 

@@ -8,9 +8,9 @@ import (
 
 	pdp "github.com/dpduado/dpduado-go/xz21"
 
+	"github.com/dpduado/dpduado-test/harness/client"
 	"github.com/dpduado/dpduado-test/harness/entity"
 	"github.com/dpduado/dpduado-test/harness/helper"
-	"github.com/dpduado/dpduado-test/harness/session"
 	"github.com/dpduado/dpduado-test/harness/types"
 )
 
@@ -45,9 +45,9 @@ var su1 *entity.User
 var su2 *entity.User
 var su3 *entity.User
 
-var sessionTable map[types.EntityType]session.Session
+var sessionTable map[types.EntityType]client.BaseClient
 
-var ledger session.FakeLedger
+var ledger client.FakeLedger
 
 type Account struct {
 	Address string `json:'Address'`
@@ -123,26 +123,26 @@ func setup(_opts []string) {
 	mode = _opts[1]
 	command = _opts[2]
 
-	sesOpts := session.NewSessionOpts()
+	clientOpts := client.NewClientOpts()
 
 	for _, e := range EntityList {
-		sesOpts.AddrTable[e] = getAddress(mode, e)
-		sesOpts.PrivKeyTable[e] = getPrivKey(mode, e)
+		clientOpts.AddrTable[e] = getAddress(mode, e)
+		clientOpts.PrivKeyTable[e] = getPrivKey(mode, e)
 	}
 
 	if mode == "sim" {
 		// make fake ledger
 		if command == "setup" {
-			ledger = session.GenFakeLedger()
+			ledger = client.GenFakeLedger()
 		} else {
-			ledger = session.LoadFakeLedger("./cache/fake-ledger.json")
+			ledger = client.LoadFakeLedger("./cache/fake-ledger.json")
 		}
-		sesOpts.Ledger = &ledger
+		clientOpts.Ledger = &ledger
 	}
 
-	sessionTable = make(map[types.EntityType]session.Session)
+	sessionTable = make(map[types.EntityType]client.BaseClient)
 	for _, e := range EntityList {
-		sessionTable[e] = session.NewSession(mode, e, &sesOpts)
+		sessionTable[e] = client.NewClient(mode, e, &clientOpts)
 	}
 
 	if command == "setup" {

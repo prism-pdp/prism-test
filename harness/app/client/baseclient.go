@@ -1,4 +1,4 @@
-package session
+package client
 
 import (
 	"github.com/ethereum/go-ethereum/common"
@@ -8,7 +8,7 @@ import (
 	"github.com/dpduado/dpduado-test/harness/types"
 )
 
-type Session interface {
+type BaseClient interface {
 	GetAddr() common.Address
 	// interface of blockchain
 	GetParam() (pdp.XZ21Param, error) // E
@@ -27,7 +27,7 @@ type Session interface {
 	GetAuditingLogs(_hash [32]byte) ([]pdp.XZ21AuditingLog, error)
 }
 
-type SessionOpts struct {
+type ClientOpts struct {
 	Server string
 	ContractAddr string
 
@@ -37,31 +37,31 @@ type SessionOpts struct {
 	Ledger *FakeLedger
 }
 
-func NewSessionOpts() SessionOpts {
-	var opts SessionOpts
+func NewClientOpts() ClientOpts {
+	var opts ClientOpts
 	opts.AddrTable = make(map[types.EntityType]common.Address)
 	opts.PrivKeyTable = make(map[types.EntityType]string)
 	return opts
 }
 
-func NewSession(_mode string, _entity types.EntityType, _opts *SessionOpts) Session {
+func NewClient(_mode string, _entity types.EntityType, _opts *ClientOpts) BaseClient {
 	switch _mode {
 	case "sim":
-		return NewSimSession(_opts.Ledger, _opts.AddrTable[_entity])
+		return NewSimClient(_opts.Ledger, _opts.AddrTable[_entity])
 	}
 	return nil
 }
 
-func NewEthSession(_server string, _contractAddr string, _privKey string, _addr common.Address) Session {
+func NewEthClient(_server string, _contractAddr string, _privKey string, _addr common.Address) BaseClient {
 	var ethClient EthClient
 	ethClient.Setup(_server, _contractAddr, _privKey, _addr)
 	return &ethClient
 }
 
-func NewSimSession(_ledger *FakeLedger, _addr common.Address) Session {
-	var simSession SimSession
-	simSession.Setup(_addr, _ledger)
-	return &simSession
+func NewSimClient(_ledger *FakeLedger, _addr common.Address) BaseClient {
+	var simClient SimClient
+	simClient.Setup(_addr, _ledger)
+	return &simClient
 
 	return nil
 }

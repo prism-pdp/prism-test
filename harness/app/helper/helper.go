@@ -24,8 +24,7 @@ const (
 	PURPLE
 )
 
-
-func GenSession(_server string, _contractAddr string, _privKey string) pdp.XZ21Session {
+func GenXZ21Session(_server string, _contractAddr string, _privKey string) pdp.XZ21Session {
 	cl, err := ethclient.Dial(_server)
 	if err != nil { panic(err) }
 

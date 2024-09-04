@@ -8,23 +8,23 @@ import (
 
 	pdp "github.com/dpduado/dpduado-go/xz21"
 
-	"github.com/dpduado/dpduado-test/harness/session"
+	"github.com/dpduado/dpduado-test/harness/client"
 )
 
 type Manager struct {
 	Param pdp.PairingParam // TODO: Use Params struct (same with fake ledger)
 
-	session session.Session
+	client client.BaseClient
 }
 
-func GenManager( _session session.Session) *Manager {
+func GenManager( _client client.BaseClient) *Manager {
 	manager := new(Manager)
 	manager.Param = pdp.GenPairingParam()
-	manager.session = _session
+	manager.client = _client
 	return manager
 }
 
-func LoadManager(_path string, _session session.Session) *Manager {
+func LoadManager(_path string, _client client.BaseClient) *Manager {
 	f, err := os.Open(_path)
 	if err != nil { panic(err) }
 	defer f.Close()
@@ -35,14 +35,14 @@ func LoadManager(_path string, _session session.Session) *Manager {
 	sm := new(Manager)
 	json.Unmarshal(s, &sm)
 
-	sm.session = _session
+	sm.client = _client
 
 	return sm
 }
 
 func (this *Manager) RegisterParam() {
 	xz21Param := this.Param.ToXZ21Param()
-	this.session.RegisterParam(
+	this.client.RegisterParam(
 		xz21Param.P,
 		xz21Param.G,
 		xz21Param.U,
@@ -50,7 +50,7 @@ func (this *Manager) RegisterParam() {
 }
 
 func (this *Manager) EnrollUser(_addr common.Address, _pubKey []byte)  {
-	this.session.EnrollAccount(_addr, _pubKey)
+	this.client.EnrollAccount(_addr, _pubKey)
 }
 
 func (this *Manager) Dump(_path string) {

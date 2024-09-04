@@ -11,8 +11,8 @@ import (
 
 	pdp "github.com/dpduado/dpduado-go/xz21"
 
+	"github.com/dpduado/dpduado-test/harness/client"
 	"github.com/dpduado/dpduado-test/harness/helper"
-	"github.com/dpduado/dpduado-test/harness/session"
 )
 
 type User struct {
@@ -20,24 +20,24 @@ type User struct {
 	PublicKeyData pdp.PublicKeyData `json:'publicKey'`
 	PrivateKeyData pdp.PrivateKeyData `json:'privateKey'`
 
-	session session.Session
+	client client.BaseClient
 }
 
-func GenUser(_session session.Session, _param *pdp.PairingParam) *User {
+func GenUser(_client client.BaseClient, _param *pdp.PairingParam) *User {
 	user := new(User)
 
-	user.Addr = _session.GetAddr()
+	user.Addr = _client.GetAddr()
 
 	pk, sk := pdp.GenPairingKey(_param)
 	user.PublicKeyData = pk.Export()
 	user.PrivateKeyData = sk.Export()
 
-	user.session = _session
+	user.client = _client
 
 	return user
 }
 
-func LoadUser(_path string, _session session.Session) *User {
+func LoadUser(_path string, _client client.BaseClient) *User {
 	f, err := os.Open(_path)
 	if err != nil { panic(err) }
 	defer f.Close()
@@ -48,7 +48,7 @@ func LoadUser(_path string, _session session.Session) *User {
 	su := new(User)
 	json.Unmarshal(s, &su)
 
-	su.session = _session
+	su.client = _client
 
 	return su
 }
@@ -67,7 +67,7 @@ func (this *User) Dump(_path string) {
 
 func (this *User) IsUploaded(_data []byte) bool {
 	hash := sha256.Sum256(_data)
-	fileProp, err := this.session.SearchFile(hash)
+	fileProp, err := this.client.SearchFile(hash)
 	if err != nil { panic(err) }
 
 	if helper.IsEmptyFileProperty(&fileProp) { return false }
@@ -75,7 +75,7 @@ func (this *User) IsUploaded(_data []byte) bool {
 }
 
 func (this *User) PrepareUpload(_data []byte, _chunkNum uint32) pdp.Tag {
-	xz21Param, err := this.session.GetParam()
+	xz21Param, err := this.client.GetParam()
 	if err != nil { panic(err) }
 
 	param := pdp.GenParamFromXZ21Param(&xz21Param)
@@ -89,7 +89,7 @@ func (this *User) PrepareUpload(_data []byte, _chunkNum uint32) pdp.Tag {
 }
 
 func (this *User) GenDedupProof(_chal *pdp.ChalData, _data []byte, _chunkNum uint32) pdp.ProofData {
-	xz21Param, err := this.session.GetParam()
+	xz21Param, err := this.client.GetParam()
 	if err != nil { panic(err) }
 
 	params := pdp.GenParamFromXZ21Param(&xz21Param)
@@ -105,12 +105,12 @@ func (this *User) GenDedupProof(_chal *pdp.ChalData, _data []byte, _chunkNum uin
 }
 
 func (this *User) GenAuditChallen(_hash [32]byte) pdp.ChalData {
-	xz21Param, err := this.session.GetParam()
+	xz21Param, err := this.client.GetParam()
 	if err != nil { panic(err) }
 
 	params := pdp.GenParamFromXZ21Param(&xz21Param)
 
-	fileProp, err := this.session.SearchFile(_hash)
+	fileProp, err := this.client.SearchFile(_hash)
 	if err != nil { panic(err) }
 	if helper.IsEmptyFileProperty(&fileProp) { panic(fmt.Errorf("File property is not found")) }
 
@@ -125,14 +125,14 @@ func (this *User) GenAuditChallen(_hash [32]byte) pdp.ChalData {
 func (this *User) UploadChallen(_hash [32]byte, _chalData *pdp.ChalData) bool {
 	chalBytes, err := _chalData.Encode()
 	if err != nil { panic(err) }
-	success, err := this.session.SetChal(_hash, chalBytes)
+	success, err := this.client.SetChal(_hash, chalBytes)
 	if err != nil { panic(err) }
 
 	return success
 }
 
 func (this *User) FetchFileList() [][32]byte {
-	fileList, err := this.session.GetFileList(this.Addr)
+	fileList, err := this.client.GetFileList(this.Addr)
 	if err != nil { panic(err) }
 	return fileList
 }

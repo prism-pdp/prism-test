@@ -1,4 +1,4 @@
-package session
+package client
 
 import (
 	"fmt"
@@ -9,21 +9,21 @@ import (
 	"github.com/dpduado/dpduado-test/harness/helper"
 )
 
-type SimSession struct {
+type SimClient struct {
 	Addr common.Address `json:'addr'`
 	Ledger *FakeLedger  `json:'ledger'`
 }
 
-func (this *SimSession) Setup(_addr common.Address, _ledger *FakeLedger) {
+func (this *SimClient) Setup(_addr common.Address, _ledger *FakeLedger) {
 	this.Addr = _addr
 	this.Ledger = _ledger
 }
 
-func (this *SimSession) GetAddr() common.Address {
+func (this *SimClient) GetAddr() common.Address {
 	return this.Addr
 }
 
-func (this *SimSession) GetParam() (pdp.XZ21Param, error) {
+func (this *SimClient) GetParam() (pdp.XZ21Param, error) {
 	var xz21Param pdp.XZ21Param
 	xz21Param.P = this.Ledger.Params.P
 	xz21Param.G = this.Ledger.Params.G
@@ -31,19 +31,19 @@ func (this *SimSession) GetParam() (pdp.XZ21Param, error) {
 	return xz21Param, nil
 }
 
-func (this *SimSession) RegisterParam(_params string, _g []byte, _u []byte) error {
+func (this *SimClient) RegisterParam(_params string, _g []byte, _u []byte) error {
 	this.Ledger.Params.P = _params
 	this.Ledger.Params.G = _g
 	this.Ledger.Params.U = _u
 	return nil
 }
 
-func (this *SimSession) RegisterFile(_hash [32]byte, _splitNum uint32, _owner common.Address) error {
+func (this *SimClient) RegisterFile(_hash [32]byte, _splitNum uint32, _owner common.Address) error {
 	this.Ledger.RegisterFile(_hash, _splitNum, _owner)
 	return nil
 }
 
-func (this *SimSession) GetFileList(_addr common.Address) ([][32]byte, error) {
+func (this *SimClient) GetFileList(_addr common.Address) ([][32]byte, error) {
 	var fileList [][32]byte
 	for hashHex, prop := range this.Ledger.FileProperties {
 		if prop.Creator == _addr {
@@ -55,24 +55,24 @@ func (this *SimSession) GetFileList(_addr common.Address) ([][32]byte, error) {
 	return fileList, nil
 }
 
-func (this *SimSession) SearchFile(_hash [32]byte) (pdp.XZ21FileProperty, error) {
+func (this *SimClient) SearchFile(_hash [32]byte) (pdp.XZ21FileProperty, error) {
 	return this.Ledger.SearchFile(_hash)
 }
 
-func (this *SimSession) GetAccount(_addr common.Address) (pdp.XZ21Account, error) {
+func (this *SimClient) GetAccount(_addr common.Address) (pdp.XZ21Account, error) {
 	return *this.Ledger.Accounts[_addr], nil
 }
 
-func (this *SimSession) EnrollAccount(_addr common.Address, _pubKey []byte) error {
+func (this *SimClient) EnrollAccount(_addr common.Address, _pubKey []byte) error {
 	this.Ledger.EnrollAccount(_addr, _pubKey)
 	return nil
 }
 
-func (this *SimSession) AppendOwner(_hash [32]byte, _addr common.Address) error {
+func (this *SimClient) AppendOwner(_hash [32]byte, _addr common.Address) error {
 	return this.Ledger.AppendOwner(_hash, _addr)
 }
 
-func (this *SimSession) SetChal(_hash [32]byte, _chalBytes []byte) (bool, error) {
+func (this *SimClient) SetChal(_hash [32]byte, _chalBytes []byte) (bool, error) {
 	hashHex := helper.Hex(_hash[:])
 	if _, ok := this.Ledger.Reqs[hashHex]; ok {
 		return false, nil
@@ -85,7 +85,7 @@ func (this *SimSession) SetChal(_hash [32]byte, _chalBytes []byte) (bool, error)
 	return true, nil
 }
 
-func (this *SimSession) GetChalList() ([][32]byte, []pdp.ChalData, error) {
+func (this *SimClient) GetChalList() ([][32]byte, []pdp.ChalData, error) {
 	hashList := make([][32]byte, 0)
 	chalDataList := make([]pdp.ChalData, 0)
 	for k, v := range this.Ledger.Reqs {
@@ -102,12 +102,12 @@ func (this *SimSession) GetChalList() ([][32]byte, []pdp.ChalData, error) {
 	return hashList, chalDataList, nil
 }
 
-func (this *SimSession) SetProof(_hash [32]byte, _proofBytes []byte) error {
+func (this *SimClient) SetProof(_hash [32]byte, _proofBytes []byte) error {
 	this.Ledger.Reqs[helper.Hex(_hash[:])].Proof = _proofBytes
 	return nil
 }
 
-func (this *SimSession) SetAuditingResult(_hash [32]byte, _result bool) error {
+func (this *SimClient) SetAuditingResult(_hash [32]byte, _result bool) error {
 	hashHex := helper.Hex(_hash[:])
 
 	req, ok := this.Ledger.Reqs[hashHex]
@@ -130,7 +130,7 @@ func (this *SimSession) SetAuditingResult(_hash [32]byte, _result bool) error {
 	return nil
 }
 
-func (this *SimSession) GetAuditingReqList() ([][32]byte, []pdp.XZ21AuditingReq, error) {
+func (this *SimClient) GetAuditingReqList() ([][32]byte, []pdp.XZ21AuditingReq, error) {
 	var fileList [][32]byte
 	var reqList []pdp.XZ21AuditingReq
 	for hashHex, req := range this.Ledger.Reqs {
@@ -142,7 +142,7 @@ func (this *SimSession) GetAuditingReqList() ([][32]byte, []pdp.XZ21AuditingReq,
 	return fileList, reqList, nil
 }
 
-func (this *SimSession) GetAuditingLogs(_hash [32]byte) ([]pdp.XZ21AuditingLog, error) {
+func (this *SimClient) GetAuditingLogs(_hash [32]byte) ([]pdp.XZ21AuditingLog, error) {
 	hashHex := helper.Hex(_hash[:])
 	var logs []pdp.XZ21AuditingLog
 	for _, v := range this.Ledger.Logs[hashHex] {
