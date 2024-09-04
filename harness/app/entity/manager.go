@@ -13,7 +13,7 @@ import (
 )
 
 type Manager struct {
-	Param pdp.PairingParam // TODO: Use Params struct (same with fake ledger)
+	Param pdp.PairingParam
 
 	client client.BaseClient
 }
