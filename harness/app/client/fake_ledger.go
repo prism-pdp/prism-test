@@ -12,14 +12,8 @@ import (
 	"github.com/dpduado/dpduado-test/harness/helper"
 )
 
-type Params struct {
-	P string `json:'params'`
-	G []byte `json:'G'`
-	U []byte `json:'U'`
-}
-
 type FakeLedger struct {
-	Params Params `json:'params'`
+	Param pdp.XZ21Param `json:'param'`
 	FileProperties map[string]*pdp.XZ21FileProperty `json:'fileProperties'`
 	Accounts map[common.Address]*pdp.XZ21Account `json:'accounts'`
 	Reqs map[string]*pdp.XZ21AuditingReq `json:'auditReqs'`

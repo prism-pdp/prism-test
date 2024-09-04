@@ -25,16 +25,16 @@ func (this *SimClient) GetAddr() common.Address {
 
 func (this *SimClient) GetParam() (pdp.XZ21Param, error) {
 	var xz21Param pdp.XZ21Param
-	xz21Param.P = this.Ledger.Params.P
-	xz21Param.G = this.Ledger.Params.G
-	xz21Param.U = this.Ledger.Params.U
+	xz21Param.P = this.Ledger.Param.P
+	xz21Param.G = this.Ledger.Param.G
+	xz21Param.U = this.Ledger.Param.U
 	return xz21Param, nil
 }
 
 func (this *SimClient) RegisterParam(_params string, _g []byte, _u []byte) error {
-	this.Ledger.Params.P = _params
-	this.Ledger.Params.G = _g
-	this.Ledger.Params.U = _u
+	this.Ledger.Param.P = _params
+	this.Ledger.Param.G = _g
+	this.Ledger.Param.U = _u
 	return nil
 }
 
