@@ -45,7 +45,7 @@ var su1 *entity.User
 var su2 *entity.User
 var su3 *entity.User
 
-var sessionTable map[types.EntityType]client.BaseClient
+var clientTable map[types.EntityType]client.BaseClient
 
 var ledger client.FakeLedger
 
@@ -140,25 +140,25 @@ func setup(_opts []string) {
 		clientOpts.Ledger = &ledger
 	}
 
-	sessionTable = make(map[types.EntityType]client.BaseClient)
+	clientTable = make(map[types.EntityType]client.BaseClient)
 	for _, e := range EntityList {
-		sessionTable[e] = client.NewClient(mode, e, &clientOpts)
+		clientTable[e] = client.NewClient(mode, e, &clientOpts)
 	}
 
 	if command == "setup" {
-		sm  = entity.GenManager(sessionTable[SM])
-		sp  = entity.GenProvider(sessionTable[SP])
-		tpa = entity.GenAuditor(sessionTable[TPA])
-		su1 = entity.GenUser(sessionTable[SU1], &sm.Param)
-		su2 = entity.GenUser(sessionTable[SU2], &sm.Param)
-		su3 = entity.GenUser(sessionTable[SU3], &sm.Param)
+		sm  = entity.GenManager(clientTable[SM])
+		sp  = entity.GenProvider(clientTable[SP])
+		tpa = entity.GenAuditor(clientTable[TPA])
+		su1 = entity.GenUser(clientTable[SU1], &sm.Param)
+		su2 = entity.GenUser(clientTable[SU2], &sm.Param)
+		su3 = entity.GenUser(clientTable[SU3], &sm.Param)
 	} else {
-		sm = entity.LoadManager("./cache/sm.json", sessionTable[SM])
-		sp = entity.LoadProvider("./cache/sp.json", sessionTable[SP])
-		tpa = entity.LoadAuditor("./cache/tpa.json", sessionTable[TPA])
-		su1 = entity.LoadUser("./cache/su1.json", sessionTable[SU1])
-		su2 = entity.LoadUser("./cache/su2.json", sessionTable[SU2])
-		su3 = entity.LoadUser("./cache/su3.json", sessionTable[SU3])
+		sm = entity.LoadManager("./cache/sm.json", clientTable[SM])
+		sp = entity.LoadProvider("./cache/sp.json", clientTable[SP])
+		tpa = entity.LoadAuditor("./cache/tpa.json", clientTable[TPA])
+		su1 = entity.LoadUser("./cache/su1.json", clientTable[SU1])
+		su2 = entity.LoadUser("./cache/su2.json", clientTable[SU2])
+		su3 = entity.LoadUser("./cache/su3.json", clientTable[SU3])
 	}
 }
 
