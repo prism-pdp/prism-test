@@ -153,7 +153,7 @@ func setup(_opts []string) {
 	su3 = entity.MakeUser("./cache/su3.json", clientTable[SU3], &sm.Param)
 }
 
-func runSetupPhase(_server string, _contractAddr string) {
+func runSetupPhase() {
 	helper.PrintLog("Start Setup Phase")
 
 	// =================================================
@@ -283,7 +283,7 @@ func main() {
 
 	switch command {
 	case "setup":
-		runSetupPhase(os.Args[1], os.Args[2])
+		runSetupPhase()
 	case "upload":
 		runUploadPhase(su1, data1)
 		runUploadPhase(su2, data1)
