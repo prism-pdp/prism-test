@@ -10,6 +10,7 @@ import (
 
 type BaseClient interface {
 	GetAddr() common.Address
+	WaitEvent(_from common.Address, _hash [32]byte) (bool, string, error)
 	// interface of blockchain
 	GetParam() (pdp.XZ21Param, error) // E
 	RegisterParam(_param string, _g []byte, _u []byte) error // A
@@ -19,7 +20,7 @@ type BaseClient interface {
 	GetAccount(_addr common.Address) (pdp.XZ21Account, error)
 	EnrollAccount(_addr common.Address, _pubKey []byte) error // B
 	AppendOwner(_hash [32]byte, _owner common.Address) error // F
-	SetChal(_hash [32]byte, _chalBytes []byte) (bool, error) // G
+	SetChal(_hash [32]byte, _chalBytes []byte) error // G
 	GetChalList() ([][32]byte, []pdp.ChalData, error) // H
 	SetProof(_hash [32]byte, _proofBytes []byte) error // I
 	GetAuditingReqList() ([][32]byte, []pdp.XZ21AuditingReq, error) // J
@@ -37,10 +38,13 @@ type ClientOpts struct {
 	Ledger *FakeLedger
 }
 
-func NewClientOpts() ClientOpts {
+func NewClientOpts(_mode string, _server string, _contractAddr string) ClientOpts {
 	var opts ClientOpts
 	opts.AddrTable = make(map[types.EntityType]common.Address)
 	opts.PrivKeyTable = make(map[types.EntityType]string)
+	opts.Server = _server
+	opts.ContractAddr = _contractAddr
+
 	return opts
 }
 
@@ -48,6 +52,8 @@ func NewClient(_mode string, _entity types.EntityType, _opts *ClientOpts) BaseCl
 	switch _mode {
 	case "sim":
 		return NewSimClient(_opts.Ledger, _opts.AddrTable[_entity])
+	case "eth":
+		return NewEthClient(_opts.Server, _opts.ContractAddr, _opts.PrivKeyTable[_entity], _opts.AddrTable[_entity])
 	}
 	return nil
 }

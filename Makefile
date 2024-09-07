@@ -6,8 +6,15 @@ CONTRACT = XZ21
 shell:
 	docker compose run $(SERVICE) bash
 
-test/sim:
+test@sim:
 	rm -rf ./harness/app/cache/*
+	$(MAKE) harness@build
+	$(MAKE) harness@run@sim
+
+test:
+	rm -rf ./harness/app/cache/*
+	$(MAKE) testnet/shutdown
+	$(MAKE) testnet/startup
 	$(MAKE) harness@build
 	$(MAKE) harness@run
 
@@ -29,6 +36,7 @@ testnet/startup:
 testnet/shutdown:
 	docker compose down testnet
 
+# Unused
 testnet/test:
 	$(MAKE) docker-run SERVICE="testnet" CMD='forge test'
 
@@ -47,19 +55,27 @@ setup:
 harness@build:
 	$(MAKE) docker-run SERVICE="harness" CMD="go build -o bin/harness ."
 
+harness@run@sim:
+	$(MAKE) harness@run-setup@sim
+	$(MAKE) harness@run-upload@sim
+	$(MAKE) harness@run-audit@sim
+harness@run-setup@sim:
+	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness sim setup"
+harness@run-upload@sim:
+	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness sim upload"
+harness@run-audit@sim:
+	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness sim audit"
+
 harness@run:
 	$(MAKE) harness@run-setup
 	$(MAKE) harness@run-upload
 	$(MAKE) harness@run-audit
-
 harness@run-setup:
-	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness http://testnet:8545 $(file < cache/contract.addr) setup sim"
-
+	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness eth setup ws://testnet:8545 $(file < cache/contract.addr)"
 harness@run-upload:
-	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness http://testnet:8545 $(file < cache/contract.addr) upload sim"
-
+	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness eth upload ws://testnet:8545 $(file < cache/contract.addr)"
 harness@run-audit:
-	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness http://testnet:8545 $(file < cache/contract.addr) audit sim"
+	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness eth audit ws://testnet:8545 $(file < cache/contract.addr)"
 
 harness/clean:
 	rm -rf ./harness/app/cache/*

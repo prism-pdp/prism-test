@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"io/ioutil"
 	"os"
+	"time"
 
 	"github.com/ethereum/go-ethereum/common"
 
@@ -16,6 +17,7 @@ import (
 )
 
 type User struct {
+	Name string
 	Addr common.Address `json:'addr'`
 	PublicKeyData pdp.PublicKeyData `json:'publicKey'`
 	PrivateKeyData pdp.PrivateKeyData `json:'privateKey'`
@@ -23,16 +25,18 @@ type User struct {
 	client client.BaseClient
 }
 
-func MakeUser(_path string, _client client.BaseClient, _param *pdp.PairingParam) *User {
+func MakeUser(_path string, _client client.BaseClient, _param *pdp.PairingParam, _name string) *User {
 	if (helper.IsFile(_path)) {
 		return LoadUser(_path, _client)
 	} else {
-		return GenUser(_client, _param)
+		return GenUser(_client, _param, _name)
 	}
 }
 
-func GenUser(_client client.BaseClient, _param *pdp.PairingParam) *User {
+func GenUser(_client client.BaseClient, _param *pdp.PairingParam, _name string) *User {
 	user := new(User)
+
+	user.Name = _name
 
 	user.Addr = _client.GetAddr()
 
@@ -130,13 +134,17 @@ func (this *User) GenAuditingChal(_hash [32]byte) pdp.ChalData {
 
 // Return true when upload is success.
 // Return false when the file is under auditing.
-func (this *User) UploadAuditingChal(_hash [32]byte, _chalData *pdp.ChalData) bool {
+func (this *User) UploadAuditingChal(_hash [32]byte, _chalData *pdp.ChalData) {
 	chalBytes, err := _chalData.Encode()
 	if err != nil { panic(err) }
-	success, err := this.client.SetChal(_hash, chalBytes)
+	err = this.client.SetChal(_hash, chalBytes)
 	if err != nil { panic(err) }
 
-	return success
+	// if msg == "Success" {
+	// 	return true
+	// }
+
+	// return false
 }
 
 func (this *User) FetchFileList() [][32]byte {
@@ -144,3 +152,23 @@ func (this *User) FetchFileList() [][32]byte {
 	if err != nil { panic(err) }
 	return fileList
 }
+
+func (this *User) WaitEvent(_hash [32]byte) string {
+	var ok bool
+	var msg string
+	var err error
+
+	for {
+		ok, msg, err = this.client.WaitEvent(this.Addr, _hash)
+		if err != nil { panic(err) }
+
+		if ok {
+			break
+		} else {
+			time.Sleep(1 * time.Second)
+		}
+	}
+
+	return msg
+}
+

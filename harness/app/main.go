@@ -14,25 +14,10 @@ import (
 	"github.com/dpduado/dpduado-test/harness/types"
 )
 
-const (
-	SM types.EntityType = iota
-	SP
-	TPA
-	SU1
-	SU2
-	SU3
-)
-var EntityList [6]types.EntityType = [6]types.EntityType{
-	SM,
-	SP,
-	TPA,
-	SU1,
-	SU2,
-	SU3,
-}
-
 var mode string
 var command string
+var server string
+var contractAddr string
 
 var data1 []byte
 var data2 []byte
@@ -123,9 +108,17 @@ func setup(_opts []string) {
 	mode = _opts[1]
 	command = _opts[2]
 
-	clientOpts := client.NewClientOpts()
+	if mode == "eth" {
+		server = _opts[3]
+		contractAddr = _opts[4]
+	} else {
+		server = ""
+		contractAddr = ""
+	}
 
-	for _, e := range EntityList {
+	clientOpts := client.NewClientOpts(mode, server, contractAddr)
+
+	for _, e := range types.EntityList {
 		clientOpts.AddrTable[e] = getAddress(mode, e)
 		clientOpts.PrivKeyTable[e] = getPrivKey(mode, e)
 	}
@@ -141,16 +134,16 @@ func setup(_opts []string) {
 	}
 
 	clientTable = make(map[types.EntityType]client.BaseClient)
-	for _, e := range EntityList {
+	for _, e := range types.EntityList {
 		clientTable[e] = client.NewClient(mode, e, &clientOpts)
 	}
 
-	sm = entity.MakeManager("./cache/sm.json", clientTable[SM])
-	sp = entity.MakeProvider("./cache/sp.json", clientTable[SP])
-	tpa = entity.MakeAuditor("./cache/tpa.json", clientTable[TPA])
-	su1 = entity.MakeUser("./cache/su1.json", clientTable[SU1], &sm.Param)
-	su2 = entity.MakeUser("./cache/su2.json", clientTable[SU2], &sm.Param)
-	su3 = entity.MakeUser("./cache/su3.json", clientTable[SU3], &sm.Param)
+	sm = entity.MakeManager("./cache/sm.json", clientTable[types.SM])
+	sp = entity.MakeProvider("./cache/sp.json", clientTable[types.SP])
+	tpa = entity.MakeAuditor("./cache/tpa.json", clientTable[types.TPA])
+	su1 = entity.MakeUser("./cache/su1.json", clientTable[types.SU1], &sm.Param, "SU1")
+	su2 = entity.MakeUser("./cache/su2.json", clientTable[types.SU2], &sm.Param, "SU2")
+	su3 = entity.MakeUser("./cache/su3.json", clientTable[types.SU3], &sm.Param, "SU3")
 }
 
 func runSetupPhase() {
@@ -218,20 +211,28 @@ func runUploadAuditingChal(_su *entity.User) {
 	// SU gets the list of his/her files.
 	fileList := _su.FetchFileList()
 	// SU generates challenge and requests to audit each file
+	helper.PrintLog(fmt.Sprintf("Start upload auditing chal (su:%s, fileNum:%d)", _su.Name, len(fileList)))
 	for _, f := range fileList {
 		chalData := _su.GenAuditingChal(f)
-		result := _su.UploadAuditingChal(f, &chalData)
-		if result {
-			helper.PrintLog("Upload chal: OK")
-		} else {
-			helper.PrintLog("Upload chal: Skip (Under auditing)")
-		}
+		_su.UploadAuditingChal(f, &chalData)
+		// msg := _su.WaitEvent(f)
+		// if msg == "Success" {
+		// 	helper.PrintLog(fmt.Sprintf("Upload chal (su:%s, file:%s, status:ok)", _su.Name, helper.Hex(f[:])))
+		// } else if msg == "Skip" {
+		// 	helper.PrintLog(fmt.Sprintf("Upload chal (su:%s, file:%s, status:skip)", _su.Name, helper.Hex(f[:])))
+		// } else {
+		// 	helper.PrintLog(fmt.Sprintf("Upload chal (su:%s, file:%s, status:unknown)", _su.Name, helper.Hex(f[:])))
+		// }
 	}
 }
 
 func runUploadAuditingProof() {
 	// SP gets challenge from blockchain.
 	hashList, chalDataList := sp.DownloadAuditingChal()
+	for _, h := range hashList {
+		helper.PrintLog(helper.Hex(h[:]))
+	}
+	if len(hashList) != 2 { panic(fmt.Errorf("Invalid hashList size (expect:2, actual:%d)", len(hashList))) }
 	for i, h := range hashList {
 		proofData := sp.GenAuditingProof(h, &chalDataList[i])
 		sp.UploadAuditingProof(h, &proofData)
@@ -241,6 +242,7 @@ func runUploadAuditingProof() {
 func runVerifyAuditingProof() {
 	// TPA gets challenge and proof from blockchain.
 	hashList, reqList := tpa.GetAuditingReqList()
+	if len(hashList) != 2 { panic(fmt.Errorf("Invalid hashList size (expect:2, actual:%d)", len(hashList))) }
 	for i, h := range hashList {
 		// TPA gets M (list of hash of chunks) from SP.
 		f := sp.SearchFile(h)
