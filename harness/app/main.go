@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"os"
+	"time"
 
 	"github.com/ethereum/go-ethereum/common"
 
@@ -270,6 +271,9 @@ func runAuditingPhase() {
 	runUploadAuditingChal(su2)
 	runUploadAuditingProof()
 	runVerifyAuditingProof()
+
+	time.Sleep(3 * time.Second)
+
 	// 2nd
 	runUploadAuditingChal(su1)
 	runUploadAuditingChal(su2)

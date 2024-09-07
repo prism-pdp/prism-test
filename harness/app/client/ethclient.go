@@ -144,7 +144,11 @@ func (this *EthClient) SetChal(_hash [32]byte, _chalBytes []byte) error {
 	fmt.Println("A: ", time.Now())
 	receipt, err := bind.WaitMined(context.Background(), this.Client, tx)
 	if err != nil { return err }
-	fmt.Printf("%+v\n", receipt)
+	for _, l := range receipt.Logs {
+		xz21Res, err := this.Session.Contract.XZ21Filterer.ParseResult(*l)
+		if err != nil { return err }
+		helper.PrintLog(fmt.Sprintf("SetChal (caller:%s, file:%s, msg:%s)", xz21Res.From, helper.Hex(xz21Res.Hash[:]), xz21Res.Msg))
+	}
 	fmt.Println("B: ", time.Now())
 
 	return nil
