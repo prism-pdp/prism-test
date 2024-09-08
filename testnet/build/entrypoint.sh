@@ -45,7 +45,8 @@ elif [ "$1" = "start" ]; then
         --port $RPC_PORT \
         --accounts $NUM_FIRST_ACCOUNTS \
         --balance $BALANCE_FIRST_ACCOUNTS \
-        --mnemonic "$WALLET_MNEMONIC"
+        --mnemonic "$WALLET_MNEMONIC" \
+        --block-time 5
 else
     exec "$@"
 fi
