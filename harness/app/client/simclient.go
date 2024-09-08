@@ -23,10 +23,6 @@ func (this *SimClient) GetAddr() common.Address {
 	return this.Addr
 }
 
-func (this *SimClient) WaitEvent(_from common.Address, _hash [32]byte) (bool, string, error) {
-	return true, "", nil
-}
-
 func (this *SimClient) GetParam() (pdp.XZ21Param, error) {
 	var xz21Param pdp.XZ21Param
 	xz21Param.P = this.Ledger.Param.P
@@ -87,23 +83,6 @@ func (this *SimClient) SetChal(_hash [32]byte, _chalBytes []byte) error {
 	this.Ledger.Reqs[hashHex] = &req
 
 	return nil
-}
-
-func (this *SimClient) GetChalList() ([][32]byte, []pdp.ChalData, error) {
-	hashList := make([][32]byte, 0)
-	chalDataList := make([]pdp.ChalData, 0)
-	for k, v := range this.Ledger.Reqs {
-		if len(v.Proof) == 0 {
-			h, err := helper.DecodeHex(k)
-			if err != nil { panic(err) }
-			hashList = append(hashList, [32]byte(h))
-
-			chalData, err := pdp.DecodeToChalData(v.Chal)
-			if err != nil { panic(err) }
-			chalDataList = append(chalDataList, chalData)
-		}
-	}
-	return hashList, chalDataList, nil
 }
 
 func (this *SimClient) SetProof(_hash [32]byte, _proofBytes []byte) error {

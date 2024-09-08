@@ -6,7 +6,6 @@ import (
 	"encoding/json"
 	"io/ioutil"
 	"os"
-	"time"
 
 	"github.com/ethereum/go-ethereum/common"
 
@@ -132,19 +131,10 @@ func (this *User) GenAuditingChal(_hash [32]byte) pdp.ChalData {
 	return chalData
 }
 
-// Return true when upload is success.
-// Return false when the file is under auditing.
 func (this *User) UploadAuditingChal(_hash [32]byte, _chalData *pdp.ChalData) {
 	chalBytes, err := _chalData.Encode()
 	if err != nil { panic(err) }
 	err = this.client.SetChal(_hash, chalBytes)
-	if err != nil { panic(err) }
-
-	// if msg == "Success" {
-	// 	return true
-	// }
-
-	// return false
 }
 
 func (this *User) FetchFileList() [][32]byte {
@@ -152,23 +142,3 @@ func (this *User) FetchFileList() [][32]byte {
 	if err != nil { panic(err) }
 	return fileList
 }
-
-func (this *User) WaitEvent(_hash [32]byte) string {
-	var ok bool
-	var msg string
-	var err error
-
-	for {
-		ok, msg, err = this.client.WaitEvent(this.Addr, _hash)
-		if err != nil { panic(err) }
-
-		if ok {
-			break
-		} else {
-			time.Sleep(1 * time.Second)
-		}
-	}
-
-	return msg
-}
-

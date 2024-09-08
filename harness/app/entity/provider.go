@@ -179,8 +179,16 @@ func (this *Provider) GenDedupChal(_data []byte, _addrSU common.Address) (pdp.Ch
 }
 
 func (this *Provider) DownloadAuditingChal() ([][32]byte, []pdp.ChalData) {
-	hashList, chalDataList, err := this.client.GetChalList()
+	hashList, reqList, err := this.client.GetAuditingReqList()
 	if err != nil { panic(err) }
+	chalDataList := make([]pdp.ChalData, 0)
+	for _, v := range reqList {
+		if len(v.Proof) == 0 {
+			chalData, err := pdp.DecodeToChalData(v.Chal)
+			if err != nil { panic(err) }
+			chalDataList = append(chalDataList, chalData)
+		}
+	}
 	return hashList, chalDataList
 }
 

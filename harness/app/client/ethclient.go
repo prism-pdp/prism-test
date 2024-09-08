@@ -2,9 +2,7 @@ package client
 
 import (
 	"context"
-	"bytes"
 	"fmt"
-	"time"
 
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
@@ -19,79 +17,15 @@ type EthClient struct {
 	Addr common.Address `json:'addr'`
 	Client *ethclient.Client
 	Session pdp.XZ21Session
-	// Subscr event.Subscription
-	// ChanResult chan pdp.XZ21Result
 }
 
 func (this *EthClient) Setup(_server string, _contractAddr string, _privKey string, _addr common.Address) {
 	this.Addr = _addr
 	this.Client, this.Session = helper.GenXZ21Session(_server, _contractAddr, _privKey)
-
-	// query := ethereum.FilterQuery{
-	// 	Addresses: []common.Address{common.HexToAddress(_contractAddr)},
-	// }
-	// this.Logs = make(chan types.Log)
-	// this.Subscr, err = this.Client.SubscribeFilterLogs(context.Background(), query, this.Logs)
-	// if err != nil { panic(err) }
-
-	// this.ChanResult = make(chan pdp.XZ21Result)
-	// this.Subscr, err = this.Session.Contract.WatchResult(nil, &this.ChanResult, nil)
-	// if err != nil { panic(err) }
 }
 
 func (this *EthClient) GetAddr() common.Address {
 	return this.Addr
-}
-
-func (this *EthClient) WaitEvent(_from common.Address, _hash [32]byte) (bool, string, error) {
-	iter, err := this.Session.Contract.FilterResult(nil, nil)
-	defer iter.Close()
-	if err != nil {
-		panic(err)
-	}
-	i := uint(1)
-	for {
-		if !iter.Next() {
-			helper.PrintLog(fmt.Sprintf("Missing log (addr:%s, hash:%s)", _from, helper.Hex(_hash[:])))
-			break
-		}
-		if _from != iter.Event.From {
-			continue
-		}
-		if bytes.Equal(_hash[:], iter.Event.Hash[:]) == false {
-			continue
-		}
-		// if _msg != iter.Event.Msg {
-		// 	continue
-		// }
-		helper.PrintLog(fmt.Sprintf("Log(%d) -- msg:%s, from:%s, hash:%s", i, iter.Event.Msg, iter.Event.From, helper.Hex(iter.Event.Hash[:])))
-		return true, iter.Event.Msg, nil
-	}
-
-	return false, "", nil
-
-
-	// ch := make(chan *pdp.XZ21Result)
-	// sub, err := this.Session.Contract.WatchResult(nil, ch, nil)
-	// if err != nil { return "", err }
-
-	// for {
-	// 	select {
-	// 	case v := <-ch:
-	// 		return v.Msg, nil
-	// 	case err := <-sub.Err():
-	// 		if err != nil {
-	// 			if err.Error() == "unexpected EOF" {
-	// 				continue
-	// 			} else {
-	// 				return "", err
-	// 			}
-	// 		}
-	// 	default:
-	// 		fmt.Printf(".")
-	// 		time.Sleep(1 * time.Second)
-	// 	}
-	// }
 }
 
 func (this *EthClient) GetParam() (pdp.XZ21Param, error) {
@@ -139,34 +73,20 @@ func (this *EthClient) AppendOwner(_hash [32]byte, _owner common.Address) error 
 
 func (this *EthClient) SetChal(_hash [32]byte, _chalBytes []byte) error {
 	tx, err := this.Session.SetChal(_hash, _chalBytes)
-	if err != nil { return err }
-
-	fmt.Println("A: ", time.Now())
-	receipt, err := bind.WaitMined(context.Background(), this.Client, tx)
-	if err != nil { return err }
-	for _, l := range receipt.Logs {
-		xz21Res, err := this.Session.Contract.XZ21Filterer.ParseResult(*l)
-		if err != nil { return err }
-		helper.PrintLog(fmt.Sprintf("SetChal (caller:%s, file:%s, msg:%s)", xz21Res.From, helper.Hex(xz21Res.Hash[:]), xz21Res.Msg))
+	if err != nil {
+		if helper.ErrSetChal.Comp(err) {
+			helper.PrintLog(fmt.Sprintf("Skip SetChal contract (addr:%s, targetFile:%s)", this.Addr, helper.Hex(_hash[:])))
+			return nil
+		} else {
+			return err
+		}
 	}
-	fmt.Println("B: ", time.Now())
+
+	// Receipt -- https://github.com/ethereum/go-ethereum/blob/master/core/types/receipt.go#L52
+	receipt, err := bind.WaitMined(context.Background(), this.Client, tx)
+	helper.PrintLog(fmt.Sprintf("Completed SetChal contract (addr:%s, targetFile:%s, gasUsed:%d)", this.Addr, helper.Hex(_hash[:]), receipt.GasUsed))
 
 	return nil
-}
-
-func (this *EthClient) GetChalList() ([][32]byte, []pdp.ChalData, error) {
-	fileList, chalList, err := this.Session.GetChalList()
-	if err != nil {
-		return make([][32]byte, 0), make([]pdp.ChalData, 0), err
-	}
-	chalDataList := make([]pdp.ChalData, 0)
-	for _, chal := range chalList {
-		chalData, err := pdp.DecodeToChalData(chal)
-		if err != nil { panic(err) }
-		chalDataList = append(chalDataList, chalData)
-	}
-
-	return fileList, chalDataList, nil
 }
 
 func (this *EthClient) SetProof(_hash [32]byte, _proofBytes []byte) error {

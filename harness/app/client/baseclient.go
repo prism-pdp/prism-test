@@ -10,7 +10,6 @@ import (
 
 type BaseClient interface {
 	GetAddr() common.Address
-	WaitEvent(_from common.Address, _hash [32]byte) (bool, string, error)
 	// interface of blockchain
 	GetParam() (pdp.XZ21Param, error) // E
 	RegisterParam(_param string, _g []byte, _u []byte) error // A
@@ -21,7 +20,6 @@ type BaseClient interface {
 	EnrollAccount(_addr common.Address, _pubKey []byte) error // B
 	AppendOwner(_hash [32]byte, _owner common.Address) error // F
 	SetChal(_hash [32]byte, _chalBytes []byte) error // G
-	GetChalList() ([][32]byte, []pdp.ChalData, error) // H
 	SetProof(_hash [32]byte, _proofBytes []byte) error // I
 	GetAuditingReqList() ([][32]byte, []pdp.XZ21AuditingReq, error) // J
 	SetAuditingResult(_hash [32]byte, _result bool) error // K

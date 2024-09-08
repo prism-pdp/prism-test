@@ -216,24 +216,18 @@ func runUploadAuditingChal(_su *entity.User) {
 	for _, f := range fileList {
 		chalData := _su.GenAuditingChal(f)
 		_su.UploadAuditingChal(f, &chalData)
-		// msg := _su.WaitEvent(f)
-		// if msg == "Success" {
-		// 	helper.PrintLog(fmt.Sprintf("Upload chal (su:%s, file:%s, status:ok)", _su.Name, helper.Hex(f[:])))
-		// } else if msg == "Skip" {
-		// 	helper.PrintLog(fmt.Sprintf("Upload chal (su:%s, file:%s, status:skip)", _su.Name, helper.Hex(f[:])))
-		// } else {
-		// 	helper.PrintLog(fmt.Sprintf("Upload chal (su:%s, file:%s, status:unknown)", _su.Name, helper.Hex(f[:])))
-		// }
 	}
 }
 
 func runUploadAuditingProof() {
+	helper.PrintLog("Start upload auditing proof")
 	// SP gets challenge from blockchain.
 	hashList, chalDataList := sp.DownloadAuditingChal()
 	for _, h := range hashList {
-		helper.PrintLog(helper.Hex(h[:]))
+		helper.PrintLog(fmt.Sprintf("Download auditing chal (targetFile:%s)", helper.Hex(h[:])))
 	}
 	if len(hashList) != 2 { panic(fmt.Errorf("Invalid hashList size (expect:2, actual:%d)", len(hashList))) }
+
 	for i, h := range hashList {
 		proofData := sp.GenAuditingProof(h, &chalDataList[i])
 		sp.UploadAuditingProof(h, &proofData)
@@ -272,7 +266,7 @@ func runAuditingPhase() {
 	runUploadAuditingProof()
 	runVerifyAuditingProof()
 
-	time.Sleep(3 * time.Second)
+	time.Sleep(3 * time.Second) // TODO: Implement WaitMined into all contracts.
 
 	// 2nd
 	runUploadAuditingChal(su1)
