@@ -13,19 +13,22 @@ import (
 )
 
 type Auditor struct {
+	Name string
+
 	client client.BaseClient
 }
 
-func MakeAuditor(_path string, _client client.BaseClient) *Auditor {
+func MakeAuditor(_path string, _client client.BaseClient, _name string) *Auditor {
 	if (helper.IsFile(_path)) {
 		return LoadAuditor(_path, _client)
 	} else {
-		return GenAuditor(_client)
+		return GenAuditor(_client, _name)
 	}
 }
 
-func GenAuditor(_client client.BaseClient) *Auditor {
+func GenAuditor(_client client.BaseClient, _name string) *Auditor {
 	e := new(Auditor)
+	e.Name = _name
 	e.client = _client
 	return e
 }

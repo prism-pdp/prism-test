@@ -139,9 +139,9 @@ func setup(_opts []string) {
 		clientTable[e] = client.NewClient(mode, e, &clientOpts)
 	}
 
-	sm = entity.MakeManager("./cache/sm.json", clientTable[types.SM])
-	sp = entity.MakeProvider("./cache/sp.json", clientTable[types.SP])
-	tpa = entity.MakeAuditor("./cache/tpa.json", clientTable[types.TPA])
+	sm = entity.MakeManager("./cache/sm.json", clientTable[types.SM], "SM")
+	sp = entity.MakeProvider("./cache/sp.json", clientTable[types.SP], "SP")
+	tpa = entity.MakeAuditor("./cache/tpa.json", clientTable[types.TPA], "TPA")
 	su1 = entity.MakeUser("./cache/su1.json", clientTable[types.SU1], &sm.Param, "SU1")
 	su2 = entity.MakeUser("./cache/su2.json", clientTable[types.SU2], &sm.Param, "SU2")
 	su3 = entity.MakeUser("./cache/su3.json", clientTable[types.SU3], &sm.Param, "SU3")
@@ -209,52 +209,67 @@ func runUploadPhase(_su *entity.User, _data []byte) {
 }
 
 func runUploadAuditingChal(_su *entity.User) {
+	helper.PrintLog(fmt.Sprintf("Start upload auditing chal (entity:%s)", _su.Name))
+
 	// SU gets the list of his/her files.
 	fileList := _su.FetchFileList()
 	// SU generates challenge and requests to audit each file
-	helper.PrintLog(fmt.Sprintf("Start upload auditing chal (su:%s, fileNum:%d)", _su.Name, len(fileList)))
-	for _, f := range fileList {
+	for i, f := range fileList {
+		helper.PrintLog(fmt.Sprintf("Upload auditing chal (file:%s, index:%d/%d)", helper.Hex(f[:]), i+1, len(fileList)))
 		chalData := _su.GenAuditingChal(f)
 		_su.UploadAuditingChal(f, &chalData)
 	}
+
+	helper.PrintLog(fmt.Sprintf("Finish upload auditing chal (entity:%s)", _su.Name))
 }
 
 func runUploadAuditingProof() {
-	helper.PrintLog("Start upload auditing proof")
-	// SP gets challenge from blockchain.
-	hashList, chalDataList := sp.DownloadAuditingChal()
-	for _, h := range hashList {
-		helper.PrintLog(fmt.Sprintf("Download auditing chal (targetFile:%s)", helper.Hex(h[:])))
-	}
-	if len(hashList) != 2 { panic(fmt.Errorf("Invalid hashList size (expect:2, actual:%d)", len(hashList))) }
+	helper.PrintLog(fmt.Sprintf("Start upload auditing proof (entity:%s)", sp.Name))
 
-	for i, h := range hashList {
-		proofData := sp.GenAuditingProof(h, &chalDataList[i])
-		sp.UploadAuditingProof(h, &proofData)
+	// SP gets challenge from blockchain.
+	fileList, chalDataList := sp.DownloadAuditingChal()
+	for i, h := range fileList {
+		helper.PrintLog(fmt.Sprintf("Download auditing chal (file:%s, index:%d/%d)", helper.Hex(h[:]), i+1, len(fileList)))
 	}
+
+	// For test
+	if len(fileList) != 2 { panic(fmt.Errorf("Invalid fileList size (expect:2, actual:%d)", len(fileList))) }
+
+	for i, f := range fileList {
+		helper.PrintLog(fmt.Sprintf("Upload auditing proof (entity:%s, file:%s, index:%d/%d)", sp.Name, helper.Hex(f[:]), i+1, len(fileList)))
+		proofData := sp.GenAuditingProof(f, &chalDataList[i])
+		sp.UploadAuditingProof(f, &proofData)
+	}
+
+	helper.PrintLog(fmt.Sprintf("Finish upload auditing proof (entity:%s)", sp.Name))
 }
 
 func runVerifyAuditingProof() {
+	helper.PrintLog(fmt.Sprintf("Start verify auditing proof (entity:%s)", tpa.Name))
+
 	// TPA gets challenge and proof from blockchain.
-	hashList, reqList := tpa.GetAuditingReqList()
-	if len(hashList) != 2 { panic(fmt.Errorf("Invalid hashList size (expect:2, actual:%d)", len(hashList))) }
-	for i, h := range hashList {
+	fileList, reqList := tpa.GetAuditingReqList()
+	for i, f := range fileList {
+		helper.PrintLog(fmt.Sprintf("Download auditing req (file:%s, index:%d/%d)", helper.Hex(f[:]), i+1, len(fileList)))
+	}
+
+	if len(fileList) != 2 { panic(fmt.Errorf("Invalid fileList size (expect:2, actual:%d)", len(fileList))) }
+
+	for i, f := range fileList {
 		// TPA gets M (list of hash of chunks) from SP.
-		f := sp.SearchFile(h)
-		chunk, _ := pdp.SplitData(f.Data, f.TagData.Size)
+		file := sp.SearchFile(f)
+		chunk, _ := pdp.SplitData(file.Data, file.TagData.Size)
 		hashChunks := pdp.HashChunks(chunk)
 
 		// TPA verifies proof.
-		result, err := tpa.VerifyAuditingProof(&f.TagData, hashChunks, &reqList[i].ChalData, &reqList[i].ProofData, f.Owners[0])
+		result, err := tpa.VerifyAuditingProof(&file.TagData, hashChunks, &reqList[i].ChalData, &reqList[i].ProofData, file.Owners[0])
 		if err != nil { panic(err) }
-		if result {
-			helper.PrintLog("Verify proof: OK")
-		} else {
-			helper.PrintLog("Verify proof: NG")
-		}
 
-		tpa.UploadAuditingResult(h, result)
+		helper.PrintLog(fmt.Sprintf("Upload auditing result (file:%s, result:%t)", helper.Hex(f[:]), result))
+		tpa.UploadAuditingResult(f, result)
 	}
+
+	helper.PrintLog(fmt.Sprintf("Finish verify auditing proof (entity:%s)", tpa.Name))
 }
 
 func runAuditingPhase() {

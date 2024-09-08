@@ -13,21 +13,23 @@ import (
 )
 
 type Manager struct {
+	Name string
 	Param pdp.PairingParam
 
 	client client.BaseClient
 }
 
-func MakeManager(_path string, _client client.BaseClient) *Manager {
+func MakeManager(_path string, _client client.BaseClient, _name string) *Manager {
 	if (helper.IsFile(_path)) {
 		return LoadManager(_path, _client)
 	} else {
-		return GenManager(_client)
+		return GenManager(_client, _name)
 	}
 }
 
-func GenManager(_client client.BaseClient) *Manager {
+func GenManager(_client client.BaseClient, _name string) *Manager {
 	manager := new(Manager)
+	manager.Name = _name
 	manager.Param = pdp.GenPairingParam()
 	manager.client = _client
 	return manager

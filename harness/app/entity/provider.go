@@ -22,6 +22,7 @@ type File struct {
 }
 
 type Provider struct {
+	Name string
 	Files map[string]*File `json:'files'`
 
 	client client.BaseClient
@@ -34,17 +35,18 @@ func (this *Provider) SearchFile(_hash [32]byte) *File {
 	return nil
 }
 
-func MakeProvider(_path string, _client client.BaseClient) *Provider {
+func MakeProvider(_path string, _client client.BaseClient, _name string) *Provider {
 	if (helper.IsFile(_path)) {
 		return LoadProvider(_path, _client)
 	} else {
-		return GenProvider(_client)
+		return GenProvider(_client, _name)
 	}
 }
 
-func GenProvider(_client client.BaseClient) *Provider {
+func GenProvider(_client client.BaseClient, _name string) *Provider {
 	provider := new(Provider)
 
+	provider.Name = _name
 	provider.Files = make(map[string]*File)
 
 	provider.client = _client
