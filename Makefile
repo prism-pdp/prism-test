@@ -13,8 +13,8 @@ test@sim:
 
 test:
 	rm -rf ./harness/app/cache/*
-	$(MAKE) testnet/shutdown
-	$(MAKE) testnet/startup
+	$(MAKE) testnet/down
+	$(MAKE) testnet/up
 	$(MAKE) harness@build
 	$(MAKE) harness@run
 
@@ -29,11 +29,11 @@ testnet/build:
 testnet/clean:
 	$(MAKE) docker-run SERVICE="testnet" CMD='forge clean'
 
-testnet/startup:
+testnet/up:
 	docker compose up -d testnet
 	@$(MAKE) docker-exec SERVICE="testnet" CMD="deploy $(CONTRACT)" | tee ./cache/contract.addr
 
-testnet/shutdown:
+testnet/down:
 	docker compose down testnet
 
 # Unused
