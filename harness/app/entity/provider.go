@@ -141,15 +141,15 @@ func (this *Provider) RegisterOwnerToFile(_su *User, _data []byte, _chalData *pd
 	if err != nil { panic(fmt.Errorf("Account is not found.")) }
 	pkData := pdp.PublicKeyData{account.PubKey}
 	pk := pkData.Import(&params)
+	// prepare chal, proof
+	chal := _chalData.Import(&params)
+	proof := _proofData.Import(&params)
 	// prepare hash chunks
 	// TODO: function VerifyProof内で必要なタグだけ復元するのがよい
 	tag := file.TagData.Import(&params)
 	chunks, err := pdp.SplitData(file.Data, tag.Size)
 	if err != nil { panic(err) }
-	hashChunks := pdp.HashChunks(chunks)
-	// prepare chal, proof
-	chal := _chalData.Import(&params)
-	proof := _proofData.Import(&params)
+	hashChunks := pdp.HashChunks(chunks, &chal)
 	// verify chal & proof
 	isVerified := pdp.VerifyProof(&params, &tag, hashChunks, &chal, &proof, pk.Key)
 	if !isVerified { return false }
