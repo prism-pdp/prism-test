@@ -212,7 +212,7 @@ func runUploadAuditingChal(_su *entity.User) {
 	helper.PrintLog(fmt.Sprintf("Start upload auditing chal (entity:%s)", _su.Name))
 
 	// SU gets the list of his/her files.
-	fileList := _su.FetchFileList()
+	fileList := _su.GetFileList()
 	// SU generates challenge and requests to audit each file
 	for i, f := range fileList {
 		helper.PrintLog(fmt.Sprintf("Upload auditing chal (file:%s, index:%d/%d)", helper.Hex(f[:]), i+1, len(fileList)))
@@ -259,7 +259,10 @@ func runVerifyAuditingProof() {
 		// TPA gets M (list of hash of chunks) from SP.
 		file := sp.SearchFile(f)
 		chunk, _ := pdp.SplitData(file.Data, file.TagData.Size)
-		hashChunks := pdp.HashChunks(chunk)
+
+		ここ
+		chal := reqList[i].ChalData.Import(&params)
+		hashChunks := pdp.HashChunks(chunk, &reqList[i].ChalData)
 
 		// TPA verifies proof.
 		result, err := tpa.VerifyAuditingProof(&file.TagData, hashChunks, &reqList[i].ChalData, &reqList[i].ProofData, file.Owners[0])

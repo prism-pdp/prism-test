@@ -137,7 +137,7 @@ func (this *User) UploadAuditingChal(_hash [32]byte, _chalData *pdp.ChalData) {
 	err = this.client.SetChal(_hash, chalBytes)
 }
 
-func (this *User) FetchFileList() [][32]byte {
+func (this *User) GetFileList() [][32]byte {
 	fileList, err := this.client.GetFileList(this.Addr)
 	if err != nil { panic(err) }
 	return fileList
