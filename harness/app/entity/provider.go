@@ -146,12 +146,13 @@ func (this *Provider) RegisterOwnerToFile(_su *User, _data []byte, _chalData *pd
 	proof := _proofData.Import(&params)
 	// prepare hash chunks
 	// TODO: function VerifyProof内で必要なタグだけ復元するのがよい
-	tag := file.TagData.Import(&params)
+	tag := file.TagData.ImportSubset(&params, &chal)
 	chunks, err := pdp.SplitData(file.Data, tag.Size)
 	if err != nil { panic(err) }
-	hashChunks := pdp.HashChunks(chunks, &chal)
+	digestSubset := pdp.HashSampledChunks(chunks, &chal)
 	// verify chal & proof
-	isVerified := pdp.VerifyProof(&params, &tag, hashChunks, &chal, &proof, pk.Key)
+	isVerified, err := pdp.VerifyProof(&params, &tag, digestSubset, &chal, &proof, pk.Key)
+	if err != nil { panic(err) }
 	if !isVerified { return false }
 
 	// ===================================
@@ -174,7 +175,7 @@ func (this *Provider) GenDedupChal(_data []byte, _addrSU common.Address) (pdp.Ch
 	file := this.SearchFile(hash)
 	if file == nil { panic(fmt.Errorf("File is not found.")) }
 
-	chal := pdp.GenChal(&param, file.TagData.Size)
+	chal := pdp.NewChal(&param, file.TagData.Size)
 	chalData := chal.Export()
 
 	return chalData
@@ -218,4 +219,18 @@ func (this *Provider) UploadAuditingProof(_hash [32]byte, _proofData *pdp.ProofD
 	if err != nil { panic(err) }
 	err = this.client.SetProof(_hash, proofBytes)
 	if err != nil { panic(err) }
+}
+
+func (this *Provider) PrepareVerificationData(_hash [32]byte, _chalData *pdp.ChalData) (common.Address, *pdp.DigestSet, *pdp.TagData) {
+	xz21Param, err := this.client.GetParam()
+	if err != nil { panic(err) }
+
+	params := pdp.GenParamFromXZ21Param(&xz21Param)
+	chal := _chalData.Import(&params)
+
+	file := this.SearchFile(_hash)
+	digestSubset, tagDataSubset, err := pdp.MakeSubset(file.Data, &file.TagData, &chal)
+	if err != nil { panic(err) }
+
+	return file.Owners[0], digestSubset, tagDataSubset
 }

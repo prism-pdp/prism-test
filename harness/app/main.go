@@ -7,8 +7,6 @@ import (
 
 	"github.com/ethereum/go-ethereum/common"
 
-	pdp "github.com/dpduado/dpduado-go/xz21"
-
 	"github.com/dpduado/dpduado-test/harness/client"
 	"github.com/dpduado/dpduado-test/harness/entity"
 	"github.com/dpduado/dpduado-test/harness/helper"
@@ -248,7 +246,7 @@ func runVerifyAuditingProof() {
 	helper.PrintLog(fmt.Sprintf("Start verify auditing proof (entity:%s)", tpa.Name))
 
 	// TPA gets challenge and proof from blockchain.
-	fileList, reqList := tpa.GetAuditingReqList()
+	fileList, reqDataList := tpa.GetAuditingReqList()
 	for i, f := range fileList {
 		helper.PrintLog(fmt.Sprintf("Download auditing req (file:%s, index:%d/%d)", helper.Hex(f[:]), i+1, len(fileList)))
 	}
@@ -257,15 +255,10 @@ func runVerifyAuditingProof() {
 
 	for i, f := range fileList {
 		// TPA gets M (list of hash of chunks) from SP.
-		file := sp.SearchFile(f)
-		chunk, _ := pdp.SplitData(file.Data, file.TagData.Size)
-
-		ここ
-		chal := reqList[i].ChalData.Import(&params)
-		hashChunks := pdp.HashChunks(chunk, &reqList[i].ChalData)
+		owner, digestSet, tagDataSet := sp.PrepareVerificationData(f, &reqDataList[i].ChalData)
 
 		// TPA verifies proof.
-		result, err := tpa.VerifyAuditingProof(&file.TagData, hashChunks, &reqList[i].ChalData, &reqList[i].ProofData, file.Owners[0])
+		result, err := tpa.VerifyAuditingProof(tagDataSet, digestSet, &reqDataList[i], owner)
 		if err != nil { panic(err) }
 
 		helper.PrintLog(fmt.Sprintf("Upload auditing result (file:%s, result:%t)", helper.Hex(f[:]), result))

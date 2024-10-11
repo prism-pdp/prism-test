@@ -49,28 +49,27 @@ func LoadAuditor(_path string, _client client.BaseClient) *Auditor {
 	return e
 }
 
-func (this *Auditor) GetAuditingReqList() ([][32]byte, []pdp.AuditingReq) {
+func (this *Auditor) GetAuditingReqList() ([][32]byte, []pdp.AuditingReqData) {
 	hashList, xz21ReqList, err := this.client.GetAuditingReqList()
 	if err != nil { panic(err) }
 
-	var reqList []pdp.AuditingReq
+	var reqDataList []pdp.AuditingReqData
 	for _, v := range xz21ReqList {
-		var req pdp.AuditingReq
-		req.Import(&v)
-		reqList = append(reqList, req)
+		var reqData pdp.AuditingReqData
+		reqData.LoadFromXZ21(&v)
+		reqDataList = append(reqDataList, reqData)
 	}
-	return hashList, reqList
+	return hashList, reqDataList
 }
 
-func (this *Auditor) VerifyAuditingProof(_tagData *pdp.TagData, _hashChunks [][]byte, _chalData *pdp.ChalData, _proofData *pdp.ProofData, _owner common.Address) (bool, error) {
+func (this *Auditor) VerifyAuditingProof(_tagData *pdp.TagData, _digestSet *pdp.DigestSet, _auditingReqData *pdp.AuditingReqData, _owner common.Address) (bool, error) {
 	xz21Param, err := this.client.GetParam()
 	if err != nil { return false, err }
 
 	params := pdp.GenParamFromXZ21Param(&xz21Param)
 
-	tag := _tagData.Import(&params)
-	chal := _chalData.Import(&params)
-	proof := _proofData.Import(&params)
+	auditingReq := _auditingReqData.Import(&params)
+	tag := _tagData.ImportSubset(&params, &auditingReq.Chal)
 
 	account, err := this.client.GetAccount(_owner)
 	if err != nil { panic(err) }
@@ -78,7 +77,8 @@ func (this *Auditor) VerifyAuditingProof(_tagData *pdp.TagData, _hashChunks [][]
 	pubKeyData := pdp.PublicKeyData{account.PubKey}
 	pubKey := pubKeyData.Import(&params)
 
-	result := pdp.VerifyProof(&params, &tag, _hashChunks, &chal, &proof, pubKey.Key)
+	result, err := pdp.VerifyProof(&params, &tag, _digestSet, &auditingReq.Chal, &auditingReq.Proof, pubKey.Key)
+	if err != nil { return false, err }
 
 	return result, nil
 }

@@ -125,7 +125,7 @@ func (this *User) GenAuditingChal(_hash [32]byte) pdp.ChalData {
 	if err != nil { panic(err) }
 	if helper.IsEmptyFileProperty(&fileProp) { panic(fmt.Errorf("File property is not found")) }
 
-	chal := pdp.GenChal(&params, fileProp.SplitNum)
+	chal := pdp.NewChal(&params, fileProp.SplitNum)
 	chalData := chal.Export()
 
 	return chalData
