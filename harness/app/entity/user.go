@@ -85,7 +85,7 @@ func (this *User) IsUploaded(_data []byte) bool {
 	return true
 }
 
-func (this *User) PrepareUpload(_data []byte, _chunkNum uint32) pdp.Tag {
+func (this *User) PrepareUpload(_data []byte, _chunkNum uint32) pdp.TagSet {
 	xz21Param, err := this.client.GetParam()
 	if err != nil { panic(err) }
 
@@ -95,8 +95,8 @@ func (this *User) PrepareUpload(_data []byte, _chunkNum uint32) pdp.Tag {
 	if err != nil { panic(err) }
 
 	sk := this.PrivateKeyData.Import(&param)
-	tag, _ := pdp.GenTag(&param, sk.Key, chunks)
-	return tag
+	tagSet, _ := pdp.GenTags(&param, sk.Key, chunks)
+	return tagSet
 }
 
 func (this *User) GenDedupProof(_chal *pdp.ChalData, _data []byte, _chunkNum uint32) pdp.ProofData {

@@ -62,14 +62,14 @@ func (this *Auditor) GetAuditingReqList() ([][32]byte, []pdp.AuditingReqData) {
 	return hashList, reqDataList
 }
 
-func (this *Auditor) VerifyAuditingProof(_tagData *pdp.TagData, _digestSet *pdp.DigestSet, _auditingReqData *pdp.AuditingReqData, _owner common.Address) (bool, error) {
+func (this *Auditor) VerifyAuditingProof(_tagDataSet *pdp.TagDataSet, _digestSet *pdp.DigestSet, _auditingReqData *pdp.AuditingReqData, _owner common.Address) (bool, error) {
 	xz21Param, err := this.client.GetParam()
 	if err != nil { return false, err }
 
 	params := pdp.GenParamFromXZ21Param(&xz21Param)
 
 	auditingReq := _auditingReqData.Import(&params)
-	tag := _tagData.ImportSubset(&params, &auditingReq.Chal)
+	tag := _tagDataSet.ImportSubset(&params, &auditingReq.Chal)
 
 	account, err := this.client.GetAccount(_owner)
 	if err != nil { panic(err) }
