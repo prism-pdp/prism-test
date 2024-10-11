@@ -17,7 +17,7 @@ import (
 
 type File struct {
 	Data []byte    `json:'data'`
-	TagData pdp.TagData `json:'tag'`
+	TagDataSet pdp.TagDataSet `json:'tag'`
 	Owners []common.Address `json:'owners'`
 }
 
@@ -86,15 +86,15 @@ func (this *Provider) Dump(_path string) {
 	if err != nil { panic(err) }
 }
 
-func (this *Provider) NewFile(_addr common.Address, _hash [32]byte, _data []byte, _tag *pdp.Tag, _pubKey *pdp.PublicKeyData) {
+func (this *Provider) NewFile(_addr common.Address, _hash [32]byte, _data []byte, _tagSet *pdp.TagSet, _pubKey *pdp.PublicKeyData) {
 	var file File
 	file.Data = _data
-	file.TagData = _tag.Export()
+	file.TagDataSet = _tagSet.Export()
 	file.Owners = append(file.Owners, _addr)
 
 	this.Files[helper.Hex(_hash[:])] = &file
 
-	this.client.RegisterFile(_hash, _tag.Size, _addr)
+	this.client.RegisterFile(_hash, _tagSet.Size, _addr)
 }
 
 func (this *Provider) IsUploaded(_data []byte) bool {
@@ -106,7 +106,7 @@ func (this *Provider) IsUploaded(_data []byte) bool {
 	return true
 }
 
-func (this *Provider) UploadNewFile(_data []byte, _tag *pdp.Tag, _addrSU common.Address, _pubKeySU *pdp.PublicKeyData) error {
+func (this *Provider) UploadNewFile(_data []byte, _tagSet *pdp.TagSet, _addrSU common.Address, _pubKeySU *pdp.PublicKeyData) error {
 	hash := sha256.Sum256(_data)
 
 	isUploaded := this.IsUploaded(_data)
@@ -114,7 +114,7 @@ func (this *Provider) UploadNewFile(_data []byte, _tag *pdp.Tag, _addrSU common.
 	if isUploaded {
 		return fmt.Errorf("File is already uploaded. (hash:%s)", helper.Hex(hash[:]))
 	} else {
-		this.NewFile(_addrSU, hash, _data, _tag, _pubKeySU)
+		this.NewFile(_addrSU, hash, _data, _tagSet, _pubKeySU)
 	}
 
 	return nil
@@ -146,12 +146,12 @@ func (this *Provider) RegisterOwnerToFile(_su *User, _data []byte, _chalData *pd
 	proof := _proofData.Import(&params)
 	// prepare hash chunks
 	// TODO: function VerifyProof内で必要なタグだけ復元するのがよい
-	tag := file.TagData.ImportSubset(&params, &chal)
-	chunks, err := pdp.SplitData(file.Data, tag.Size)
+	tagSet := file.TagDataSet.ImportSubset(&params, &chal)
+	chunks, err := pdp.SplitData(file.Data, tagSet.Size)
 	if err != nil { panic(err) }
 	digestSubset := pdp.HashSampledChunks(chunks, &chal)
 	// verify chal & proof
-	isVerified, err := pdp.VerifyProof(&params, &tag, digestSubset, &chal, &proof, pk.Key)
+	isVerified, err := pdp.VerifyProof(&params, &tagSet, digestSubset, &chal, &proof, pk.Key)
 	if err != nil { panic(err) }
 	if !isVerified { return false }
 
@@ -175,7 +175,7 @@ func (this *Provider) GenDedupChal(_data []byte, _addrSU common.Address) (pdp.Ch
 	file := this.SearchFile(hash)
 	if file == nil { panic(fmt.Errorf("File is not found.")) }
 
-	chal := pdp.NewChal(&param, file.TagData.Size)
+	chal := pdp.NewChal(&param, file.TagDataSet.Size)
 	chalData := chal.Export()
 
 	return chalData
@@ -204,7 +204,7 @@ func (this *Provider) GenAuditingProof(_hash [32]byte, _chal *pdp.ChalData) pdp.
 	f := this.SearchFile(_hash)
 	if f == nil { panic(fmt.Errorf("Unknown file: %s", helper.Hex(_hash[:]))) }
 
-	chunks, err := pdp.SplitData(f.Data, f.TagData.Size)
+	chunks, err := pdp.SplitData(f.Data, f.TagDataSet.Size)
 	if err != nil { panic(err) }
 
 	chal := _chal.Import(&params)
@@ -221,7 +221,7 @@ func (this *Provider) UploadAuditingProof(_hash [32]byte, _proofData *pdp.ProofD
 	if err != nil { panic(err) }
 }
 
-func (this *Provider) PrepareVerificationData(_hash [32]byte, _chalData *pdp.ChalData) (common.Address, *pdp.DigestSet, *pdp.TagData) {
+func (this *Provider) PrepareVerificationData(_hash [32]byte, _chalData *pdp.ChalData) (common.Address, *pdp.DigestSet, *pdp.TagDataSet) {
 	xz21Param, err := this.client.GetParam()
 	if err != nil { panic(err) }
 
@@ -229,7 +229,7 @@ func (this *Provider) PrepareVerificationData(_hash [32]byte, _chalData *pdp.Cha
 	chal := _chalData.Import(&params)
 
 	file := this.SearchFile(_hash)
-	digestSubset, tagDataSubset, err := pdp.MakeSubset(file.Data, &file.TagData, &chal)
+	digestSubset, tagDataSubset, err := pdp.MakeSubset(file.Data, &file.TagDataSet, &chal)
 	if err != nil { panic(err) }
 
 	return file.Owners[0], digestSubset, tagDataSubset
