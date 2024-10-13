@@ -53,7 +53,7 @@ setup:
 	$(MAKE) show-accounts > accounts.env
 
 harness@build:
-	$(MAKE) docker-run SERVICE="harness" CMD="go build -o bin/harness ."
+	$(MAKE) docker-run SERVICE="harness" CMD="go build -o bin/harness ./cmd/dpduado"
 
 harness@run@sim:
 	$(MAKE) harness@run-setup@sim
