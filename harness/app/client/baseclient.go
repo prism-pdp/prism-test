@@ -4,8 +4,6 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 
 	pdp "github.com/dpduado/dpduado-go/xz21"
-
-	"github.com/dpduado/dpduado-test/harness/types"
 )
 
 type BaseClient interface {
@@ -30,41 +28,32 @@ type ClientOpts struct {
 	Server string
 	ContractAddr string
 
-	AddrTable map[types.EntityType]common.Address
-	PrivKeyTable map[types.EntityType]string
+	Addr common.Address
+	PrivKey string
 
 	Ledger *FakeLedger
 }
 
-func NewClientOpts(_mode string, _server string, _contractAddr string) ClientOpts {
-	var opts ClientOpts
-	opts.AddrTable = make(map[types.EntityType]common.Address)
-	opts.PrivKeyTable = make(map[types.EntityType]string)
-	opts.Server = _server
-	opts.ContractAddr = _contractAddr
+func NewClient(_simFlag bool, _server string, _contractAddr string, _senderAddr string, _senderPrivKey string, _ledger *FakeLedger) BaseClient {
+	addr := common.HexToAddress(_senderAddr)
 
-	return opts
-}
-
-func NewClient(_mode string, _entity types.EntityType, _opts *ClientOpts) BaseClient {
-	switch _mode {
-	case "sim":
-		return NewSimClient(_opts.Ledger, _opts.AddrTable[_entity])
-	case "eth":
-		return NewEthClient(_opts.Server, _opts.ContractAddr, _opts.PrivKeyTable[_entity], _opts.AddrTable[_entity])
+	if _simFlag {
+		return NewSimClient(_ledger, addr)
+	} else {
+		return NewEthClient(_server, _contractAddr, _senderPrivKey, addr)
 	}
 	return nil
 }
 
-func NewEthClient(_server string, _contractAddr string, _privKey string, _addr common.Address) BaseClient {
+func NewEthClient(_server string, _contractAddr string, _senderPrivKey string, _senderAddr common.Address) BaseClient {
 	var ethClient EthClient
-	ethClient.Setup(_server, _contractAddr, _privKey, _addr)
+	ethClient.Setup(_server, _contractAddr, _senderPrivKey, _senderAddr)
 	return &ethClient
 }
 
-func NewSimClient(_ledger *FakeLedger, _addr common.Address) BaseClient {
+func NewSimClient(_ledger *FakeLedger, _senderAddr common.Address) BaseClient {
 	var simClient SimClient
-	simClient.Setup(_addr, _ledger)
+	simClient.Setup(_senderAddr, _ledger)
 	return &simClient
 
 	return nil

@@ -4,38 +4,31 @@ import (
 	"encoding/json"
 	"io"
 	"os"
-	"github.com/ethereum/go-ethereum/common"
 
 	pdp "github.com/dpduado/dpduado-go/xz21"
 
 	"github.com/dpduado/dpduado-test/harness/client"
-	"github.com/dpduado/dpduado-test/harness/helper"
 )
 
 type Manager struct {
 	Name string
-	Param pdp.PairingParam
+	ParamXZ21 pdp.XZ21Param
+
+	param pdp.PairingParam
 
 	client client.BaseClient
 }
 
-func MakeManager(_path string, _client client.BaseClient, _name string) *Manager {
-	if (helper.IsFile(_path)) {
-		return LoadManager(_path, _client)
-	} else {
-		return GenManager(_client, _name)
-	}
-}
 
-func GenManager(_client client.BaseClient, _name string) *Manager {
+func GenManager(_name string) *Manager {
 	manager := new(Manager)
 	manager.Name = _name
-	manager.Param = pdp.GenPairingParam()
-	manager.client = _client
+	manager.param = pdp.GenPairingParam()
+	manager.ParamXZ21 = manager.param.ToXZ21Param()
 	return manager
 }
 
-func LoadManager(_path string, _client client.BaseClient) *Manager {
+func LoadManager(_path string) *Manager {
 	f, err := os.Open(_path)
 	if err != nil { panic(err) }
 	defer f.Close()
@@ -46,13 +39,17 @@ func LoadManager(_path string, _client client.BaseClient) *Manager {
 	sm := new(Manager)
 	json.Unmarshal(s, &sm)
 
-	sm.client = _client
+	sm.param = pdp.GenParamFromXZ21Param(&sm.ParamXZ21)
 
 	return sm
 }
 
+func (this *Manager) SetClient(_client client.BaseClient) {
+	this.client = _client
+}
+
 func (this *Manager) RegisterParam() {
-	xz21Param := this.Param.ToXZ21Param()
+	xz21Param := this.param.ToXZ21Param()
 	this.client.RegisterParam(
 		xz21Param.P,
 		xz21Param.G,
@@ -60,8 +57,8 @@ func (this *Manager) RegisterParam() {
 	)
 }
 
-func (this *Manager) EnrollUser(_addr common.Address, _pubKey []byte)  {
-	this.client.EnrollAccount(_addr, _pubKey)
+func (this *Manager) EnrollUser(_su *User)  {
+	this.client.EnrollAccount(_su.Addr, _su.PublicKeyData.Key)
 }
 
 func (this *Manager) Dump(_path string) {
@@ -75,4 +72,8 @@ func (this *Manager) Dump(_path string) {
 	_, err = f.Write(s)
 
 	if err != nil { panic(err) }
+}
+
+func (this *Manager) GetParam() *pdp.PairingParam {
+	return &this.param
 }

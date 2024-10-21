@@ -5,22 +5,36 @@ import (
 	"os"
 	"time"
 
-	"github.com/ethereum/go-ethereum/common"
+	"github.com/pborman/getopt/v2"
 
 	"github.com/dpduado/dpduado-test/harness/client"
 	"github.com/dpduado/dpduado-test/harness/entity"
 	"github.com/dpduado/dpduado-test/harness/helper"
-	"github.com/dpduado/dpduado-test/harness/types"
 )
 
-var mode string
+var (
+	helpFlag *bool
+	simFlag *bool
+	optServer *string
+	optContractAddr *string
+	optSenderAddr *string
+	optSenderPrivKey *string
+)
+
+var (
+	server string
+	contractAddr string
+	senderAddr string
+	senderPrivKey string
+)
+
 var command string
-var server string
-var contractAddr string
 
 var data1 []byte
 var data2 []byte
 var chunkNum uint32
+
+var baseClient client.BaseClient
 
 var sm *entity.Manager
 var sp *entity.Provider
@@ -29,7 +43,9 @@ var su1 *entity.User
 var su2 *entity.User
 var su3 *entity.User
 
-var clientTable map[types.EntityType]client.BaseClient
+// var clientOpts client.ClientOpts
+
+// var clientTable map[types.EntityType]client.BaseClient
 
 var ledger client.FakeLedger
 
@@ -38,52 +54,12 @@ type Account struct {
 	PrivKey string `json:'PrivKey'`
 }
 
-func getAddress(_mode string, _entity types.EntityType) common.Address {
-	var addr common.Address
-
-	switch _mode {
-	case "eth":
-		tmp := fmt.Sprintf("ADDRESS_%d", _entity)
-		addr = common.HexToAddress(os.Getenv(tmp))
-	case "sim":
-		tmp := fmt.Sprintf("0x100%d", int(_entity))
-		addr = common.HexToAddress(tmp)
+func toString(_opt *string) string {
+	if _opt == nil {
+		return ""
 	}
-
-	return addr
+	return *_opt
 }
-
-func getPrivKey(_mode string, _entity types.EntityType) string {
-	var key string
-
-	switch mode {
-	case "eth":
-		tmp := fmt.Sprintf("PRIVKEY_%d", _entity)
-		key = os.Getenv(tmp)
-	default:
-		key = "NA"
-	}
-
-	return key
-}
-
-// func getName(_entity EntityType) string {
-// 	switch _entity {
-// 	case SM:
-// 		return "SM"
-// 	case SP:
-// 		return "SP"
-// 	case TPA:
-// 		return "TPA"
-// 	case SU1:
-// 		return "SU1"
-// 	case SU2:
-// 		return "SU2"
-// 	case SU3:
-// 		return "SU3"
-// 	}
-// 	return "NA"
-// }
 
 func setup(_opts []string) {
 	data1 = []byte{
@@ -104,49 +80,30 @@ func setup(_opts []string) {
 	}
 	chunkNum = uint32(5)
 
-	mode = _opts[1]
-	command = _opts[2]
+	command = _opts[0]
 
-	if mode == "eth" {
-		server = _opts[3]
-		contractAddr = _opts[4]
-	} else {
-		server = ""
-		contractAddr = ""
-	}
+	server := toString(optServer)
+	contractAddr:= toString(optContractAddr)
+	senderAddr := toString(optSenderAddr)
+	senderPrivKey := toString(optSenderPrivKey)
 
-	clientOpts := client.NewClientOpts(mode, server, contractAddr)
+	baseClient = client.NewClient(*simFlag, server, contractAddr, senderAddr, senderPrivKey, &ledger)
 
-	for _, e := range types.EntityList {
-		clientOpts.AddrTable[e] = getAddress(mode, e)
-		clientOpts.PrivKeyTable[e] = getPrivKey(mode, e)
-	}
-
-	if mode == "sim" {
+	if *simFlag {
 		// make fake ledger
 		if command == "setup" {
 			ledger = client.GenFakeLedger()
 		} else {
 			ledger = client.LoadFakeLedger("./cache/fake-ledger.json")
 		}
-		clientOpts.Ledger = &ledger
 	}
-
-	clientTable = make(map[types.EntityType]client.BaseClient)
-	for _, e := range types.EntityList {
-		clientTable[e] = client.NewClient(mode, e, &clientOpts)
-	}
-
-	sm = entity.MakeManager("./cache/sm.json", clientTable[types.SM], "SM")
-	sp = entity.MakeProvider("./cache/sp.json", clientTable[types.SP], "SP")
-	tpa = entity.MakeAuditor("./cache/tpa.json", clientTable[types.TPA], "TPA")
-	su1 = entity.MakeUser("./cache/su1.json", clientTable[types.SU1], &sm.Param, "SU1")
-	su2 = entity.MakeUser("./cache/su2.json", clientTable[types.SU2], &sm.Param, "SU2")
-	su3 = entity.MakeUser("./cache/su3.json", clientTable[types.SU3], &sm.Param, "SU3")
 }
 
 func runSetupPhase() {
 	helper.PrintLog("Start Setup Phase")
+
+	sm = entity.GenManager("SM")
+	sm.SetClient(baseClient)
 
 	// =================================================
 	// Register param
@@ -154,19 +111,21 @@ func runSetupPhase() {
 	sm.RegisterParam()
 	helper.PrintLog("Register Parameter: OK")
 
-	// =================================================
-	// Enroll user accounts
-	// =================================================
-	sm.EnrollUser(su1.Addr, su1.PublicKeyData.Key)
-	helper.PrintLog("Enroll Service User 1: OK")
-
-	sm.EnrollUser(su2.Addr, su2.PublicKeyData.Key)
-	helper.PrintLog("Enroll Service User 2: OK")
-
-	sm.EnrollUser(su3.Addr, su3.PublicKeyData.Key)
-	helper.PrintLog("Enroll Service User 3: OK")
+	sm.Dump("./cache/sm.json")
 
 	helper.PrintLog("Finish Setup Phase")
+}
+
+func runEnrollUser(_name string, _addr string) {
+	sm = entity.LoadManager("./cache/sm.json")
+	sm.SetClient(baseClient)
+
+	su := entity.GenUser(_addr, sm.GetParam(), _name)
+	sm.EnrollUser(su)
+
+	helper.PrintLog("Enroll Service User : OK")
+
+	su.Dump("./cache/" + _name + ".json")
 }
 
 func runUploadPhase(_su *entity.User, _data []byte) {
@@ -290,26 +249,40 @@ func runAuditingPhase() {
 
 func main() {
 
-	setup(os.Args)
+	helpFlag = getopt.BoolLong("help", 'h', "display help")
+	simFlag  = getopt.BoolLong("sim", 0, "simulation mode (disable blockchain)")
+	optServer = getopt.StringLong("server", 0, "", "server's URL")
+	optContractAddr = getopt.StringLong("contract", 0, "", "contract address")
+	optSenderAddr = getopt.StringLong("sender-addr", 0, "", "sender's address")
+	optSenderPrivKey = getopt.StringLong("sender-key", 0, "", "sender's private key")
+
+	getopt.Parse()
+
+	if *helpFlag {
+		getopt.Usage()
+		os.Exit(1)
+	}
+
+	args := getopt.Args()
+	setup(args)
 
 	switch command {
 	case "setup":
 		runSetupPhase()
+	case "enroll":
+		runEnrollUser(args[1], args[2]) // TODO: optarg
 	case "upload":
 		runUploadPhase(su1, data1)
 		runUploadPhase(su2, data1)
 		runUploadPhase(su2, data2)
 	case "audit":
 		runAuditingPhase()
+	default:
+		getopt.Usage()
+		os.Exit(1)
 	}
 
-	sm.Dump("./cache/sm.json")
-	sp.Dump("./cache/sp.json")
-	tpa.Dump("./cache/tpa.json")
-	su1.Dump("./cache/su1.json")
-	su2.Dump("./cache/su2.json")
-	su3.Dump("./cache/su3.json")
-	if mode == "sim" {
+	if *simFlag {
 		ledger.Dump("./cache/fake-ledger.json")
 	}
 }

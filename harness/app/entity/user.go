@@ -24,31 +24,22 @@ type User struct {
 	client client.BaseClient
 }
 
-func MakeUser(_path string, _client client.BaseClient, _param *pdp.PairingParam, _name string) *User {
-	if (helper.IsFile(_path)) {
-		return LoadUser(_path, _client)
-	} else {
-		return GenUser(_client, _param, _name)
-	}
-}
 
-func GenUser(_client client.BaseClient, _param *pdp.PairingParam, _name string) *User {
+func GenUser(_addr string, _param *pdp.PairingParam, _name string) *User {
 	user := new(User)
 
 	user.Name = _name
 
-	user.Addr = _client.GetAddr()
+	user.Addr = common.HexToAddress(_addr)
 
 	pk, sk := pdp.GenPairingKey(_param)
 	user.PublicKeyData = pk.Export()
 	user.PrivateKeyData = sk.Export()
 
-	user.client = _client
-
 	return user
 }
 
-func LoadUser(_path string, _client client.BaseClient) *User {
+func LoadUser(_path string) *User {
 	f, err := os.Open(_path)
 	if err != nil { panic(err) }
 	defer f.Close()
@@ -59,9 +50,11 @@ func LoadUser(_path string, _client client.BaseClient) *User {
 	su := new(User)
 	json.Unmarshal(s, &su)
 
-	su.client = _client
-
 	return su
+}
+
+func (this *User) SetClient(_client client.BaseClient) {
+	this.client = _client
 }
 
 func (this *User) Dump(_path string) {
