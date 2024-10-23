@@ -5,6 +5,8 @@ import (
 	"io"
 	"os"
 
+	"github.com/ethereum/go-ethereum/common"
+
 	pdp "github.com/dpduado/dpduado-go/xz21"
 
 	"github.com/dpduado/dpduado-test/harness/client"
@@ -13,6 +15,8 @@ import (
 type Manager struct {
 	Name string
 	ParamXZ21 pdp.XZ21Param
+	Addr common.Address
+	PrivKey string
 
 	param pdp.PairingParam
 
@@ -20,9 +24,11 @@ type Manager struct {
 }
 
 
-func GenManager(_name string) *Manager {
+func GenManager(_name string, _addr string, _privKey string) *Manager {
 	manager := new(Manager)
 	manager.Name = _name
+	manager.Addr = common.HexToAddress(_addr)
+	manager.PrivKey = _privKey
 	manager.param = pdp.GenPairingParam()
 	manager.ParamXZ21 = manager.param.ToXZ21Param()
 	return manager
@@ -44,8 +50,8 @@ func LoadManager(_path string) *Manager {
 	return sm
 }
 
-func (this *Manager) SetClient(_client client.BaseClient) {
-	this.client = _client
+func (this *Manager) SetupSimClient(_ledger *client.FakeLedger) {
+	this.client = client.NewSimClient(_ledger, this.Addr)
 }
 
 func (this *Manager) RegisterParam() {

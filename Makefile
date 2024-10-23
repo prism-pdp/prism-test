@@ -1,5 +1,7 @@
 MAKEFLAGS += --no-print-directory
 
+include accounts.env
+
 # dpduado-sol/srcの中から選ぶ
 CONTRACT = XZ21
 
@@ -55,16 +57,12 @@ setup:
 harness@build:
 	$(MAKE) docker-run SERVICE="harness" CMD="go build -o bin/harness ./cmd/dpduado"
 
-harness@run@sim:
-	$(MAKE) harness@run-setup@sim
-	$(MAKE) harness@run-upload@sim
-	$(MAKE) harness@run-audit@sim
-harness@run-setup@sim:
-	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness sim setup"
-harness@run-upload@sim:
-	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness sim upload"
-harness@run-audit@sim:
-	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness sim audit"
+harness@test-sim:
+	rm harness/app/cache/*
+	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --sim setup $(ADDRESS_0) $(PRIVKEY_0) $(ADDRESS_1) $(PRIVKEY_1)"
+	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --sim enroll su1 $(ADDRESS_2) $(PRIVKEY_2)"
+	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --sim enroll su2 $(ADDRESS_3) $(PRIVKEY_3)"
+	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --sim upload su1"
 
 harness@run:
 	$(MAKE) harness@run-setup

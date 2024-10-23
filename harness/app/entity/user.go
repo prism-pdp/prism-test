@@ -18,6 +18,7 @@ import (
 type User struct {
 	Name string
 	Addr common.Address `json:'addr'`
+	PrivKey string
 	PublicKeyData pdp.PublicKeyData `json:'publicKey'`
 	PrivateKeyData pdp.PrivateKeyData `json:'privateKey'`
 
@@ -25,12 +26,13 @@ type User struct {
 }
 
 
-func GenUser(_addr string, _param *pdp.PairingParam, _name string) *User {
+func GenUser(_addr string, _privKey string, _param *pdp.PairingParam, _name string) *User {
 	user := new(User)
 
 	user.Name = _name
 
 	user.Addr = common.HexToAddress(_addr)
+	user.PrivKey = _privKey
 
 	pk, sk := pdp.GenPairingKey(_param)
 	user.PublicKeyData = pk.Export()
@@ -53,8 +55,8 @@ func LoadUser(_path string) *User {
 	return su
 }
 
-func (this *User) SetClient(_client client.BaseClient) {
-	this.client = _client
+func (this *User) SetupSimClient(_ledger *client.FakeLedger) {
+	this.client = client.NewSimClient(_ledger, this.Addr)
 }
 
 func (this *User) Dump(_path string) {

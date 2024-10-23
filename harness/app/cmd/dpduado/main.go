@@ -37,7 +37,7 @@ var chunkNum uint32
 var baseClient client.BaseClient
 
 var sm *entity.Manager
-var sp *entity.Provider
+// var sp *entity.Provider
 var tpa *entity.Auditor
 var su1 *entity.User
 var su2 *entity.User
@@ -61,6 +61,10 @@ func toString(_opt *string) string {
 	return *_opt
 }
 
+func makePath(_name string) string {
+	return "./cache/" + _name + ".json"
+}
+
 func setup(_opts []string) {
 	data1 = []byte{
 		0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09,
@@ -82,12 +86,12 @@ func setup(_opts []string) {
 
 	command = _opts[0]
 
-	server := toString(optServer)
-	contractAddr:= toString(optContractAddr)
-	senderAddr := toString(optSenderAddr)
-	senderPrivKey := toString(optSenderPrivKey)
+	// server := toString(optServer)
+	// contractAddr:= toString(optContractAddr)
+	senderAddr = toString(optSenderAddr)
+	senderPrivKey = toString(optSenderPrivKey)
 
-	baseClient = client.NewClient(*simFlag, server, contractAddr, senderAddr, senderPrivKey, &ledger)
+	// baseClient = client.NewClient(*simFlag, server, contractAddr, senderAddr, senderPrivKey, &ledger)
 
 	if *simFlag {
 		// make fake ledger
@@ -99,11 +103,13 @@ func setup(_opts []string) {
 	}
 }
 
-func runSetupPhase() {
+func runSetupPhase(_smAddr string, _smPrivKey string, _spAddr string, _spPrivKey string) {
 	helper.PrintLog("Start Setup Phase")
 
-	sm = entity.GenManager("SM")
-	sm.SetClient(baseClient)
+	sm = entity.GenManager("SM", _smAddr, _smPrivKey)
+	if *simFlag {
+		sm.SetupSimClient(&ledger)
+	}
 
 	// =================================================
 	// Register param
@@ -111,41 +117,64 @@ func runSetupPhase() {
 	sm.RegisterParam()
 	helper.PrintLog("Register Parameter: OK")
 
+	sp := entity.GenProvider("SP", _spAddr, _spPrivKey)
+	if *simFlag {
+		sp.SetupSimClient(&ledger)
+	}
+
 	sm.Dump("./cache/sm.json")
+	sp.Dump("./cache/sp.json")
 
 	helper.PrintLog("Finish Setup Phase")
 }
 
-func runEnrollUser(_name string, _addr string) {
+func runEnrollUser(_name string, _addr string, _privKey string) {
 	sm = entity.LoadManager("./cache/sm.json")
-	sm.SetClient(baseClient)
+	if *simFlag {
+		sm.SetupSimClient(&ledger)
+	}
 
-	su := entity.GenUser(_addr, sm.GetParam(), _name)
+	su := entity.GenUser(_addr, _privKey, sm.GetParam(), _name)
 	sm.EnrollUser(su)
 
 	helper.PrintLog("Enroll Service User : OK")
 
-	su.Dump("./cache/" + _name + ".json")
+	path := makePath(_name)
+	su.Dump(path)
 }
 
-func runUploadPhase(_su *entity.User, _data []byte) {
+func runUploadPhase(_name string, _data []byte) {
+	var path string
+
 	helper.PrintLog("Start Upload Phase")
 
+	path = makePath("sp")
+	sp := entity.LoadProvider(path)
+	if *simFlag {
+		sp.SetupSimClient(&ledger)
+	}
+
+	path = makePath(_name)
+	su := entity.LoadUser(path)
+	if *simFlag {
+		su.SetupSimClient(&ledger)
+	}
+
 	// SU checks whether data is uploaded.
-	isUploaded := _su.IsUploaded(_data)
+	isUploaded := su.IsUploaded(_data)
 
 	// Processing differs depending on whether the file has already been uploaded or not.
 	if isUploaded {
 		// SP generates a challenge for deduplication.
-		chalData := sp.GenDedupChal(_data, _su.Addr)
+		chalData := sp.GenDedupChal(_data, su.Addr)
 
 		// SP sends the challenge to SU.
 
 		// SU generates a proof to prove ownership of the data to be uploaded.
-		proofData := _su.GenDedupProof(&chalData, _data, chunkNum)
+		proofData := su.GenDedupProof(&chalData, _data, chunkNum)
 
 		// SP verifies the proof.
-		isRegistered := sp.RegisterOwnerToFile(_su, _data, &chalData, &proofData)
+		isRegistered := sp.RegisterOwnerToFile(su, _data, &chalData, &proofData)
 		if isRegistered {
 			helper.PrintLog("Append Owner: OK")
 		} else {
@@ -153,14 +182,20 @@ func runUploadPhase(_su *entity.User, _data []byte) {
 		}
 	} else {
 		// SU uploads the file.
-		tag := _su.PrepareUpload(_data, chunkNum)
+		tag := su.PrepareUpload(_data, chunkNum)
 
 		// SP accepts the file.
-		err := sp.UploadNewFile(_data, &tag, _su.Addr, &_su.PublicKeyData)
+		err := sp.UploadNewFile(_data, &tag, su.Addr, &su.PublicKeyData)
 		if err != nil { panic(err) }
 
 		helper.PrintLog("Upload New file: OK")
 	}
+
+	path = makePath("sp")
+	sp.Dump(path)
+
+	path = makePath(_name)
+	su.Dump(path)
 
 	helper.PrintLog("Finish Upload Phase")
 }
@@ -180,52 +215,52 @@ func runUploadAuditingChal(_su *entity.User) {
 	helper.PrintLog(fmt.Sprintf("Finish upload auditing chal (entity:%s)", _su.Name))
 }
 
-func runUploadAuditingProof() {
-	helper.PrintLog(fmt.Sprintf("Start upload auditing proof (entity:%s)", sp.Name))
+// func runUploadAuditingProof() {
+// 	helper.PrintLog(fmt.Sprintf("Start upload auditing proof (entity:%s)", sp.Name))
 
-	// SP gets challenge from blockchain.
-	fileList, chalDataList := sp.DownloadAuditingChal()
-	for i, h := range fileList {
-		helper.PrintLog(fmt.Sprintf("Download auditing chal (file:%s, index:%d/%d)", helper.Hex(h[:]), i+1, len(fileList)))
-	}
+// 	// SP gets challenge from blockchain.
+// 	fileList, chalDataList := sp.DownloadAuditingChal()
+// 	for i, h := range fileList {
+// 		helper.PrintLog(fmt.Sprintf("Download auditing chal (file:%s, index:%d/%d)", helper.Hex(h[:]), i+1, len(fileList)))
+// 	}
 
-	// For test
-	if len(fileList) != 2 { panic(fmt.Errorf("Invalid fileList size (expect:2, actual:%d)", len(fileList))) }
+// 	// For test
+// 	if len(fileList) != 2 { panic(fmt.Errorf("Invalid fileList size (expect:2, actual:%d)", len(fileList))) }
 
-	for i, f := range fileList {
-		helper.PrintLog(fmt.Sprintf("Upload auditing proof (entity:%s, file:%s, index:%d/%d)", sp.Name, helper.Hex(f[:]), i+1, len(fileList)))
-		proofData := sp.GenAuditingProof(f, &chalDataList[i])
-		sp.UploadAuditingProof(f, &proofData)
-	}
+// 	for i, f := range fileList {
+// 		helper.PrintLog(fmt.Sprintf("Upload auditing proof (entity:%s, file:%s, index:%d/%d)", sp.Name, helper.Hex(f[:]), i+1, len(fileList)))
+// 		proofData := sp.GenAuditingProof(f, &chalDataList[i])
+// 		sp.UploadAuditingProof(f, &proofData)
+// 	}
 
-	helper.PrintLog(fmt.Sprintf("Finish upload auditing proof (entity:%s)", sp.Name))
-}
+// 	helper.PrintLog(fmt.Sprintf("Finish upload auditing proof (entity:%s)", sp.Name))
+// }
 
-func runVerifyAuditingProof() {
-	helper.PrintLog(fmt.Sprintf("Start verify auditing proof (entity:%s)", tpa.Name))
+// func runVerifyAuditingProof() {
+// 	helper.PrintLog(fmt.Sprintf("Start verify auditing proof (entity:%s)", tpa.Name))
 
-	// TPA gets challenge and proof from blockchain.
-	fileList, reqDataList := tpa.GetAuditingReqList()
-	for i, f := range fileList {
-		helper.PrintLog(fmt.Sprintf("Download auditing req (file:%s, index:%d/%d)", helper.Hex(f[:]), i+1, len(fileList)))
-	}
+// 	// TPA gets challenge and proof from blockchain.
+// 	fileList, reqDataList := tpa.GetAuditingReqList()
+// 	for i, f := range fileList {
+// 		helper.PrintLog(fmt.Sprintf("Download auditing req (file:%s, index:%d/%d)", helper.Hex(f[:]), i+1, len(fileList)))
+// 	}
 
-	if len(fileList) != 2 { panic(fmt.Errorf("Invalid fileList size (expect:2, actual:%d)", len(fileList))) }
+// 	if len(fileList) != 2 { panic(fmt.Errorf("Invalid fileList size (expect:2, actual:%d)", len(fileList))) }
 
-	for i, f := range fileList {
-		// TPA gets M (list of hash of chunks) from SP.
-		owner, digestSet, tagDataSet := sp.PrepareVerificationData(f, &reqDataList[i].ChalData)
+// 	for i, f := range fileList {
+// 		// TPA gets M (list of hash of chunks) from SP.
+// 		owner, digestSet, tagDataSet := sp.PrepareVerificationData(f, &reqDataList[i].ChalData)
 
-		// TPA verifies proof.
-		result, err := tpa.VerifyAuditingProof(tagDataSet, digestSet, &reqDataList[i], owner)
-		if err != nil { panic(err) }
+// 		// TPA verifies proof.
+// 		result, err := tpa.VerifyAuditingProof(tagDataSet, digestSet, &reqDataList[i], owner)
+// 		if err != nil { panic(err) }
 
-		helper.PrintLog(fmt.Sprintf("Upload auditing result (file:%s, result:%t)", helper.Hex(f[:]), result))
-		tpa.UploadAuditingResult(f, result)
-	}
+// 		helper.PrintLog(fmt.Sprintf("Upload auditing result (file:%s, result:%t)", helper.Hex(f[:]), result))
+// 		tpa.UploadAuditingResult(f, result)
+// 	}
 
-	helper.PrintLog(fmt.Sprintf("Finish verify auditing proof (entity:%s)", tpa.Name))
-}
+// 	helper.PrintLog(fmt.Sprintf("Finish verify auditing proof (entity:%s)", tpa.Name))
+// }
 
 func runAuditingPhase() {
 	helper.PrintLog("Start Auditing Phase")
@@ -233,16 +268,16 @@ func runAuditingPhase() {
 	// 1st
 	runUploadAuditingChal(su1)
 	runUploadAuditingChal(su2)
-	runUploadAuditingProof()
-	runVerifyAuditingProof()
+	// runUploadAuditingProof()
+	// runVerifyAuditingProof()
 
 	time.Sleep(3 * time.Second) // TODO: Implement WaitMined into all contracts.
 
 	// 2nd
 	runUploadAuditingChal(su1)
 	runUploadAuditingChal(su2)
-	runUploadAuditingProof()
-	runVerifyAuditingProof()
+	// runUploadAuditingProof()
+	// runVerifyAuditingProof()
 
 	helper.PrintLog("Finish Auditing Phase")
 }
@@ -268,13 +303,12 @@ func main() {
 
 	switch command {
 	case "setup":
-		runSetupPhase()
+		fmt.Println(args)
+		runSetupPhase(args[1], args[2], args[3], args[4])
 	case "enroll":
-		runEnrollUser(args[1], args[2]) // TODO: optarg
+		runEnrollUser(args[1], args[2], args[3]) // TODO: optarg
 	case "upload":
-		runUploadPhase(su1, data1)
-		runUploadPhase(su2, data1)
-		runUploadPhase(su2, data2)
+		runUploadPhase(args[1], data1)
 	case "audit":
 		runAuditingPhase()
 	default:

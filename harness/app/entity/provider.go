@@ -24,6 +24,8 @@ type File struct {
 type Provider struct {
 	Name string
 	Files map[string]*File `json:'files'`
+	Addr common.Address
+	PrivKey string
 
 	client client.BaseClient
 }
@@ -35,26 +37,28 @@ func (this *Provider) SearchFile(_hash [32]byte) *File {
 	return nil
 }
 
-func MakeProvider(_path string, _client client.BaseClient, _name string) *Provider {
-	if (helper.IsFile(_path)) {
-		return LoadProvider(_path, _client)
-	} else {
-		return GenProvider(_client, _name)
-	}
-}
+// func MakeProvider(_path string, _client client.BaseClient, _name string) *Provider {
+// 	if (helper.IsFile(_path)) {
+// 		return LoadProvider(_path, _client)
+// 	} else {
+// 		return GenProvider(_client, _name)
+// 	}
+// }
 
-func GenProvider(_client client.BaseClient, _name string) *Provider {
+func GenProvider(_name string, _addr string, _privKey string) *Provider {
 	provider := new(Provider)
 
 	provider.Name = _name
 	provider.Files = make(map[string]*File)
+	provider.Addr = common.HexToAddress(_addr)
+	provider.PrivKey = _privKey
 
-	provider.client = _client
+	// provider.client = _client
 
 	return provider
 }
 
-func LoadProvider(_path string, _client client.BaseClient) *Provider {
+func LoadProvider(_path string) *Provider {
 	f, err := os.Open(_path)
 	if err != nil { panic(err) }
 	defer f.Close()
@@ -69,9 +73,13 @@ func LoadProvider(_path string, _client client.BaseClient) *Provider {
 		sp.Files = make(map[string]*File)
 	}
 
-	sp.client = _client
+	// sp.client = _client
 
 	return sp
+}
+
+func (this *Provider) SetupSimClient(_ledger *client.FakeLedger) {
+	this.client = client.NewSimClient(_ledger, this.Addr)
 }
 
 func (this *Provider) Dump(_path string) {
