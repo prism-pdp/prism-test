@@ -63,8 +63,8 @@ func (this *SimClient) GetAccount(_addr common.Address) (pdp.XZ21Account, error)
 	return *this.Ledger.Accounts[_addr], nil
 }
 
-func (this *SimClient) EnrollAccount(_addr common.Address, _pubKey []byte) error {
-	this.Ledger.EnrollAccount(_addr, _pubKey)
+func (this *SimClient) EnrollAccount(_type int, _addr common.Address, _pubKey []byte) error {
+	this.Ledger.EnrollAccount(_type, _addr, _pubKey)
 	return nil
 }
 
@@ -103,8 +103,7 @@ func (this *SimClient) SetAuditingResult(_hash [32]byte, _result bool) error {
 	}
 
 	var log pdp.XZ21AuditingLog
-	log.Chal = req.Chal
-	log.Proof = req.Proof
+	log.Req = *req
 	log.Result = _result
 	this.Ledger.Logs[hashHex] = append(this.Ledger.Logs[hashHex], &log)
 

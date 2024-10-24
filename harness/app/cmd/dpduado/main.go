@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 	"os"
-	"time"
+	// "time"
 
 	"github.com/pborman/getopt/v2"
 
@@ -129,6 +129,8 @@ func runSetupPhase(_smAddr string, _smPrivKey string, _spAddr string, _spPrivKey
 }
 
 func runEnrollUser(_name string, _addr string, _privKey string) {
+	helper.PrintLog(fmt.Sprintf("enroll service user (name:%s)", _name))
+
 	sm = entity.LoadManager("./cache/sm.json")
 	if *simFlag {
 		sm.SetupSimClient(&ledger)
@@ -137,10 +139,25 @@ func runEnrollUser(_name string, _addr string, _privKey string) {
 	su := entity.GenUser(_addr, _privKey, sm.GetParam(), _name)
 	sm.EnrollUser(su)
 
+	path := makePath(_name)
+	su.Dump(path)
+}
+
+func runEnrollAuditor(_name string, _addr string) {
+	helper.PrintLog(fmt.Sprintf("enroll auditor (name:%s)", _name))
+
+	sm = entity.LoadManager("./cache/sm.json")
+	if *simFlag {
+		sm.SetupSimClient(&ledger)
+	}
+
+	tpa := entity.GenAuditor(_name, _addr)
+	sm.EnrollAuditor(tpa)
+
 	helper.PrintLog("Enroll Service User : OK")
 
 	path := makePath(_name)
-	su.Dump(path)
+	tpa.Dump(path)
 }
 
 func runUploadPhase(_name string, _data []byte) {
@@ -200,41 +217,55 @@ func runUploadPhase(_name string, _data []byte) {
 	helper.PrintLog("Finish Upload Phase")
 }
 
-func runUploadAuditingChal(_su *entity.User) {
-	helper.PrintLog(fmt.Sprintf("Start upload auditing chal (entity:%s)", _su.Name))
+func runUploadAuditingChal(_name string) {
+	path := makePath(_name)
+	su := entity.LoadUser(path)
+	if *simFlag {
+		su.SetupSimClient(&ledger)
+	}
+
+	helper.PrintLog(fmt.Sprintf("Start upload auditing chal (entity:%s)", su.Name))
 
 	// SU gets the list of his/her files.
-	fileList := _su.GetFileList()
+	fileList := su.GetFileList()
 	// SU generates challenge and requests to audit each file
 	for i, f := range fileList {
 		helper.PrintLog(fmt.Sprintf("Upload auditing chal (file:%s, index:%d/%d)", helper.Hex(f[:]), i+1, len(fileList)))
-		chalData := _su.GenAuditingChal(f)
-		_su.UploadAuditingChal(f, &chalData)
+		chalData := su.GenAuditingChal(f)
+		su.UploadAuditingChal(f, &chalData)
 	}
 
-	helper.PrintLog(fmt.Sprintf("Finish upload auditing chal (entity:%s)", _su.Name))
+	path = makePath(_name)
+	su.Dump(path)
+
+	helper.PrintLog(fmt.Sprintf("Finish upload auditing chal (entity:%s)", su.Name))
 }
 
-// func runUploadAuditingProof() {
-// 	helper.PrintLog(fmt.Sprintf("Start upload auditing proof (entity:%s)", sp.Name))
+func runUploadAuditingProof() {
+	path := makePath("sp")
+	sp := entity.LoadProvider(path)
+	if *simFlag {
+		sp.SetupSimClient(&ledger)
+	}
 
-// 	// SP gets challenge from blockchain.
-// 	fileList, chalDataList := sp.DownloadAuditingChal()
-// 	for i, h := range fileList {
-// 		helper.PrintLog(fmt.Sprintf("Download auditing chal (file:%s, index:%d/%d)", helper.Hex(h[:]), i+1, len(fileList)))
-// 	}
+	helper.PrintLog(fmt.Sprintf("Start upload auditing proof (entity:%s)", sp.Name))
 
-// 	// For test
-// 	if len(fileList) != 2 { panic(fmt.Errorf("Invalid fileList size (expect:2, actual:%d)", len(fileList))) }
+	// SP gets challenge from blockchain.
+	fileList, chalDataList := sp.DownloadAuditingChal()
+	for i, h := range fileList {
+		helper.PrintLog(fmt.Sprintf("Download auditing chal (file:%s, index:%d/%d)", helper.Hex(h[:]), i+1, len(fileList)))
+	}
 
-// 	for i, f := range fileList {
-// 		helper.PrintLog(fmt.Sprintf("Upload auditing proof (entity:%s, file:%s, index:%d/%d)", sp.Name, helper.Hex(f[:]), i+1, len(fileList)))
-// 		proofData := sp.GenAuditingProof(f, &chalDataList[i])
-// 		sp.UploadAuditingProof(f, &proofData)
-// 	}
+	for i, f := range fileList {
+		helper.PrintLog(fmt.Sprintf("Upload auditing proof (entity:%s, file:%s, index:%d/%d)", sp.Name, helper.Hex(f[:]), i+1, len(fileList)))
+		proofData := sp.GenAuditingProof(f, &chalDataList[i])
+		sp.UploadAuditingProof(f, &proofData)
+	}
 
-// 	helper.PrintLog(fmt.Sprintf("Finish upload auditing proof (entity:%s)", sp.Name))
-// }
+	sp.Dump(path)
+
+	helper.PrintLog(fmt.Sprintf("Finish upload auditing proof (entity:%s)", sp.Name))
+}
 
 // func runVerifyAuditingProof() {
 // 	helper.PrintLog(fmt.Sprintf("Start verify auditing proof (entity:%s)", tpa.Name))
@@ -262,25 +293,25 @@ func runUploadAuditingChal(_su *entity.User) {
 // 	helper.PrintLog(fmt.Sprintf("Finish verify auditing proof (entity:%s)", tpa.Name))
 // }
 
-func runAuditingPhase() {
-	helper.PrintLog("Start Auditing Phase")
+// func runAuditingPhase() {
+// 	helper.PrintLog("Start Auditing Phase")
 
-	// 1st
-	runUploadAuditingChal(su1)
-	runUploadAuditingChal(su2)
-	// runUploadAuditingProof()
-	// runVerifyAuditingProof()
+// 	// 1st
+// 	runUploadAuditingChal(su1)
+// 	runUploadAuditingChal(su2)
+// 	// runUploadAuditingProof()
+// 	// runVerifyAuditingProof()
 
-	time.Sleep(3 * time.Second) // TODO: Implement WaitMined into all contracts.
+// 	time.Sleep(3 * time.Second) // TODO: Implement WaitMined into all contracts.
 
-	// 2nd
-	runUploadAuditingChal(su1)
-	runUploadAuditingChal(su2)
-	// runUploadAuditingProof()
-	// runVerifyAuditingProof()
+// 	// 2nd
+// 	runUploadAuditingChal(su1)
+// 	runUploadAuditingChal(su2)
+// 	// runUploadAuditingProof()
+// 	// runVerifyAuditingProof()
 
-	helper.PrintLog("Finish Auditing Phase")
-}
+// 	helper.PrintLog("Finish Auditing Phase")
+// }
 
 func main() {
 
@@ -306,11 +337,19 @@ func main() {
 		fmt.Println(args)
 		runSetupPhase(args[1], args[2], args[3], args[4])
 	case "enroll":
-		runEnrollUser(args[1], args[2], args[3]) // TODO: optarg
+		if args[1] == "auditor" {
+			runEnrollAuditor(args[2], args[3]) // TODO: optarg
+		} else if args[1] == "user" {
+			runEnrollUser(args[2], args[3], args[4]) // TODO: optarg
+		}
 	case "upload":
 		runUploadPhase(args[1], data1)
-	case "audit":
-		runAuditingPhase()
+	case "challenge":
+		runUploadAuditingChal(args[1])
+	case "proof":
+		runUploadAuditingProof()
+	// case "audit":
+		// runVerifyAuditingProof()
 	default:
 		getopt.Usage()
 		os.Exit(1)

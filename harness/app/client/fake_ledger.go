@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"github.com/ethereum/go-ethereum/common"
 	"os"
+	// "slices"
 
 	pdp "github.com/dpduado/dpduado-go/xz21"
 
@@ -16,6 +17,7 @@ type FakeLedger struct {
 	Param pdp.XZ21Param `json:'param'`
 	FileProperties map[string]*pdp.XZ21FileProperty `json:'fileProperties'`
 	Accounts map[common.Address]*pdp.XZ21Account `json:'accounts'`
+	AddrListTPA []common.Address `json:'addrListTPA'`
 	Reqs map[string]*pdp.XZ21AuditingReq `json:'auditReqs'`
 	Logs map[string][]*pdp.XZ21AuditingLog `json:'auditLogs'`
 }
@@ -52,10 +54,16 @@ func (this *FakeLedger) RegisterFile(_hash [32]byte, _splitNum uint32, _addr com
 	this.Accounts[_addr].FileList = append(this.Accounts[_addr].FileList, _hash)
 }
 
-func (this *FakeLedger) EnrollAccount(_addr common.Address, _key []byte) error {
-	var a pdp.XZ21Account
-	a.PubKey = _key
-	this.Accounts[_addr] = &a
+func (this *FakeLedger) EnrollAccount(_type int, _addr common.Address, _key []byte) error {
+	if _type == 0 {
+		this.AddrListTPA = append(this.AddrListTPA, _addr)
+		// slices.Sort(this.AddrListTPA) TODO
+		// this.AddrListTPA = slices.Compact(this.AddrListTPA) TODO
+	} else if _type == 1 {
+		var a pdp.XZ21Account
+		a.PubKey = _key
+		this.Accounts[_addr] = &a
+	}
 
 	return nil
 }

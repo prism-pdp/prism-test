@@ -9,27 +9,28 @@ import (
 	pdp "github.com/dpduado/dpduado-go/xz21"
 
 	"github.com/dpduado/dpduado-test/harness/client"
-	"github.com/dpduado/dpduado-test/harness/helper"
+	// "github.com/dpduado/dpduado-test/harness/helper"
 )
 
 type Auditor struct {
 	Name string
+	Addr common.Address
 
 	client client.BaseClient
 }
 
-func MakeAuditor(_path string, _client client.BaseClient, _name string) *Auditor {
-	if (helper.IsFile(_path)) {
-		return LoadAuditor(_path, _client)
-	} else {
-		return GenAuditor(_client, _name)
-	}
-}
+// func MakeAuditor(_path string, _client client.BaseClient, _name string) *Auditor {
+// 	if (helper.IsFile(_path)) {
+// 		return LoadAuditor(_path, _client)
+// 	} else {
+// 		return GenAuditor(_client, _name)
+// 	}
+// }
 
-func GenAuditor(_client client.BaseClient, _name string) *Auditor {
+func GenAuditor(_name string, _addr string) *Auditor {
 	e := new(Auditor)
 	e.Name = _name
-	e.client = _client
+	e.Addr = common.HexToAddress(_addr)
 	return e
 }
 
@@ -44,9 +45,11 @@ func LoadAuditor(_path string, _client client.BaseClient) *Auditor {
 	e := new(Auditor)
 	json.Unmarshal(s, &e)
 
-	e.client = _client
-
 	return e
+}
+
+func (this *Auditor) SetupSimClient(_ledger *client.FakeLedger) {
+	this.client = client.NewSimClient(_ledger, this.Addr)
 }
 
 func (this *Auditor) GetAuditingReqList() ([][32]byte, []pdp.AuditingReqData) {

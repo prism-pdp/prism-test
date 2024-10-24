@@ -15,7 +15,7 @@ type BaseClient interface {
 	GetFileList(_addr common.Address) ([][32]byte, error)
 	SearchFile(_hash [32]byte) (pdp.XZ21FileProperty, error) // C
 	GetAccount(_addr common.Address) (pdp.XZ21Account, error)
-	EnrollAccount(_addr common.Address, _pubKey []byte) error // B
+	EnrollAccount(_type int, _addr common.Address, _pubKey []byte) error // B
 	AppendOwner(_hash [32]byte, _owner common.Address) error // F
 	SetChal(_hash [32]byte, _chalBytes []byte) error // G
 	SetProof(_hash [32]byte, _proofBytes []byte) error // I

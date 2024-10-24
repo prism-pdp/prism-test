@@ -3,6 +3,7 @@ package client
 import (
 	"context"
 	"fmt"
+	"math/big"
 
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
@@ -84,8 +85,9 @@ func (this *EthClient) GetAccount(_addr common.Address) (pdp.XZ21Account, error)
 	return account, err
 }
 
-func (this *EthClient) EnrollAccount(_addr common.Address, _pubKey []byte) error {
-	tx, err := this.Session.EnrollAccount(_addr, _pubKey)
+func (this *EthClient) EnrollAccount(_type int, _addr common.Address, _pubKey []byte) error {
+	t := big.NewInt(int64(_type))
+	tx, err := this.Session.EnrollAccount(t, _addr, _pubKey)
 	if err != nil {
 		helper.PrintLog(fmt.Sprintf("Failed to call EnrollAccount contract (caller:%s, addr:%s, key:%s)", this.Addr, _addr, helper.Hex(_pubKey[:])))
 		return err
