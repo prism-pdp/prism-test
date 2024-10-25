@@ -60,7 +60,7 @@ func (this *SimClient) SearchFile(_hash [32]byte) (pdp.XZ21FileProperty, error) 
 }
 
 func (this *SimClient) GetAccount(_addr common.Address) (pdp.XZ21Account, error) {
-	return *this.Ledger.Accounts[_addr], nil
+	return *this.Ledger.UserAccountTable[_addr], nil
 }
 
 func (this *SimClient) EnrollAuditor(_addr common.Address) error {

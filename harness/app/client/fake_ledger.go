@@ -16,8 +16,8 @@ import (
 type FakeLedger struct {
 	Param pdp.XZ21Param `json:'param'`
 	FileProperties map[string]*pdp.XZ21FileProperty `json:'fileProperties'`
-	Accounts map[common.Address]*pdp.XZ21Account `json:'accounts'`
-	AddrListTPA []common.Address `json:'addrListTPA'`
+	UserAccountTable map[common.Address]*pdp.XZ21Account `json:'accounts'`
+	AuditorAddrList []common.Address `json:'addrListTPA'`
 	Reqs map[string]*pdp.XZ21AuditingReq `json:'auditReqs'`
 	Logs map[string][]*pdp.XZ21AuditingLog `json:'auditLogs'`
 }
@@ -25,7 +25,7 @@ type FakeLedger struct {
 func GenFakeLedger() FakeLedger {
 	var ledger FakeLedger
 	ledger.FileProperties = make(map[string]*pdp.XZ21FileProperty)
-	ledger.Accounts = make(map[common.Address]*pdp.XZ21Account)
+	ledger.UserAccountTable = make(map[common.Address]*pdp.XZ21Account)
 	ledger.Reqs = make(map[string]*pdp.XZ21AuditingReq)
 	ledger.Logs = make(map[string][]*pdp.XZ21AuditingLog)
 	return ledger
@@ -51,7 +51,7 @@ func (this *FakeLedger) RegisterFile(_hash [32]byte, _splitNum uint32, _addr com
 	p.Creator = _addr
 	this.FileProperties[helper.Hex(_hash[:])] = &p
 
-	this.Accounts[_addr].FileList = append(this.Accounts[_addr].FileList, _hash)
+	this.UserAccountTable[_addr].FileList = append(this.UserAccountTable[_addr].FileList, _hash)
 }
 
 func (this *FakeLedger) EnrollAuditor(_addr common.Address) error {
@@ -64,13 +64,13 @@ func (this *FakeLedger) EnrollUser(_addr common.Address, _key []byte) error {
 
 func (this *FakeLedger) enroll(_type int, _addr common.Address, _key []byte) error {
 	if _type == 0 {
-		this.AddrListTPA = append(this.AddrListTPA, _addr)
-		// slices.Sort(this.AddrListTPA) TODO
-		// this.AddrListTPA = slices.Compact(this.AddrListTPA) TODO
+		this.AuditorAddrList = append(this.AuditorAddrList, _addr)
+		// slices.Sort(this.AuditorAddrList) TODO
+		// this.AuditorAddrList = slices.Compact(this.AuditorAddrList) TODO
 	} else if _type == 1 {
 		var a pdp.XZ21Account
 		a.PubKey = _key
-		this.Accounts[_addr] = &a
+		this.UserAccountTable[_addr] = &a
 	}
 
 	return nil
@@ -80,11 +80,11 @@ func (this *FakeLedger) AppendOwner(_hash [32]byte, _addr common.Address) error 
 	if _, ok := this.FileProperties[helper.Hex(_hash[:])]; !ok {
 		return fmt.Errorf("Unknown file")
 	}
-	if _, ok := this.Accounts[_addr]; !ok {
+	if _, ok := this.UserAccountTable[_addr]; !ok {
 		return fmt.Errorf("Unknown account")
 	}
 
-	this.Accounts[_addr].FileList = append(this.Accounts[_addr].FileList, _hash)
+	this.UserAccountTable[_addr].FileList = append(this.UserAccountTable[_addr].FileList, _hash)
 
 	return nil
 }
