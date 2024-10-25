@@ -54,7 +54,15 @@ func (this *FakeLedger) RegisterFile(_hash [32]byte, _splitNum uint32, _addr com
 	this.Accounts[_addr].FileList = append(this.Accounts[_addr].FileList, _hash)
 }
 
-func (this *FakeLedger) EnrollAccount(_type int, _addr common.Address, _key []byte) error {
+func (this *FakeLedger) EnrollAuditor(_addr common.Address) error {
+	return this.enroll(0, _addr, []byte{})
+}
+
+func (this *FakeLedger) EnrollUser(_addr common.Address, _key []byte) error {
+	return this.enroll(1, _addr, _key)
+}
+
+func (this *FakeLedger) enroll(_type int, _addr common.Address, _key []byte) error {
 	if _type == 0 {
 		this.AddrListTPA = append(this.AddrListTPA, _addr)
 		// slices.Sort(this.AddrListTPA) TODO

@@ -85,8 +85,16 @@ func (this *EthClient) GetAccount(_addr common.Address) (pdp.XZ21Account, error)
 	return account, err
 }
 
-func (this *EthClient) EnrollAccount(_type int, _addr common.Address, _pubKey []byte) error {
-	t := big.NewInt(int64(_type))
+func (this *EthClient) EnrollAuditor(_addr common.Address) error {
+	return this.enroll(0, _addr, []byte{})
+}
+
+func (this *EthClient) EnrollUser(_addr common.Address, _pubKey []byte) error {
+	return this.enroll(1, _addr, _pubKey)
+}
+
+func (this *EthClient) enroll(_type int, _addr common.Address, _pubKey []byte) error {
+	t := big.NewInt(int64(0))
 	tx, err := this.Session.EnrollAccount(t, _addr, _pubKey)
 	if err != nil {
 		helper.PrintLog(fmt.Sprintf("Failed to call EnrollAccount contract (caller:%s, addr:%s, key:%s)", this.Addr, _addr, helper.Hex(_pubKey[:])))

@@ -64,11 +64,11 @@ func (this *Manager) RegisterParam() {
 }
 
 func (this *Manager) EnrollUser(_su *User)  {
-	this.client.EnrollAccount(1, _su.Addr, _su.PublicKeyData.Key)
+	this.client.EnrollUser(_su.Addr, _su.PublicKeyData.Key)
 }
 
 func (this *Manager) EnrollAuditor(_tpa *Auditor)  {
-	this.client.EnrollAccount(0, _tpa.Addr, nil)
+	this.client.EnrollAuditor(_tpa.Addr)
 }
 
 func (this *Manager) Dump(_path string) {
