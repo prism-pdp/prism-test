@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"os"
-	// "time"
 
 	"github.com/pborman/getopt/v2"
 
@@ -33,19 +32,6 @@ var command string
 var data1 []byte
 var data2 []byte
 var chunkNum uint32
-
-var baseClient client.BaseClient
-
-var sm *entity.Manager
-// var sp *entity.Provider
-var tpa *entity.Auditor
-var su1 *entity.User
-var su2 *entity.User
-var su3 *entity.User
-
-// var clientOpts client.ClientOpts
-
-// var clientTable map[types.EntityType]client.BaseClient
 
 var ledger client.FakeLedger
 
@@ -91,8 +77,6 @@ func setup(_opts []string) {
 	senderAddr = toString(optSenderAddr)
 	senderPrivKey = toString(optSenderPrivKey)
 
-	// baseClient = client.NewClient(*simFlag, server, contractAddr, senderAddr, senderPrivKey, &ledger)
-
 	if *simFlag {
 		// make fake ledger
 		if command == "setup" {
@@ -106,7 +90,7 @@ func setup(_opts []string) {
 func runSetupPhase(_smAddr string, _smPrivKey string, _spAddr string, _spPrivKey string) {
 	helper.PrintLog("Start Setup Phase")
 
-	sm = entity.GenManager("SM", _smAddr, _smPrivKey)
+	sm := entity.GenManager("SM", _smAddr, _smPrivKey)
 	if *simFlag {
 		sm.SetupSimClient(&ledger)
 	}
@@ -131,7 +115,7 @@ func runSetupPhase(_smAddr string, _smPrivKey string, _spAddr string, _spPrivKey
 func runEnrollUser(_name string, _addr string, _privKey string) {
 	helper.PrintLog(fmt.Sprintf("enroll service user (name:%s)", _name))
 
-	sm = entity.LoadManager("./cache/sm.json")
+	sm := entity.LoadManager("./cache/sm.json")
 	if *simFlag {
 		sm.SetupSimClient(&ledger)
 	}
@@ -146,7 +130,7 @@ func runEnrollUser(_name string, _addr string, _privKey string) {
 func runEnrollAuditor(_name string, _addr string) {
 	helper.PrintLog("enroll auditor (name:%s)", _name)
 
-	sm = entity.LoadManager("./cache/sm.json")
+	sm := entity.LoadManager("./cache/sm.json")
 	if *simFlag {
 		sm.SetupSimClient(&ledger)
 	}
@@ -303,26 +287,6 @@ func runVerifyAuditingProof(_name string) {
 	sp.Dump(pathSP)
 	tpa.Dump(pathTPA)
 }
-
-// func runAuditingPhase() {
-// 	helper.PrintLog("Start Auditing Phase")
-
-// 	// 1st
-// 	runUploadAuditingChal(su1)
-// 	runUploadAuditingChal(su2)
-// 	// runUploadAuditingProof()
-// 	// runVerifyAuditingProof()
-
-// 	time.Sleep(3 * time.Second) // TODO: Implement WaitMined into all contracts.
-
-// 	// 2nd
-// 	runUploadAuditingChal(su1)
-// 	runUploadAuditingChal(su2)
-// 	// runUploadAuditingProof()
-// 	// runVerifyAuditingProof()
-
-// 	helper.PrintLog("Finish Auditing Phase")
-// }
 
 func main() {
 
