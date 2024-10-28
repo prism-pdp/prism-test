@@ -34,7 +34,7 @@ func GenAuditor(_name string, _addr string) *Auditor {
 	return e
 }
 
-func LoadAuditor(_path string, _client client.BaseClient) *Auditor {
+func LoadAuditor(_path string) *Auditor {
 	f, err := os.Open(_path)
 	if err != nil { panic(err) }
 	defer f.Close()

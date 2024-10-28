@@ -265,31 +265,44 @@ func runUploadAuditingProof() {
 	helper.PrintLog("Finish upload auditing proof (entity:%s)", sp.Name)
 }
 
-// func runVerifyAuditingProof() {
-// 	helper.PrintLog(fmt.Sprintf("Start verify auditing proof (entity:%s)", tpa.Name))
+func runVerifyAuditingProof(_name string) {
+	pathSP := makePath("sp")
+	sp := entity.LoadProvider(pathSP)
+	if *simFlag {
+		sp.SetupSimClient(&ledger)
+	}
 
-// 	// TPA gets challenge and proof from blockchain.
-// 	fileList, reqDataList := tpa.GetAuditingReqList()
-// 	for i, f := range fileList {
-// 		helper.PrintLog(fmt.Sprintf("Download auditing req (file:%s, index:%d/%d)", helper.Hex(f[:]), i+1, len(fileList)))
-// 	}
+	pathTPA := makePath(_name)
+	tpa := entity.LoadAuditor(pathTPA)
+	if *simFlag {
+		tpa.SetupSimClient(&ledger)
+	}
 
-// 	if len(fileList) != 2 { panic(fmt.Errorf("Invalid fileList size (expect:2, actual:%d)", len(fileList))) }
+	helper.PrintLog("Start verify auditing proof (entity:%s)", tpa.Name)
 
-// 	for i, f := range fileList {
-// 		// TPA gets M (list of hash of chunks) from SP.
-// 		owner, digestSet, tagDataSet := sp.PrepareVerificationData(f, &reqDataList[i].ChalData)
+	// TPA gets challenge and proof from blockchain.
+	fileList, reqDataList := tpa.GetAuditingReqList()
+	for i, f := range fileList {
+		helper.PrintLog("Download auditing req (file:%s, index:%d/%d)", helper.Hex(f[:]), i+1, len(fileList))
+	}
 
-// 		// TPA verifies proof.
-// 		result, err := tpa.VerifyAuditingProof(tagDataSet, digestSet, &reqDataList[i], owner)
-// 		if err != nil { panic(err) }
+	for i, f := range fileList {
+		// TPA gets M (list of hash of chunks) from SP.
+		owner, digestSet, tagDataSet := sp.PrepareVerificationData(f, &reqDataList[i].ChalData)
 
-// 		helper.PrintLog(fmt.Sprintf("Upload auditing result (file:%s, result:%t)", helper.Hex(f[:]), result))
-// 		tpa.UploadAuditingResult(f, result)
-// 	}
+		// TPA verifies proof.
+		result, err := tpa.VerifyAuditingProof(tagDataSet, digestSet, &reqDataList[i], owner)
+		if err != nil { panic(err) }
 
-// 	helper.PrintLog(fmt.Sprintf("Finish verify auditing proof (entity:%s)", tpa.Name))
-// }
+		helper.PrintLog("Upload auditing result (file:%s, result:%t)", helper.Hex(f[:]), result)
+		tpa.UploadAuditingResult(f, result)
+	}
+
+	helper.PrintLog("Finish verify auditing proof (entity:%s)", tpa.Name)
+
+	sp.Dump(pathSP)
+	tpa.Dump(pathTPA)
+}
 
 // func runAuditingPhase() {
 // 	helper.PrintLog("Start Auditing Phase")
@@ -346,8 +359,8 @@ func main() {
 		runUploadAuditingChal(args[1])
 	case "proof":
 		runUploadAuditingProof()
-	// case "audit":
-		// runVerifyAuditingProof()
+	case "audit":
+		runVerifyAuditingProof(args[1])
 	default:
 		getopt.Usage()
 		os.Exit(1)
