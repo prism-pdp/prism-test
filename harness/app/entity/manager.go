@@ -10,6 +10,7 @@ import (
 	pdp "github.com/dpduado/dpduado-go/xz21"
 
 	"github.com/dpduado/dpduado-test/harness/client"
+	"github.com/dpduado/dpduado-test/harness/helper"
 )
 
 type Manager struct {
@@ -24,17 +25,22 @@ type Manager struct {
 }
 
 
-func GenManager(_name string, _addr string, _privKey string) *Manager {
-	manager := new(Manager)
-	manager.Name = _name
-	manager.Addr = common.HexToAddress(_addr)
-	manager.PrivKey = _privKey
-	manager.param = pdp.GenPairingParam()
-	manager.ParamXZ21 = manager.param.ToXZ21Param()
-	return manager
+func GenManager(_name string, _addr string, _privKey string, _simFlag bool) *Manager {
+	sm := new(Manager)
+	sm.Name = _name
+	sm.Addr = common.HexToAddress(_addr)
+	sm.PrivKey = _privKey
+	sm.param = pdp.GenPairingParam()
+	sm.ParamXZ21 = sm.param.ToXZ21Param()
+
+	if _simFlag {
+		sm.SetupSimClient(client.GetFakeLedger())
+	}
+
+	return sm
 }
 
-func LoadManager(_path string) *Manager {
+func LoadManager(_path string, _simFlag bool) *Manager {
 	f, err := os.Open(_path)
 	if err != nil { panic(err) }
 	defer f.Close()
@@ -46,6 +52,10 @@ func LoadManager(_path string) *Manager {
 	json.Unmarshal(s, &sm)
 
 	sm.param = pdp.GenParamFromXZ21Param(&sm.ParamXZ21)
+
+	if _simFlag {
+		sm.SetupSimClient(client.GetFakeLedger())
+	}
 
 	return sm
 }
@@ -71,11 +81,12 @@ func (this *Manager) EnrollAuditor(_tpa *Auditor)  {
 	this.client.EnrollAuditor(_tpa.Addr)
 }
 
-func (this *Manager) Dump(_path string) {
+func (this *Manager) Dump(_pathDir string) {
 	s, err := json.MarshalIndent(this, "", "\t")
 	if err != nil { panic(err) }
 
-	f, err := os.Create(_path)
+	path := helper.MakeDumpPath(_pathDir, this.Name)
+	f, err := os.Create(path)
 	if err != nil { panic(err) }
 	defer f.Close()
 

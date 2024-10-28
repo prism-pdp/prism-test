@@ -37,28 +37,22 @@ func (this *Provider) SearchFile(_hash [32]byte) *File {
 	return nil
 }
 
-// func MakeProvider(_path string, _client client.BaseClient, _name string) *Provider {
-// 	if (helper.IsFile(_path)) {
-// 		return LoadProvider(_path, _client)
-// 	} else {
-// 		return GenProvider(_client, _name)
-// 	}
-// }
+func GenProvider(_name string, _addr string, _privKey string, _simFlag bool) *Provider {
+	p := new(Provider)
 
-func GenProvider(_name string, _addr string, _privKey string) *Provider {
-	provider := new(Provider)
+	p.Name = _name
+	p.Files = make(map[string]*File)
+	p.Addr = common.HexToAddress(_addr)
+	p.PrivKey = _privKey
 
-	provider.Name = _name
-	provider.Files = make(map[string]*File)
-	provider.Addr = common.HexToAddress(_addr)
-	provider.PrivKey = _privKey
+	if _simFlag {
+		p.SetupSimClient(client.GetFakeLedger())
+	}
 
-	// provider.client = _client
-
-	return provider
+	return p
 }
 
-func LoadProvider(_path string) *Provider {
+func LoadProvider(_path string, _simFlag bool) *Provider {
 	f, err := os.Open(_path)
 	if err != nil { panic(err) }
 	defer f.Close()
@@ -66,27 +60,30 @@ func LoadProvider(_path string) *Provider {
 	s, err := ioutil.ReadAll(f)
 	if err != nil { panic(err) }
 
-	sp := new(Provider)
-	json.Unmarshal(s, sp)
+	p := new(Provider)
+	json.Unmarshal(s, p)
 
-	if sp.Files == nil {
-		sp.Files = make(map[string]*File)
+	if p.Files == nil {
+		p.Files = make(map[string]*File)
 	}
 
-	// sp.client = _client
+	if _simFlag {
+		p.SetupSimClient(client.GetFakeLedger())
+	}
 
-	return sp
+	return p
 }
 
 func (this *Provider) SetupSimClient(_ledger *client.FakeLedger) {
 	this.client = client.NewSimClient(_ledger, this.Addr)
 }
 
-func (this *Provider) Dump(_path string) {
+func (this *Provider) Dump(_pathDir string) {
 	s, err := json.MarshalIndent(this, "", "\t")
 	if err != nil { panic(err) }
 
-	f, err := os.Create(_path)
+	path := helper.MakeDumpPath(_pathDir, this.Name)
+	f, err := os.Create(path)
 	if err != nil { panic(err) }
 	defer f.Close()
 

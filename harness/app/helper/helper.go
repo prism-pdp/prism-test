@@ -95,3 +95,7 @@ func IsFile(_path string) bool {
     }
     return !info.IsDir()
 }
+
+func MakeDumpPath(_pathDir string, _name string) string {
+	return fmt.Sprintf("%s/%s.json", _pathDir, _name)
+}

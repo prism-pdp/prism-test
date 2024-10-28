@@ -6,7 +6,6 @@ import (
 	"io/ioutil"
 	"github.com/ethereum/go-ethereum/common"
 	"os"
-	// "slices"
 
 	pdp "github.com/dpduado/dpduado-go/xz21"
 
@@ -22,27 +21,28 @@ type FakeLedger struct {
 	Logs map[string][]*pdp.XZ21AuditingLog `json:'auditLogs'`
 }
 
-func GenFakeLedger() FakeLedger {
-	var ledger FakeLedger
+var ledger FakeLedger
+
+func GetFakeLedger() *FakeLedger {
+	return &ledger
+}
+
+func GenFakeLedger() {
 	ledger.FileProperties = make(map[string]*pdp.XZ21FileProperty)
 	ledger.UserAccountTable = make(map[common.Address]*pdp.XZ21Account)
 	ledger.Reqs = make(map[string]*pdp.XZ21AuditingReq)
 	ledger.Logs = make(map[string][]*pdp.XZ21AuditingLog)
-	return ledger
 }
 
-func LoadFakeLedger(_path string) FakeLedger {
-	f, err := os.Open(_path)
+func LoadFakeLedger(_pathDir string) {
+	f, err := os.Open(makePath(_pathDir))
 	if err != nil { panic(err) }
 	defer f.Close()
 
 	s, err := ioutil.ReadAll(f)
 	if err != nil { panic(err) }
 
-	var ledger FakeLedger
 	json.Unmarshal(s, &ledger)
-
-	return ledger
 }
 
 func (this *FakeLedger) RegisterFile(_hash [32]byte, _splitNum uint32, _addr common.Address) {
@@ -96,14 +96,18 @@ func (this *FakeLedger) SearchFile(_hash [32]byte) (pdp.XZ21FileProperty, error)
 	return pdp.XZ21FileProperty{}, nil
 }
 
-func (this *FakeLedger) Dump(_path string) {
+func (this *FakeLedger) Dump(_pathDir string) {
 	s, err := json.MarshalIndent(this, "", "\t")
 	if err != nil { panic(err) }
 
-	f, err := os.Create(_path)
+	f, err := os.Create(makePath(_pathDir))
 	if err != nil { panic(err) }
 	defer f.Close()
 
 	_, err = f.Write(s)
 	if err != nil { panic(err) }
+}
+
+func makePath(_pathDir string) string {
+	return _pathDir + "/fake-ledger.json"
 }

@@ -26,22 +26,26 @@ type User struct {
 }
 
 
-func GenUser(_addr string, _privKey string, _param *pdp.PairingParam, _name string) *User {
-	user := new(User)
+func GenUser(_name string, _addr string, _privKey string, _param *pdp.PairingParam, _simFlag bool) *User {
+	u := new(User)
 
-	user.Name = _name
+	u.Name = _name
 
-	user.Addr = common.HexToAddress(_addr)
-	user.PrivKey = _privKey
+	u.Addr = common.HexToAddress(_addr)
+	u.PrivKey = _privKey
 
 	pk, sk := pdp.GenPairingKey(_param)
-	user.PublicKeyData = pk.Export()
-	user.PrivateKeyData = sk.Export()
+	u.PublicKeyData = pk.Export()
+	u.PrivateKeyData = sk.Export()
 
-	return user
+	if _simFlag {
+		u.SetupSimClient(client.GetFakeLedger())
+	}
+
+	return u
 }
 
-func LoadUser(_path string) *User {
+func LoadUser(_path string, _simFlag bool) *User {
 	f, err := os.Open(_path)
 	if err != nil { panic(err) }
 	defer f.Close()
@@ -49,21 +53,26 @@ func LoadUser(_path string) *User {
 	s, err := ioutil.ReadAll(f)
 	if err != nil { panic(err) }
 
-	su := new(User)
-	json.Unmarshal(s, &su)
+	u := new(User)
+	json.Unmarshal(s, &u)
 
-	return su
+	if _simFlag {
+		u.SetupSimClient(client.GetFakeLedger())
+	}
+
+	return u
 }
 
 func (this *User) SetupSimClient(_ledger *client.FakeLedger) {
 	this.client = client.NewSimClient(_ledger, this.Addr)
 }
 
-func (this *User) Dump(_path string) {
+func (this *User) Dump(_pathDir string) {
 	s, err := json.MarshalIndent(this, "", "\t")
 	if err != nil { panic(err) }
 
-	f, err := os.Create(_path)
+	path := helper.MakeDumpPath(_pathDir, this.Name)
+	f, err := os.Create(path)
 	if err != nil { panic(err) }
 	defer f.Close()
 

@@ -9,7 +9,7 @@ import (
 	pdp "github.com/dpduado/dpduado-go/xz21"
 
 	"github.com/dpduado/dpduado-test/harness/client"
-	// "github.com/dpduado/dpduado-test/harness/helper"
+	"github.com/dpduado/dpduado-test/harness/helper"
 )
 
 type Auditor struct {
@@ -19,22 +19,19 @@ type Auditor struct {
 	client client.BaseClient
 }
 
-// func MakeAuditor(_path string, _client client.BaseClient, _name string) *Auditor {
-// 	if (helper.IsFile(_path)) {
-// 		return LoadAuditor(_path, _client)
-// 	} else {
-// 		return GenAuditor(_client, _name)
-// 	}
-// }
+func GenAuditor(_name string, _addr string, _simFlag bool) *Auditor {
+	a := new(Auditor)
+	a.Name = _name
+	a.Addr = common.HexToAddress(_addr)
 
-func GenAuditor(_name string, _addr string) *Auditor {
-	e := new(Auditor)
-	e.Name = _name
-	e.Addr = common.HexToAddress(_addr)
-	return e
+	if _simFlag {
+		a.SetupSimClient(client.GetFakeLedger())
+	}
+
+	return a
 }
 
-func LoadAuditor(_path string) *Auditor {
+func LoadAuditor(_path string, _simFlag bool) *Auditor {
 	f, err := os.Open(_path)
 	if err != nil { panic(err) }
 	defer f.Close()
@@ -42,10 +39,14 @@ func LoadAuditor(_path string) *Auditor {
 	s, err := io.ReadAll(f)
 	if err != nil { panic(err) }
 
-	e := new(Auditor)
-	json.Unmarshal(s, &e)
+	a := new(Auditor)
+	json.Unmarshal(s, &a)
 
-	return e
+	if _simFlag {
+		a.SetupSimClient(client.GetFakeLedger())
+	}
+
+	return a
 }
 
 func (this *Auditor) SetupSimClient(_ledger *client.FakeLedger) {
@@ -91,11 +92,12 @@ func (this *Auditor) UploadAuditingResult(_hash [32]byte, _result bool) {
 	if err != nil { panic(err) }
 }
 
-func (this *Auditor) Dump(_path string) {
+func (this *Auditor) Dump(_pathDir string) {
 	s, err := json.MarshalIndent(this, "", "\t")
 	if err != nil { panic(err) }
 
-	f, err := os.Create(_path)
+	path := helper.MakeDumpPath(_pathDir, this.Name)
+	f, err := os.Create(path)
 	if err != nil { panic(err) }
 	defer f.Close()
 

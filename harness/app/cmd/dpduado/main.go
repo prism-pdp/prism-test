@@ -35,6 +35,8 @@ var chunkNum uint32
 
 var ledger client.FakeLedger
 
+const pathDumpDir = "./cache"
+
 type Account struct {
 	Address string `json:'Address'`
 	PrivKey string `json:'PrivKey'`
@@ -45,10 +47,6 @@ func toString(_opt *string) string {
 		return ""
 	}
 	return *_opt
-}
-
-func makePath(_name string) string {
-	return "./cache/" + _name + ".json"
 }
 
 func setup(_opts []string) {
@@ -80,9 +78,9 @@ func setup(_opts []string) {
 	if *simFlag {
 		// make fake ledger
 		if command == "setup" {
-			ledger = client.GenFakeLedger()
+			client.GenFakeLedger()
 		} else {
-			ledger = client.LoadFakeLedger("./cache/fake-ledger.json")
+			client.LoadFakeLedger(pathDumpDir)
 		}
 	}
 }
@@ -90,10 +88,7 @@ func setup(_opts []string) {
 func runSetupPhase(_smAddr string, _smPrivKey string, _spAddr string, _spPrivKey string) {
 	helper.PrintLog("Start Setup Phase")
 
-	sm := entity.GenManager("SM", _smAddr, _smPrivKey)
-	if *simFlag {
-		sm.SetupSimClient(&ledger)
-	}
+	sm := entity.GenManager("sm", _smAddr, _smPrivKey, *simFlag)
 
 	// =================================================
 	// Register param
@@ -101,13 +96,10 @@ func runSetupPhase(_smAddr string, _smPrivKey string, _spAddr string, _spPrivKey
 	sm.RegisterParam()
 	helper.PrintLog("Register Parameter: OK")
 
-	sp := entity.GenProvider("SP", _spAddr, _spPrivKey)
-	if *simFlag {
-		sp.SetupSimClient(&ledger)
-	}
+	sp := entity.GenProvider("sp", _spAddr, _spPrivKey, *simFlag)
 
-	sm.Dump("./cache/sm.json")
-	sp.Dump("./cache/sp.json")
+	sm.Dump(pathDumpDir)
+	sp.Dump(pathDumpDir)
 
 	helper.PrintLog("Finish Setup Phase")
 }
@@ -115,31 +107,25 @@ func runSetupPhase(_smAddr string, _smPrivKey string, _spAddr string, _spPrivKey
 func runEnrollUser(_name string, _addr string, _privKey string) {
 	helper.PrintLog(fmt.Sprintf("enroll service user (name:%s)", _name))
 
-	sm := entity.LoadManager("./cache/sm.json")
-	if *simFlag {
-		sm.SetupSimClient(&ledger)
-	}
+	path := helper.MakeDumpPath(pathDumpDir, "sm")
+	sm := entity.LoadManager(path, *simFlag)
 
-	su := entity.GenUser(_addr, _privKey, sm.GetParam(), _name)
+	su := entity.GenUser(_name, _addr, _privKey, sm.GetParam(), *simFlag)
 	sm.EnrollUser(su)
 
-	path := makePath(_name)
-	su.Dump(path)
+	su.Dump(pathDumpDir)
 }
 
 func runEnrollAuditor(_name string, _addr string) {
 	helper.PrintLog("enroll auditor (name:%s)", _name)
 
-	sm := entity.LoadManager("./cache/sm.json")
-	if *simFlag {
-		sm.SetupSimClient(&ledger)
-	}
+	path := helper.MakeDumpPath(pathDumpDir, "sm")
+	sm := entity.LoadManager(path, *simFlag)
 
-	tpa := entity.GenAuditor(_name, _addr)
+	tpa := entity.GenAuditor(_name, _addr, *simFlag)
 	sm.EnrollAuditor(tpa)
 
-	path := makePath(_name)
-	tpa.Dump(path)
+	tpa.Dump(pathDumpDir)
 }
 
 func runUploadPhase(_name string, _data []byte) {
@@ -147,17 +133,11 @@ func runUploadPhase(_name string, _data []byte) {
 
 	helper.PrintLog("Start Upload Phase")
 
-	path = makePath("sp")
-	sp := entity.LoadProvider(path)
-	if *simFlag {
-		sp.SetupSimClient(&ledger)
-	}
+	path = helper.MakeDumpPath(pathDumpDir, "sp")
+	sp := entity.LoadProvider(path, *simFlag)
 
-	path = makePath(_name)
-	su := entity.LoadUser(path)
-	if *simFlag {
-		su.SetupSimClient(&ledger)
-	}
+	path = helper.MakeDumpPath(pathDumpDir, _name)
+	su := entity.LoadUser(path, *simFlag)
 
 	// SU checks whether data is uploaded.
 	isUploaded := su.IsUploaded(_data)
@@ -190,21 +170,15 @@ func runUploadPhase(_name string, _data []byte) {
 		helper.PrintLog("Upload New file: OK")
 	}
 
-	path = makePath("sp")
-	sp.Dump(path)
-
-	path = makePath(_name)
-	su.Dump(path)
+	sp.Dump(pathDumpDir)
+	su.Dump(pathDumpDir)
 
 	helper.PrintLog("Finish Upload Phase")
 }
 
 func runUploadAuditingChal(_name string) {
-	path := makePath(_name)
-	su := entity.LoadUser(path)
-	if *simFlag {
-		su.SetupSimClient(&ledger)
-	}
+	path := helper.MakeDumpPath(pathDumpDir, _name)
+	su := entity.LoadUser(path, *simFlag)
 
 	helper.PrintLog("Start upload auditing chal (entity:%s)", su.Name)
 
@@ -217,18 +191,14 @@ func runUploadAuditingChal(_name string) {
 		su.UploadAuditingChal(f, &chalData)
 	}
 
-	path = makePath(_name)
-	su.Dump(path)
+	su.Dump(pathDumpDir)
 
 	helper.PrintLog("Finish upload auditing chal (entity:%s)", su.Name)
 }
 
 func runUploadAuditingProof() {
-	path := makePath("sp")
-	sp := entity.LoadProvider(path)
-	if *simFlag {
-		sp.SetupSimClient(&ledger)
-	}
+	path := helper.MakeDumpPath(pathDumpDir, "sp")
+	sp := entity.LoadProvider(path, *simFlag)
 
 	helper.PrintLog("Start upload auditing proof (entity:%s)", sp.Name)
 
@@ -244,23 +214,17 @@ func runUploadAuditingProof() {
 		sp.UploadAuditingProof(f, &proofData)
 	}
 
-	sp.Dump(path)
+	sp.Dump(pathDumpDir)
 
 	helper.PrintLog("Finish upload auditing proof (entity:%s)", sp.Name)
 }
 
 func runVerifyAuditingProof(_name string) {
-	pathSP := makePath("sp")
-	sp := entity.LoadProvider(pathSP)
-	if *simFlag {
-		sp.SetupSimClient(&ledger)
-	}
+	pathSP := helper.MakeDumpPath(pathDumpDir, "sp")
+	sp := entity.LoadProvider(pathSP, *simFlag)
 
-	pathTPA := makePath(_name)
-	tpa := entity.LoadAuditor(pathTPA)
-	if *simFlag {
-		tpa.SetupSimClient(&ledger)
-	}
+	pathTPA := helper.MakeDumpPath(pathDumpDir, _name)
+	tpa := entity.LoadAuditor(pathTPA, *simFlag)
 
 	helper.PrintLog("Start verify auditing proof (entity:%s)", tpa.Name)
 
@@ -284,8 +248,8 @@ func runVerifyAuditingProof(_name string) {
 
 	helper.PrintLog("Finish verify auditing proof (entity:%s)", tpa.Name)
 
-	sp.Dump(pathSP)
-	tpa.Dump(pathTPA)
+	sp.Dump(pathDumpDir)
+	tpa.Dump(pathDumpDir)
 }
 
 func main() {
@@ -331,6 +295,6 @@ func main() {
 	}
 
 	if *simFlag {
-		ledger.Dump("./cache/fake-ledger.json")
+		client.GetFakeLedger().Dump(pathDumpDir)
 	}
 }
