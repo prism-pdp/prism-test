@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"os"
 
 	"github.com/pborman/getopt/v2"
@@ -35,7 +34,8 @@ var chunkNum uint32
 
 var ledger client.FakeLedger
 
-const pathDumpDir = "./cache"
+const nameSM = "sm"
+const nameSP = "sp"
 
 type Account struct {
 	Address string `json:'Address'`
@@ -80,84 +80,120 @@ func setup(_opts []string) {
 		if command == "setup" {
 			client.GenFakeLedger()
 		} else {
-			client.LoadFakeLedger(pathDumpDir)
+			client.LoadFakeLedger()
 		}
 	}
 }
 
 func runSetupPhase(_smAddr string, _smPrivKey string, _spAddr string, _spPrivKey string) {
-	helper.PrintLog("Start Setup Phase")
+	helper.PrintLog("Start setup")
 
-	sm := entity.GenManager("sm", _smAddr, _smPrivKey, *simFlag)
+	// --------------------------
+	// Prepare entities
+	// --------------------------
+	sm := entity.GenManager(nameSM, _smAddr, _smPrivKey, *simFlag)
+	sp := entity.GenProvider(nameSP, _spAddr, _spPrivKey, *simFlag)
 
-	// =================================================
-	// Register param
-	// =================================================
+	// --------------------------
+	// Main processing
+	// --------------------------
 	sm.RegisterParam()
-	helper.PrintLog("Register Parameter: OK")
+	helper.PrintLog("Register param")
 
-	sp := entity.GenProvider("sp", _spAddr, _spPrivKey, *simFlag)
+	// --------------------------
+	// Save entities
+	// --------------------------
+	sm.Dump()
+	sp.Dump()
 
-	sm.Dump(pathDumpDir)
-	sp.Dump(pathDumpDir)
-
-	helper.PrintLog("Finish Setup Phase")
+	helper.PrintLog("Finish setup")
 }
 
 func runEnrollUser(_name string, _addr string, _privKey string) {
-	helper.PrintLog(fmt.Sprintf("enroll service user (name:%s)", _name))
+	helper.PrintLog("Start enroll user")
 
-	path := helper.MakeDumpPath(pathDumpDir, "sm")
-	sm := entity.LoadManager(path, *simFlag)
-
+	// --------------------------
+	// Prepare entities
+	// --------------------------
+	sm := entity.LoadManager(nameSM, *simFlag)
 	su := entity.GenUser(_name, _addr, _privKey, sm.GetParam(), *simFlag)
-	sm.EnrollUser(su)
 
-	su.Dump(pathDumpDir)
+	// --------------------------
+	// Main processing
+	// --------------------------
+	sm.EnrollUser(su)
+	helper.PrintLog("enroll service user (name:%s)", su.Name)
+
+	// --------------------------
+	// Save entities
+	// --------------------------
+	sm.Dump()
+	su.Dump()
+
+	helper.PrintLog("Finish enroll user")
 }
 
 func runEnrollAuditor(_name string, _addr string) {
-	helper.PrintLog("enroll auditor (name:%s)", _name)
+	helper.PrintLog("Start enroll auditor")
 
-	path := helper.MakeDumpPath(pathDumpDir, "sm")
-	sm := entity.LoadManager(path, *simFlag)
-
+	// --------------------------
+	// Prepare entities
+	// --------------------------
+	sm := entity.LoadManager(nameSM, *simFlag)
 	tpa := entity.GenAuditor(_name, _addr, *simFlag)
-	sm.EnrollAuditor(tpa)
 
-	tpa.Dump(pathDumpDir)
+	// --------------------------
+	// Main processing
+	// --------------------------
+	sm.EnrollAuditor(tpa)
+	helper.PrintLog("enroll auditor (name:%s)", tpa.Name)
+
+	// --------------------------
+	// Save entities
+	// --------------------------
+	sm.Dump()
+	tpa.Dump()
+
+	helper.PrintLog("Finish enroll auditor")
 }
 
 func runUploadPhase(_name string, _data []byte) {
-	var path string
+	helper.PrintLog("Start upload")
 
-	helper.PrintLog("Start Upload Phase")
+	// --------------------------
+	// Prepare entities
+	// --------------------------
+	sp := entity.LoadProvider(nameSP, *simFlag)
+	su := entity.LoadUser(_name, *simFlag)
 
-	path = helper.MakeDumpPath(pathDumpDir, "sp")
-	sp := entity.LoadProvider(path, *simFlag)
-
-	path = helper.MakeDumpPath(pathDumpDir, _name)
-	su := entity.LoadUser(path, *simFlag)
-
+	// --------------------------
+	// Main processing
+	// --------------------------
 	// SU checks whether data is uploaded.
 	isUploaded := su.IsUploaded(_data)
 
 	// Processing differs depending on whether the file has already been uploaded or not.
+	digest := helper.CalcDigest(_data)
+	hex := helper.Hex(digest[:])
 	if isUploaded {
 		// SP generates a challenge for deduplication.
 		chalData := sp.GenDedupChal(_data, su.Addr)
 
-		// SP sends the challenge to SU.
+		// (SP sends the challenge to SU.)
 
 		// SU generates a proof to prove ownership of the data to be uploaded.
 		proofData := su.GenDedupProof(&chalData, _data, chunkNum)
 
+		// (SU sends the proof to SP.)
+
 		// SP verifies the proof.
-		isRegistered := sp.RegisterOwnerToFile(su, _data, &chalData, &proofData)
-		if isRegistered {
-			helper.PrintLog("Append Owner: OK")
+		success, err := sp.RegisterOwnerToFile(su, _data, &chalData, &proofData)
+		if err != nil { panic(err) }
+
+		if success {
+			helper.PrintLog("Register an owner to a file (owner:%s, file:%s)", su.Name, hex)
 		} else {
-			helper.PrintLog("Append Owner: NG")
+			helper.PrintLog("Failure registering an owner to a file (owner:%s, file:%s)", su.Name, hex)
 		}
 	} else {
 		// SU uploads the file.
@@ -167,21 +203,29 @@ func runUploadPhase(_name string, _data []byte) {
 		err := sp.UploadNewFile(_data, &tag, su.Addr, &su.PublicKeyData)
 		if err != nil { panic(err) }
 
-		helper.PrintLog("Upload New file: OK")
+		helper.PrintLog("Upload new file (owner:%s, file:%s)", su.Name, hex)
 	}
 
-	sp.Dump(pathDumpDir)
-	su.Dump(pathDumpDir)
+	// --------------------------
+	// Save entities
+	// --------------------------
+	sp.Dump()
+	su.Dump()
 
-	helper.PrintLog("Finish Upload Phase")
+	helper.PrintLog("Finish upload")
 }
 
 func runUploadAuditingChal(_name string) {
-	path := helper.MakeDumpPath(pathDumpDir, _name)
-	su := entity.LoadUser(path, *simFlag)
+	helper.PrintLog("Start challenge")
 
-	helper.PrintLog("Start upload auditing chal (entity:%s)", su.Name)
+	// --------------------------
+	// Prepare entities
+	// --------------------------
+	su := entity.LoadUser(_name, *simFlag)
 
+	// --------------------------
+	// Main processing
+	// --------------------------
 	// SU gets the list of his/her files.
 	fileList := su.GetFileList()
 	// SU generates challenge and requests to audit each file
@@ -191,17 +235,25 @@ func runUploadAuditingChal(_name string) {
 		su.UploadAuditingChal(f, &chalData)
 	}
 
-	su.Dump(pathDumpDir)
+	// --------------------------
+	// Save entities
+	// --------------------------
+	su.Dump()
 
-	helper.PrintLog("Finish upload auditing chal (entity:%s)", su.Name)
+	helper.PrintLog("Finish challenge")
 }
 
 func runUploadAuditingProof() {
-	path := helper.MakeDumpPath(pathDumpDir, "sp")
-	sp := entity.LoadProvider(path, *simFlag)
+	helper.PrintLog("Start proof")
 
-	helper.PrintLog("Start upload auditing proof (entity:%s)", sp.Name)
+	// --------------------------
+	// Prepare entities
+	// --------------------------
+	sp := entity.LoadProvider(nameSP, *simFlag)
 
+	// --------------------------
+	// Main processing
+	// --------------------------
 	// SP gets challenge from blockchain.
 	fileList, chalDataList := sp.DownloadAuditingChal()
 	for i, h := range fileList {
@@ -214,20 +266,26 @@ func runUploadAuditingProof() {
 		sp.UploadAuditingProof(f, &proofData)
 	}
 
-	sp.Dump(pathDumpDir)
+	// --------------------------
+	// Save entities
+	// --------------------------
+	sp.Dump()
 
-	helper.PrintLog("Finish upload auditing proof (entity:%s)", sp.Name)
+	helper.PrintLog("Finish proof")
 }
 
 func runVerifyAuditingProof(_name string) {
-	pathSP := helper.MakeDumpPath(pathDumpDir, "sp")
-	sp := entity.LoadProvider(pathSP, *simFlag)
+	helper.PrintLog("Start auditing")
 
-	pathTPA := helper.MakeDumpPath(pathDumpDir, _name)
-	tpa := entity.LoadAuditor(pathTPA, *simFlag)
+	// --------------------------
+	// Prepare entities
+	// --------------------------
+	sp := entity.LoadProvider(nameSP, *simFlag)
+	tpa := entity.LoadAuditor(_name, *simFlag)
 
-	helper.PrintLog("Start verify auditing proof (entity:%s)", tpa.Name)
-
+	// --------------------------
+	// Main processing
+	// --------------------------
 	// TPA gets challenge and proof from blockchain.
 	fileList, reqDataList := tpa.GetAuditingReqList()
 	for i, f := range fileList {
@@ -246,10 +304,13 @@ func runVerifyAuditingProof(_name string) {
 		tpa.UploadAuditingResult(f, result)
 	}
 
-	helper.PrintLog("Finish verify auditing proof (entity:%s)", tpa.Name)
+	// --------------------------
+	// Save entities
+	// --------------------------
+	sp.Dump()
+	tpa.Dump()
 
-	sp.Dump(pathDumpDir)
-	tpa.Dump(pathDumpDir)
+	helper.PrintLog("Finish auditing")
 }
 
 func main() {
@@ -273,7 +334,6 @@ func main() {
 
 	switch command {
 	case "setup":
-		fmt.Println(args)
 		runSetupPhase(args[1], args[2], args[3], args[4])
 	case "enroll":
 		if args[1] == "auditor" {
@@ -295,6 +355,6 @@ func main() {
 	}
 
 	if *simFlag {
-		client.GetFakeLedger().Dump(pathDumpDir)
+		client.GetFakeLedger().Dump()
 	}
 }

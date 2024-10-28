@@ -31,8 +31,9 @@ func GenAuditor(_name string, _addr string, _simFlag bool) *Auditor {
 	return a
 }
 
-func LoadAuditor(_path string, _simFlag bool) *Auditor {
-	f, err := os.Open(_path)
+func LoadAuditor(_name string, _simFlag bool) *Auditor {
+	path := helper.MakeDumpPath(_name)
+	f, err := os.Open(path)
 	if err != nil { panic(err) }
 	defer f.Close()
 
@@ -92,11 +93,11 @@ func (this *Auditor) UploadAuditingResult(_hash [32]byte, _result bool) {
 	if err != nil { panic(err) }
 }
 
-func (this *Auditor) Dump(_pathDir string) {
+func (this *Auditor) Dump() {
 	s, err := json.MarshalIndent(this, "", "\t")
 	if err != nil { panic(err) }
 
-	path := helper.MakeDumpPath(_pathDir, this.Name)
+	path := helper.MakeDumpPath(this.Name)
 	f, err := os.Create(path)
 	if err != nil { panic(err) }
 	defer f.Close()

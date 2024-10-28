@@ -2,6 +2,7 @@ package helper
 
 import (
 	"time"
+	"crypto/sha256"
 	"encoding/hex"
 	"fmt"
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
@@ -15,6 +16,7 @@ import (
 )
 
 const escape = "\x1b"
+const PathDumpDir = "./cache"
 
 const (
 	NONE = iota
@@ -96,6 +98,10 @@ func IsFile(_path string) bool {
     return !info.IsDir()
 }
 
-func MakeDumpPath(_pathDir string, _name string) string {
-	return fmt.Sprintf("%s/%s.json", _pathDir, _name)
+func MakeDumpPath(_name string) string {
+	return fmt.Sprintf("%s/%s.json", PathDumpDir, _name)
+}
+
+func CalcDigest(_data []byte) [32]byte {
+	return sha256.Sum256(_data)
 }

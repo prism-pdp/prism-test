@@ -45,8 +45,9 @@ func GenUser(_name string, _addr string, _privKey string, _param *pdp.PairingPar
 	return u
 }
 
-func LoadUser(_path string, _simFlag bool) *User {
-	f, err := os.Open(_path)
+func LoadUser(_name string, _simFlag bool) *User {
+	path := helper.MakeDumpPath(_name)
+	f, err := os.Open(path)
 	if err != nil { panic(err) }
 	defer f.Close()
 
@@ -67,11 +68,11 @@ func (this *User) SetupSimClient(_ledger *client.FakeLedger) {
 	this.client = client.NewSimClient(_ledger, this.Addr)
 }
 
-func (this *User) Dump(_pathDir string) {
+func (this *User) Dump() {
 	s, err := json.MarshalIndent(this, "", "\t")
 	if err != nil { panic(err) }
 
-	path := helper.MakeDumpPath(_pathDir, this.Name)
+	path := helper.MakeDumpPath(this.Name)
 	f, err := os.Create(path)
 	if err != nil { panic(err) }
 	defer f.Close()

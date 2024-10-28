@@ -34,8 +34,8 @@ func GenFakeLedger() {
 	ledger.Logs = make(map[string][]*pdp.XZ21AuditingLog)
 }
 
-func LoadFakeLedger(_pathDir string) {
-	f, err := os.Open(makePath(_pathDir))
+func LoadFakeLedger() {
+	f, err := os.Open(makePath())
 	if err != nil { panic(err) }
 	defer f.Close()
 
@@ -96,11 +96,11 @@ func (this *FakeLedger) SearchFile(_hash [32]byte) (pdp.XZ21FileProperty, error)
 	return pdp.XZ21FileProperty{}, nil
 }
 
-func (this *FakeLedger) Dump(_pathDir string) {
+func (this *FakeLedger) Dump() {
 	s, err := json.MarshalIndent(this, "", "\t")
 	if err != nil { panic(err) }
 
-	f, err := os.Create(makePath(_pathDir))
+	f, err := os.Create(makePath())
 	if err != nil { panic(err) }
 	defer f.Close()
 
@@ -108,6 +108,6 @@ func (this *FakeLedger) Dump(_pathDir string) {
 	if err != nil { panic(err) }
 }
 
-func makePath(_pathDir string) string {
-	return _pathDir + "/fake-ledger.json"
+func makePath() string {
+	return helper.PathDumpDir + "/fake-ledger.json"
 }

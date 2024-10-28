@@ -52,8 +52,9 @@ func GenProvider(_name string, _addr string, _privKey string, _simFlag bool) *Pr
 	return p
 }
 
-func LoadProvider(_path string, _simFlag bool) *Provider {
-	f, err := os.Open(_path)
+func LoadProvider(_name string, _simFlag bool) *Provider {
+	path := helper.MakeDumpPath(_name)
+	f, err := os.Open(path)
 	if err != nil { panic(err) }
 	defer f.Close()
 
@@ -78,11 +79,11 @@ func (this *Provider) SetupSimClient(_ledger *client.FakeLedger) {
 	this.client = client.NewSimClient(_ledger, this.Addr)
 }
 
-func (this *Provider) Dump(_pathDir string) {
+func (this *Provider) Dump() {
 	s, err := json.MarshalIndent(this, "", "\t")
 	if err != nil { panic(err) }
 
-	path := helper.MakeDumpPath(_pathDir, this.Name)
+	path := helper.MakeDumpPath(this.Name)
 	f, err := os.Create(path)
 	if err != nil { panic(err) }
 	defer f.Close()
@@ -125,17 +126,17 @@ func (this *Provider) UploadNewFile(_data []byte, _tagSet *pdp.TagSet, _addrSU c
 	return nil
 }
 
-func (this *Provider) RegisterOwnerToFile(_su *User, _data []byte, _chalData *pdp.ChalData, _proofData *pdp.ProofData) bool {
+func (this *Provider) RegisterOwnerToFile(_su *User, _data []byte, _chalData *pdp.ChalData, _proofData *pdp.ProofData) (bool, error) {
 	// check file
 	hash := sha256.Sum256(_data)
 	file := this.SearchFile(hash)
-	if file == nil { panic(fmt.Errorf("File is not found.")) }
+	if file == nil { return false, fmt.Errorf("File is not found.") }
 	fileProp, err := this.client.SearchFile(hash)
-	if err != nil { panic(err) }
-	if helper.IsEmptyFileProperty(&fileProp) { panic(fmt.Errorf("File property is not found."))}
+	if err != nil { return false, err }
+	if helper.IsEmptyFileProperty(&fileProp) { return false, fmt.Errorf("File property is not found.")}
 	// prepare params
 	xz21Param, err := this.client.GetParam()
-	if err != nil { panic(err) }
+	if err != nil { return false, err }
 	params := pdp.GenParamFromXZ21Param(&xz21Param)
 
 	// ===================================
@@ -143,7 +144,7 @@ func (this *Provider) RegisterOwnerToFile(_su *User, _data []byte, _chalData *pd
 	// ===================================
 	// prepare public key of the creator of the file
 	account, err := this.client.GetAccount(fileProp.Creator)
-	if err != nil { panic(fmt.Errorf("Account is not found.")) }
+	if err != nil { return false, fmt.Errorf("Account is not found.") }
 	pkData := pdp.PublicKeyData{account.PubKey}
 	pk := pkData.Import(&params)
 	// prepare chal, proof
@@ -153,21 +154,21 @@ func (this *Provider) RegisterOwnerToFile(_su *User, _data []byte, _chalData *pd
 	// TODO: function VerifyProof内で必要なタグだけ復元するのがよい
 	tagSet := file.TagDataSet.ImportSubset(&params, &chal)
 	chunks, err := pdp.SplitData(file.Data, tagSet.Size)
-	if err != nil { panic(err) }
+	if err != nil { return false, err }
 	digestSubset := pdp.HashSampledChunks(chunks, &chal)
 	// verify chal & proof
 	isVerified, err := pdp.VerifyProof(&params, &tagSet, digestSubset, &chal, &proof, pk.Key)
-	if err != nil { panic(err) }
-	if !isVerified { return false }
+	if err != nil { return false, err }
+	if !isVerified { return false, nil }
 
 	// ===================================
 	// Verify chal & proof
 	// ===================================
 	file.Owners = append(file.Owners, _su.Addr)
 	err = this.client.AppendOwner(hash, _su.Addr)
-	if err != nil { panic(err) }
+	if err != nil { return false, err }
 
-	return true
+	return true, nil
 }
 
 func (this *Provider) GenDedupChal(_data []byte, _addrSU common.Address) (pdp.ChalData) {

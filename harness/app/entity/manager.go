@@ -40,8 +40,10 @@ func GenManager(_name string, _addr string, _privKey string, _simFlag bool) *Man
 	return sm
 }
 
-func LoadManager(_path string, _simFlag bool) *Manager {
-	f, err := os.Open(_path)
+func LoadManager(_name string, _simFlag bool) *Manager {
+	path := helper.MakeDumpPath(_name)
+
+	f, err := os.Open(path)
 	if err != nil { panic(err) }
 	defer f.Close()
 
@@ -81,11 +83,11 @@ func (this *Manager) EnrollAuditor(_tpa *Auditor)  {
 	this.client.EnrollAuditor(_tpa.Addr)
 }
 
-func (this *Manager) Dump(_pathDir string) {
+func (this *Manager) Dump() {
 	s, err := json.MarshalIndent(this, "", "\t")
 	if err != nil { panic(err) }
 
-	path := helper.MakeDumpPath(_pathDir, this.Name)
+	path := helper.MakeDumpPath(this.Name)
 	f, err := os.Create(path)
 	if err != nil { panic(err) }
 	defer f.Close()
