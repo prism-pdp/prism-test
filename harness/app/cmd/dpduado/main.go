@@ -144,7 +144,7 @@ func runEnrollUser(_name string, _addr string, _privKey string) {
 }
 
 func runEnrollAuditor(_name string, _addr string) {
-	helper.PrintLog(fmt.Sprintf("enroll auditor (name:%s)", _name))
+	helper.PrintLog("enroll auditor (name:%s)", _name)
 
 	sm = entity.LoadManager("./cache/sm.json")
 	if *simFlag {
@@ -153,8 +153,6 @@ func runEnrollAuditor(_name string, _addr string) {
 
 	tpa := entity.GenAuditor(_name, _addr)
 	sm.EnrollAuditor(tpa)
-
-	helper.PrintLog("Enroll Service User : OK")
 
 	path := makePath(_name)
 	tpa.Dump(path)
@@ -224,13 +222,13 @@ func runUploadAuditingChal(_name string) {
 		su.SetupSimClient(&ledger)
 	}
 
-	helper.PrintLog(fmt.Sprintf("Start upload auditing chal (entity:%s)", su.Name))
+	helper.PrintLog("Start upload auditing chal (entity:%s)", su.Name)
 
 	// SU gets the list of his/her files.
 	fileList := su.GetFileList()
 	// SU generates challenge and requests to audit each file
 	for i, f := range fileList {
-		helper.PrintLog(fmt.Sprintf("Upload auditing chal (file:%s, index:%d/%d)", helper.Hex(f[:]), i+1, len(fileList)))
+		helper.PrintLog("Upload auditing chal (file:%s, index:%d/%d)", helper.Hex(f[:]), i+1, len(fileList))
 		chalData := su.GenAuditingChal(f)
 		su.UploadAuditingChal(f, &chalData)
 	}
@@ -238,7 +236,7 @@ func runUploadAuditingChal(_name string) {
 	path = makePath(_name)
 	su.Dump(path)
 
-	helper.PrintLog(fmt.Sprintf("Finish upload auditing chal (entity:%s)", su.Name))
+	helper.PrintLog("Finish upload auditing chal (entity:%s)", su.Name)
 }
 
 func runUploadAuditingProof() {
@@ -248,23 +246,23 @@ func runUploadAuditingProof() {
 		sp.SetupSimClient(&ledger)
 	}
 
-	helper.PrintLog(fmt.Sprintf("Start upload auditing proof (entity:%s)", sp.Name))
+	helper.PrintLog("Start upload auditing proof (entity:%s)", sp.Name)
 
 	// SP gets challenge from blockchain.
 	fileList, chalDataList := sp.DownloadAuditingChal()
 	for i, h := range fileList {
-		helper.PrintLog(fmt.Sprintf("Download auditing chal (file:%s, index:%d/%d)", helper.Hex(h[:]), i+1, len(fileList)))
+		helper.PrintLog("Download auditing chal (file:%s, index:%d/%d)", helper.Hex(h[:]), i+1, len(fileList))
 	}
 
 	for i, f := range fileList {
-		helper.PrintLog(fmt.Sprintf("Upload auditing proof (entity:%s, file:%s, index:%d/%d)", sp.Name, helper.Hex(f[:]), i+1, len(fileList)))
+		helper.PrintLog("Upload auditing proof (entity:%s, file:%s, index:%d/%d)", sp.Name, helper.Hex(f[:]), i+1, len(fileList))
 		proofData := sp.GenAuditingProof(f, &chalDataList[i])
 		sp.UploadAuditingProof(f, &proofData)
 	}
 
 	sp.Dump(path)
 
-	helper.PrintLog(fmt.Sprintf("Finish upload auditing proof (entity:%s)", sp.Name))
+	helper.PrintLog("Finish upload auditing proof (entity:%s)", sp.Name)
 }
 
 // func runVerifyAuditingProof() {

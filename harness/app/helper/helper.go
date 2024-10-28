@@ -64,9 +64,10 @@ func GetCreatorAddr(_prop *pdp.XZ21FileProperty) common.Address {
 	return _prop.Creator
 }
 
-func PrintLog(_log string) {
+func PrintLog(format string, args ...interface{}) {
 	t := time.Now().Format(time.DateTime)
-	fmt.Printf("[%s] %s\n", t, _log)
+	m := fmt.Sprintf(format, args...)
+	fmt.Printf("[%s] %s\n", t, m)
 }
 
 func colorText(_color int, _text string) string {

@@ -2,7 +2,6 @@ package client
 
 import (
 	"context"
-	"fmt"
 	"math/big"
 
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
@@ -37,17 +36,17 @@ func (this *EthClient) GetParam() (pdp.XZ21Param, error) {
 func (this *EthClient) RegisterParam(_params string, _g []byte, _u []byte) error {
 	tx, err := this.Session.RegisterParam(_params, _g, _u)
 	if err != nil {
-		helper.PrintLog(fmt.Sprintf("Failed to call RegisterParam contract (caller:%s)", this.Addr))
+		helper.PrintLog("Failed to call RegisterParam contract (caller:%s)", this.Addr)
 		return nil
 	}
 
 	receipt, err := bind.WaitMined(context.Background(), this.Client, tx)
 	if err != nil {
-		helper.PrintLog(fmt.Sprintf("Failed to complete RegisterParam contract (caller:%s)", this.Addr))
+		helper.PrintLog("Failed to complete RegisterParam contract (caller:%s)", this.Addr)
 		return err
 	}
 
-	helper.PrintLog(fmt.Sprintf("Completed RegisterParam contract (caller:%s, gasUsed:%d)", this.Addr, receipt.GasUsed))
+	helper.PrintLog("Completed RegisterParam contract (caller:%s, gasUsed:%d)", this.Addr, receipt.GasUsed)
 
 	return err
 }
@@ -55,17 +54,17 @@ func (this *EthClient) RegisterParam(_params string, _g []byte, _u []byte) error
 func (this *EthClient) RegisterFile(_hash [32]byte, _splitNum uint32, _owner common.Address) error {
 	tx, err := this.Session.RegisterFile(_hash, _splitNum, _owner)
 	if err != nil {
-		helper.PrintLog(fmt.Sprintf("Failed to call RegisterFile contract (caller:%s, owner:%s, file:%s)", this.Addr, _owner, helper.Hex(_hash[:])))
+		helper.PrintLog("Failed to call RegisterFile contract (caller:%s, owner:%s, file:%s)", this.Addr, _owner, helper.Hex(_hash[:]))
 		return err
 	}
 
 	receipt, err := bind.WaitMined(context.Background(), this.Client, tx)
 	if err != nil {
-		helper.PrintLog(fmt.Sprintf("Failed to complete RegisterFile contract (caller:%s, owner:%s, file:%s)", this.Addr, _owner, helper.Hex(_hash[:])))
+		helper.PrintLog("Failed to complete RegisterFile contract (caller:%s, owner:%s, file:%s)", this.Addr, _owner, helper.Hex(_hash[:]))
 		return err
 	}
 
-	helper.PrintLog(fmt.Sprintf("Completed RegisterFile contract (caller:%s, owner:%s, file:%s, gasUsed:%d)", this.Addr, _owner, helper.Hex(_hash[:]), receipt.GasUsed))
+	helper.PrintLog("Completed RegisterFile contract (caller:%s, owner:%s, file:%s, gasUsed:%d)", this.Addr, _owner, helper.Hex(_hash[:]), receipt.GasUsed)
 
 	return err
 }
@@ -81,7 +80,7 @@ func (this *EthClient) SearchFile(_hash [32]byte) (pdp.XZ21FileProperty, error){
 }
 
 func (this *EthClient) GetAccount(_addr common.Address) (pdp.XZ21Account, error) {
-	account, err := this.Session.GetAccount(_addr)
+	account, err := this.Session.GetUserAccount(_addr)
 	return account, err
 }
 
@@ -97,17 +96,17 @@ func (this *EthClient) enroll(_type int, _addr common.Address, _pubKey []byte) e
 	t := big.NewInt(int64(0))
 	tx, err := this.Session.EnrollAccount(t, _addr, _pubKey)
 	if err != nil {
-		helper.PrintLog(fmt.Sprintf("Failed to call EnrollAccount contract (caller:%s, addr:%s, key:%s)", this.Addr, _addr, helper.Hex(_pubKey[:])))
+		helper.PrintLog("Failed to call EnrollAccount contract (caller:%s, addr:%s, key:%s)", this.Addr, _addr, helper.Hex(_pubKey[:]))
 		return err
 	}
 
 	receipt, err := bind.WaitMined(context.Background(), this.Client, tx)
 	if err != nil {
-		helper.PrintLog(fmt.Sprintf("Failed to complete EnrollAccount contract (caller:%s, addr:%s, key:%s)", this.Addr, _addr, helper.Hex(_pubKey[:])))
+		helper.PrintLog("Failed to complete EnrollAccount contract (caller:%s, addr:%s, key:%s)", this.Addr, _addr, helper.Hex(_pubKey[:]))
 		return err
 	}
 	
-	helper.PrintLog(fmt.Sprintf("Completed EnrollAccount contract (caller:%s, addr:%s, key:%s, gasUsed:%d)", this.Addr, _addr, helper.Hex(_pubKey[:]), receipt.GasUsed))
+	helper.PrintLog("Completed EnrollAccount contract (caller:%s, addr:%s, key:%s, gasUsed:%d)", this.Addr, _addr, helper.Hex(_pubKey[:]), receipt.GasUsed)
 
 	return err
 }
@@ -115,17 +114,17 @@ func (this *EthClient) enroll(_type int, _addr common.Address, _pubKey []byte) e
 func (this *EthClient) AppendOwner(_hash [32]byte, _owner common.Address) error {
 	tx, err := this.Session.AppendOwner(_hash, _owner)
 	if err != nil {
-		helper.PrintLog(fmt.Sprintf("Failed to call AppendOwner contract (caller:%s, owner:%s, file:%s)", this.Addr, _owner, helper.Hex(_hash[:])))
+		helper.PrintLog("Failed to call AppendOwner contract (caller:%s, owner:%s, file:%s)", this.Addr, _owner, helper.Hex(_hash[:]))
 		return err
 	}
 
 	receipt, err := bind.WaitMined(context.Background(), this.Client, tx)
 	if err != nil {
-		helper.PrintLog(fmt.Sprintf("Failed to complete AppendOwner contract (caller:%s, owner:%s, file:%s)", this.Addr, _owner, helper.Hex(_hash[:])))
+		helper.PrintLog("Failed to complete AppendOwner contract (caller:%s, owner:%s, file:%s)", this.Addr, _owner, helper.Hex(_hash[:]))
 		return err
 	}
 
-	helper.PrintLog(fmt.Sprintf("Completed AppendOwner contract (caller:%s, owner:%s, file:%s, gasUsed:%d)", this.Addr, _owner, helper.Hex(_hash[:]), receipt.GasUsed))
+	helper.PrintLog("Completed AppendOwner contract (caller:%s, owner:%s, file:%s, gasUsed:%d)", this.Addr, _owner, helper.Hex(_hash[:]), receipt.GasUsed)
 
 	return err
 }
@@ -134,10 +133,10 @@ func (this *EthClient) SetChal(_hash [32]byte, _chalBytes []byte) error {
 	tx, err := this.Session.SetChal(_hash, _chalBytes)
 	if err != nil {
 		if helper.ErrSetChal.Comp(err) {
-			helper.PrintLog(fmt.Sprintf("Skiped SetChal contract (caller:%s, file:%s)", this.Addr, helper.Hex(_hash[:])))
+			helper.PrintLog("Skiped SetChal contract (caller:%s, file:%s)", this.Addr, helper.Hex(_hash[:]))
 			return nil
 		} else {
-			helper.PrintLog(fmt.Sprintf("Failed to call SetChal contract (caller:%s, file:%s)", this.Addr, helper.Hex(_hash[:])))
+			helper.PrintLog("Failed to call SetChal contract (caller:%s, file:%s)", this.Addr, helper.Hex(_hash[:]))
 			return err
 		}
 	}
@@ -145,11 +144,11 @@ func (this *EthClient) SetChal(_hash [32]byte, _chalBytes []byte) error {
 	// Receipt -- https://github.com/ethereum/go-ethereum/blob/master/core/types/receipt.go#L52
 	receipt, err := bind.WaitMined(context.Background(), this.Client, tx)
 	if err != nil {
-		helper.PrintLog(fmt.Sprintf("Failed to complete SetChal contract (caller:%s, file:%s)", this.Addr, helper.Hex(_hash[:])))
+		helper.PrintLog("Failed to complete SetChal contract (caller:%s, file:%s)", this.Addr, helper.Hex(_hash[:]))
 		return err
 	}
 
-	helper.PrintLog(fmt.Sprintf("Completed SetChal contract (caller:%s, file:%s, gasUsed:%d)", this.Addr, helper.Hex(_hash[:]), receipt.GasUsed))
+	helper.PrintLog("Completed SetChal contract (caller:%s, file:%s, gasUsed:%d)", this.Addr, helper.Hex(_hash[:]), receipt.GasUsed)
 
 	return nil
 }
@@ -157,17 +156,17 @@ func (this *EthClient) SetChal(_hash [32]byte, _chalBytes []byte) error {
 func (this *EthClient) SetProof(_hash [32]byte, _proofBytes []byte) error {
 	tx, err := this.Session.SetProof(_hash, _proofBytes)
 	if err != nil {
-		helper.PrintLog(fmt.Sprintf("Failed to call SetProof contract (caller:%s, file:%s)", this.Addr, helper.Hex(_hash[:])))
+		helper.PrintLog("Failed to call SetProof contract (caller:%s, file:%s)", this.Addr, helper.Hex(_hash[:]))
 		return err
 	}
 
 	receipt, err := bind.WaitMined(context.Background(), this.Client, tx)
 	if err != nil {
-		helper.PrintLog(fmt.Sprintf("Failed to complete SetProof contract (caller:%s, file:%s)", this.Addr, helper.Hex(_hash[:])))
+		helper.PrintLog("Failed to complete SetProof contract (caller:%s, file:%s)", this.Addr, helper.Hex(_hash[:]))
 		return err
 	}
 
-	helper.PrintLog(fmt.Sprintf("Completed SetProof contract (caller:%s, file:%s, gasUsed:%d)", this.Addr, helper.Hex(_hash[:]), receipt.GasUsed))
+	helper.PrintLog("Completed SetProof contract (caller:%s, file:%s, gasUsed:%d)", this.Addr, helper.Hex(_hash[:]), receipt.GasUsed)
 
 	return err
 }
@@ -180,17 +179,17 @@ func (this *EthClient) GetAuditingReqList() ([][32]byte, []pdp.XZ21AuditingReq, 
 func (this *EthClient) SetAuditingResult(_hash [32]byte, _result bool) error {
 	tx, err := this.Session.SetAuditingResult(_hash, _result)
 	if err != nil {
-		helper.PrintLog(fmt.Sprintf("Failed to call SetAuditingResult contract (caller:%s, file:%s, result:%t)", this.Addr, helper.Hex(_hash[:]), _result))
+		helper.PrintLog("Failed to call SetAuditingResult contract (caller:%s, file:%s, result:%t)", this.Addr, helper.Hex(_hash[:]), _result)
 		return err
 	}
 
 	receipt, err := bind.WaitMined(context.Background(), this.Client, tx)
 	if err != nil {
-		helper.PrintLog(fmt.Sprintf("Failed to complete SetAuditingResult contract (caller:%s, file:%s, result:%t)", this.Addr, helper.Hex(_hash[:]), _result))
+		helper.PrintLog("Failed to complete SetAuditingResult contract (caller:%s, file:%s, result:%t)", this.Addr, helper.Hex(_hash[:]), _result)
 		return err
 	}
 
-	helper.PrintLog(fmt.Sprintf("Completed SetAuditingResult contract (caller:%s, file:%s, result:%t, gasUsed:%d)", this.Addr, helper.Hex(_hash[:]), _result, receipt.GasUsed))
+	helper.PrintLog("Completed SetAuditingResult contract (caller:%s, file:%s, result:%t, gasUsed:%d)", this.Addr, helper.Hex(_hash[:]), _result, receipt.GasUsed)
 
 	return err
 }
