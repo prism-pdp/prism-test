@@ -65,6 +65,7 @@ harness@test-sim:
 	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --sim enroll user    su1  $(ADDRESS_4) $(PRIVKEY_4)"
 	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --sim enroll user    su2  $(ADDRESS_5) $(PRIVKEY_5)"
 	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --sim upload su1"
+	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --sim upload su2"
 	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --sim challenge su1"
 	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --sim proof"
 	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --sim audit tpa1"
