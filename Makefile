@@ -58,11 +58,16 @@ harness@build:
 	$(MAKE) docker-run SERVICE="harness" CMD="go build -o bin/harness ./cmd/dpduado"
 
 harness@test-sim:
-	rm harness/app/cache/*
+	rm -f harness/app/cache/*
 	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --sim setup $(ADDRESS_0) $(PRIVKEY_0) $(ADDRESS_1) $(PRIVKEY_1)"
-	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --sim enroll su1 $(ADDRESS_2) $(PRIVKEY_2)"
-	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --sim enroll su2 $(ADDRESS_3) $(PRIVKEY_3)"
+	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --sim enroll auditor tpa1 $(ADDRESS_2)"
+	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --sim enroll auditor tpa2 $(ADDRESS_3)"
+	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --sim enroll user    su1  $(ADDRESS_4) $(PRIVKEY_4)"
+	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --sim enroll user    su2  $(ADDRESS_5) $(PRIVKEY_5)"
 	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --sim upload su1"
+	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --sim challenge su1"
+	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --sim proof"
+	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --sim audit tpa1"
 
 harness@run:
 	$(MAKE) harness@run-setup
