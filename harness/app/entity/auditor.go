@@ -67,22 +67,25 @@ func (this *Auditor) GetAuditingReqList() ([][32]byte, []pdp.AuditingReqData) {
 	return hashList, reqDataList
 }
 
-func (this *Auditor) VerifyAuditingProof(_tagDataSet *pdp.TagDataSet, _digestSet *pdp.DigestSet, _auditingReqData *pdp.AuditingReqData, _owner common.Address) (bool, error) {
+func (this *Auditor) VerifyAuditingProof(_hash [32]byte, _setTagData pdp.TagDataSet, _setDigest pdp.DigestSet, _auditingReqData *pdp.AuditingReqData, _owner common.Address) (bool, error) {
 	xz21Param, err := this.client.GetParam()
 	if err != nil { return false, err }
 
-	params := pdp.GenParamFromXZ21Param(&xz21Param)
+	param := pdp.GenParamFromXZ21Param(&xz21Param)
 
-	auditingReq := _auditingReqData.Import(&params)
-	tag := _tagDataSet.ImportSubset(&params, &auditingReq.Chal)
+	fileProp, err := this.client.SearchFile(_hash)
+	if err != nil { panic(err) }
+
+	auditingReq := _auditingReqData.Import(param)
+	subsetTag := _setTagData.ImportSubset(param, fileProp.SplitNum, auditingReq.Chal)
 
 	account, err := this.client.GetAccount(_owner)
 	if err != nil { panic(err) }
 
-	pubKeyData := pdp.PublicKeyData{account.PubKey}
-	pubKey := pubKeyData.Import(&params)
+	pubKeyData := (pdp.PublicKeyData)(account.PubKey) // TODO
+	pubKey := pubKeyData.Import(param)
 
-	result, err := pdp.VerifyProof(&params, &tag, _digestSet, &auditingReq.Chal, &auditingReq.Proof, pubKey.Key)
+	result, err := pdp.VerifyProof(param, fileProp.SplitNum, subsetTag, _setDigest, auditingReq.Chal, auditingReq.Proof, pubKey)
 	if err != nil { return false, err }
 
 	return result, nil

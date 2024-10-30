@@ -66,7 +66,7 @@ func setup(_opts []string) {
 		0x4A, 0x4B, 0x4C, 0x4D, 0x4E, 0x4F,
 		0x5A, 0x5B, 0x5C, 0x5D,
 	}
-	chunkNum = uint32(5)
+	chunkNum = uint32(100) // TODO: change to option
 
 	command = _opts[0]
 
@@ -157,7 +157,7 @@ func runEnrollAuditor(_name string, _addr string) {
 	helper.PrintLog("Finish enroll auditor")
 }
 
-func runUploadPhase(_name string, _data []byte) {
+func runUploadPhase(_name string, _path string) {
 	helper.PrintLog("Start upload")
 
 	// --------------------------
@@ -169,25 +169,29 @@ func runUploadPhase(_name string, _data []byte) {
 	// --------------------------
 	// Main processing
 	// --------------------------
+	// Read file
+	data, err := helper.ReadFile(_path)
+	if err != nil { panic(err) }
+
 	// SU checks whether data is uploaded.
-	isUploaded := su.IsUploaded(_data)
+	isUploaded := su.IsUploaded(data)
 
 	// Processing differs depending on whether the file has already been uploaded or not.
-	digest := helper.CalcDigest(_data)
+	digest := helper.CalcDigest(data)
 	hex := helper.Hex(digest[:])
 	if isUploaded {
 		// SP generates a challenge for deduplication.
-		chalData := sp.GenDedupChal(_data, su.Addr)
+		chalData := sp.GenDedupChal(data, su.Addr)
 
 		// (SP sends the challenge to SU.)
 
 		// SU generates a proof to prove ownership of the data to be uploaded.
-		proofData := su.GenDedupProof(&chalData, _data, chunkNum)
+		proofData := su.GenDedupProof(chalData, data, chunkNum)
 
 		// (SU sends the proof to SP.)
 
 		// SP verifies the proof.
-		success, err := sp.RegisterOwnerToFile(su, _data, &chalData, &proofData)
+		success, err := sp.RegisterOwnerToFile(su, data, chalData, proofData)
 		if err != nil { panic(err) }
 
 		if success {
@@ -197,10 +201,10 @@ func runUploadPhase(_name string, _data []byte) {
 		}
 	} else {
 		// SU uploads the file.
-		tag := su.PrepareUpload(_data, chunkNum)
+		tag := su.PrepareUpload(data, chunkNum)
 
 		// SP accepts the file.
-		err := sp.UploadNewFile(_data, &tag, su.Addr, &su.PublicKeyData)
+		err := sp.UploadNewFile(data, &tag, su.Addr, &su.PublicKeyData)
 		if err != nil { panic(err) }
 
 		helper.PrintLog("Upload new file (owner:%s, file:%s)", su.Name, hex)
@@ -232,7 +236,7 @@ func runUploadAuditingChal(_name string) {
 	for i, f := range fileList {
 		helper.PrintLog("Upload auditing chal (file:%s, index:%d/%d)", helper.Hex(f[:]), i+1, len(fileList))
 		chalData := su.GenAuditingChal(f)
-		su.UploadAuditingChal(f, &chalData)
+		su.UploadAuditingChal(f, chalData)
 	}
 
 	// --------------------------
@@ -262,8 +266,8 @@ func runUploadAuditingProof() {
 
 	for i, f := range fileList {
 		helper.PrintLog("Upload auditing proof (entity:%s, file:%s, index:%d/%d)", sp.Name, helper.Hex(f[:]), i+1, len(fileList))
-		proofData := sp.GenAuditingProof(f, &chalDataList[i])
-		sp.UploadAuditingProof(f, &proofData)
+		proofData := sp.GenAuditingProof(f, chalDataList[i])
+		sp.UploadAuditingProof(f, proofData)
 	}
 
 	// --------------------------
@@ -294,10 +298,10 @@ func runVerifyAuditingProof(_name string) {
 
 	for i, f := range fileList {
 		// TPA gets M (list of hash of chunks) from SP.
-		owner, digestSet, tagDataSet := sp.PrepareVerificationData(f, &reqDataList[i].ChalData)
+		owner, setDigest, tagDataSet := sp.PrepareVerificationData(f, reqDataList[i].ChalData)
 
 		// TPA verifies proof.
-		result, err := tpa.VerifyAuditingProof(tagDataSet, digestSet, &reqDataList[i], owner)
+		result, err := tpa.VerifyAuditingProof(f, tagDataSet, setDigest, &reqDataList[i], owner)
 		if err != nil { panic(err) }
 
 		helper.PrintLog("Upload auditing result (file:%s, result:%t)", helper.Hex(f[:]), result)
@@ -342,7 +346,7 @@ func main() {
 			runEnrollUser(args[2], args[3], args[4]) // TODO: optarg
 		}
 	case "upload":
-		runUploadPhase(args[1], data1)
+		runUploadPhase(args[1], args[2])
 	case "challenge":
 		runUploadAuditingChal(args[1])
 	case "proof":

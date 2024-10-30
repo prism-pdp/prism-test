@@ -100,7 +100,7 @@ func (this *Provider) NewFile(_addr common.Address, _hash [32]byte, _data []byte
 
 	this.Files[helper.Hex(_hash[:])] = &file
 
-	this.client.RegisterFile(_hash, _tagSet.Size, _addr)
+	this.client.RegisterFile(_hash, _tagSet.Size(), _addr)
 }
 
 func (this *Provider) IsUploaded(_data []byte) bool {
@@ -126,7 +126,7 @@ func (this *Provider) UploadNewFile(_data []byte, _tagSet *pdp.TagSet, _addrSU c
 	return nil
 }
 
-func (this *Provider) RegisterOwnerToFile(_su *User, _data []byte, _chalData *pdp.ChalData, _proofData *pdp.ProofData) (bool, error) {
+func (this *Provider) RegisterOwnerToFile(_su *User, _data []byte, _chalData *pdp.ChalData, _proofData pdp.ProofData) (bool, error) {
 	// check file
 	hash := sha256.Sum256(_data)
 	file := this.SearchFile(hash)
@@ -134,10 +134,10 @@ func (this *Provider) RegisterOwnerToFile(_su *User, _data []byte, _chalData *pd
 	fileProp, err := this.client.SearchFile(hash)
 	if err != nil { return false, err }
 	if helper.IsEmptyFileProperty(&fileProp) { return false, fmt.Errorf("File property is not found.")}
-	// prepare params
+	// prepare param
 	xz21Param, err := this.client.GetParam()
 	if err != nil { return false, err }
-	params := pdp.GenParamFromXZ21Param(&xz21Param)
+	param := pdp.GenParamFromXZ21Param(&xz21Param)
 
 	// ===================================
 	// Verify chal & proof
@@ -145,19 +145,18 @@ func (this *Provider) RegisterOwnerToFile(_su *User, _data []byte, _chalData *pd
 	// prepare public key of the creator of the file
 	account, err := this.client.GetAccount(fileProp.Creator)
 	if err != nil { return false, fmt.Errorf("Account is not found.") }
-	pkData := pdp.PublicKeyData{account.PubKey}
-	pk := pkData.Import(&params)
+	pkData := (pdp.PublicKeyData)(account.PubKey)
+	pk := pkData.Import(param)
 	// prepare chal, proof
-	chal := _chalData.Import(&params)
-	proof := _proofData.Import(&params)
+	chal := _chalData.Import(param)
+	proof := _proofData.Import(param)
 	// prepare hash chunks
 	// TODO: function VerifyProof内で必要なタグだけ復元するのがよい
-	tagSet := file.TagDataSet.ImportSubset(&params, &chal)
-	chunks, err := pdp.SplitData(file.Data, tagSet.Size)
-	if err != nil { return false, err }
-	digestSubset := pdp.HashSampledChunks(chunks, &chal)
+	tagSet := file.TagDataSet.ImportSubset(param, fileProp.SplitNum, chal)
+	subsetChunk := pdp.GenChunkSubset(file.Data, fileProp.SplitNum, chal)
+	subsetDigest := subsetChunk.Hash()
 	// verify chal & proof
-	isVerified, err := pdp.VerifyProof(&params, &tagSet, digestSubset, &chal, &proof, pk.Key)
+	isVerified, err := pdp.VerifyProof(param, fileProp.SplitNum, tagSet, subsetDigest, chal, proof, pk)
 	if err != nil { return false, err }
 	if !isVerified { return false, nil }
 
@@ -171,7 +170,7 @@ func (this *Provider) RegisterOwnerToFile(_su *User, _data []byte, _chalData *pd
 	return true, nil
 }
 
-func (this *Provider) GenDedupChal(_data []byte, _addrSU common.Address) (pdp.ChalData) {
+func (this *Provider) GenDedupChal(_data []byte, _addrSU common.Address) *pdp.ChalData {
 	xz21Param, err := this.client.GetParam()
 	if err != nil { panic(err) }
 
@@ -181,16 +180,16 @@ func (this *Provider) GenDedupChal(_data []byte, _addrSU common.Address) (pdp.Ch
 	file := this.SearchFile(hash)
 	if file == nil { panic(fmt.Errorf("File is not found.")) }
 
-	chal := pdp.NewChal(&param, file.TagDataSet.Size)
+	chal := pdp.NewChal(param, file.TagDataSet.Size())
 	chalData := chal.Export()
 
 	return chalData
 }
 
-func (this *Provider) DownloadAuditingChal() ([][32]byte, []pdp.ChalData) {
+func (this *Provider) DownloadAuditingChal() ([][32]byte, []*pdp.ChalData) {
 	hashList, reqList, err := this.client.GetAuditingReqList()
 	if err != nil { panic(err) }
-	chalDataList := make([]pdp.ChalData, 0)
+	chalDataList := make([]*pdp.ChalData, 0)
 	for _, v := range reqList {
 		if len(v.Proof) == 0 {
 			chalData, err := pdp.DecodeToChalData(v.Chal)
@@ -205,38 +204,44 @@ func (this *Provider) GenAuditingProof(_hash [32]byte, _chal *pdp.ChalData) pdp.
 	xz21Param, err := this.client.GetParam()
 	if err != nil { panic(err) }
 
-	params := pdp.GenParamFromXZ21Param(&xz21Param)
+	param := pdp.GenParamFromXZ21Param(&xz21Param)
 
-	f := this.SearchFile(_hash)
-	if f == nil { panic(fmt.Errorf("Unknown file: %s", helper.Hex(_hash[:]))) }
+	file := this.SearchFile(_hash)
+	if file == nil { panic(fmt.Errorf("Unknown file: %s", helper.Hex(_hash[:]))) }
 
-	chunks, err := pdp.SplitData(f.Data, f.TagDataSet.Size)
+	fileProp, err := this.client.SearchFile(_hash)
 	if err != nil { panic(err) }
 
-	chal := _chal.Import(&params)
-	proof := pdp.GenProof(&params, &chal, chunks)
+	chal := _chal.Import(param)
+	if chal == nil { panic(fmt.Errorf("Invalid chal")) }
+
+	_, proof := pdp.GenProof(param, chal, fileProp.SplitNum, file.Data) // TODO
 	proofData := proof.Export()
 
 	return proofData
 }
 
-func (this *Provider) UploadAuditingProof(_hash [32]byte, _proofData *pdp.ProofData) {
-	proofBytes, err := _proofData.Encode()
-	if err != nil { panic(err) }
-	err = this.client.SetProof(_hash, proofBytes)
+func (this *Provider) UploadAuditingProof(_hash [32]byte, _proofData pdp.ProofData) {
+	proofBytes := _proofData.Base()
+	err := this.client.SetProof(_hash, proofBytes)
 	if err != nil { panic(err) }
 }
 
-func (this *Provider) PrepareVerificationData(_hash [32]byte, _chalData *pdp.ChalData) (common.Address, *pdp.DigestSet, *pdp.TagDataSet) {
+func (this *Provider) PrepareVerificationData(_hash [32]byte, _chalData *pdp.ChalData) (common.Address, pdp.DigestSet, pdp.TagDataSet) {
 	xz21Param, err := this.client.GetParam()
 	if err != nil { panic(err) }
 
-	params := pdp.GenParamFromXZ21Param(&xz21Param)
-	chal := _chalData.Import(&params)
+	param := pdp.GenParamFromXZ21Param(&xz21Param)
+	chal := _chalData.Import(param)
 
 	file := this.SearchFile(_hash)
-	digestSubset, tagDataSubset, err := pdp.MakeSubset(file.Data, &file.TagDataSet, &chal)
+	if file == nil { panic(fmt.Errorf("Unknown file"))} // TODO: hash value
+
+	fileProp, err := this.client.SearchFile(_hash)
 	if err != nil { panic(err) }
 
-	return file.Owners[0], digestSubset, tagDataSubset
+	subsetDigest := pdp.GenChunkSubset(file.Data, fileProp.SplitNum, chal).Hash()
+	subsetTagData := file.TagDataSet.DuplicateSubset(fileProp.SplitNum, chal)
+
+	return file.Owners[0], subsetDigest, subsetTagData
 }

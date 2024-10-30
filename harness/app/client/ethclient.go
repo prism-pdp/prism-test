@@ -88,13 +88,13 @@ func (this *EthClient) EnrollAuditor(_addr common.Address) error {
 	return this.enroll(0, _addr, []byte{})
 }
 
-func (this *EthClient) EnrollUser(_addr common.Address, _pubKey []byte) error {
+func (this *EthClient) EnrollUser(_addr common.Address, _pubKey pdp.PublicKeyData) error {
 	return this.enroll(1, _addr, _pubKey)
 }
 
-func (this *EthClient) enroll(_type int, _addr common.Address, _pubKey []byte) error {
+func (this *EthClient) enroll(_type int, _addr common.Address, _pubKey pdp.PublicKeyData) error {
 	t := big.NewInt(int64(0))
-	tx, err := this.Session.EnrollAccount(t, _addr, _pubKey)
+	tx, err := this.Session.EnrollAccount(t, _addr, _pubKey.Base())
 	if err != nil {
 		helper.PrintLog("Failed to call EnrollAccount contract (caller:%s, addr:%s, key:%s)", this.Addr, _addr, helper.Hex(_pubKey[:]))
 		return err

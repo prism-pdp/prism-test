@@ -15,11 +15,11 @@ import (
 
 type Manager struct {
 	Name string
-	ParamXZ21 pdp.XZ21Param
+	ParamXZ21 *pdp.XZ21Param
 	Addr common.Address
 	PrivKey string
 
-	param pdp.PairingParam
+	param *pdp.PairingParam
 
 	client client.BaseClient
 }
@@ -53,7 +53,7 @@ func LoadManager(_name string, _simFlag bool) *Manager {
 	sm := new(Manager)
 	json.Unmarshal(s, &sm)
 
-	sm.param = pdp.GenParamFromXZ21Param(&sm.ParamXZ21)
+	sm.param = pdp.GenParamFromXZ21Param(sm.ParamXZ21)
 
 	if _simFlag {
 		sm.SetupSimClient(client.GetFakeLedger())
@@ -76,7 +76,7 @@ func (this *Manager) RegisterParam() {
 }
 
 func (this *Manager) EnrollUser(_su *User)  {
-	this.client.EnrollUser(_su.Addr, _su.PublicKeyData.Key)
+	this.client.EnrollUser(_su.Addr, _su.PublicKeyData)
 }
 
 func (this *Manager) EnrollAuditor(_tpa *Auditor)  {
@@ -98,5 +98,5 @@ func (this *Manager) Dump() {
 }
 
 func (this *Manager) GetParam() *pdp.PairingParam {
-	return &this.param
+	return this.param
 }

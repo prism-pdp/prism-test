@@ -58,18 +58,18 @@ func (this *FakeLedger) EnrollAuditor(_addr common.Address) error {
 	return this.enroll(0, _addr, []byte{})
 }
 
-func (this *FakeLedger) EnrollUser(_addr common.Address, _key []byte) error {
+func (this *FakeLedger) EnrollUser(_addr common.Address, _key pdp.PublicKeyData) error {
 	return this.enroll(1, _addr, _key)
 }
 
-func (this *FakeLedger) enroll(_type int, _addr common.Address, _key []byte) error {
+func (this *FakeLedger) enroll(_type int, _addr common.Address, _key pdp.PublicKeyData) error {
 	if _type == 0 {
 		this.AuditorAddrList = append(this.AuditorAddrList, _addr)
 		// slices.Sort(this.AuditorAddrList) TODO
 		// this.AuditorAddrList = slices.Compact(this.AuditorAddrList) TODO
 	} else if _type == 1 {
 		var a pdp.XZ21Account
-		a.PubKey = _key
+		a.PubKey = _key.Base()
 		this.UserAccountTable[_addr] = &a
 	}
 

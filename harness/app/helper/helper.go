@@ -9,6 +9,7 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/ethclient"
+	"io/ioutil"
 	"math/big"
 	"os"
 
@@ -67,7 +68,7 @@ func GetCreatorAddr(_prop *pdp.XZ21FileProperty) common.Address {
 }
 
 func PrintLog(format string, args ...interface{}) {
-	t := time.Now().Format(time.DateTime)
+	t := time.Now().Format(time.StampMilli)
 	m := fmt.Sprintf(format, args...)
 	fmt.Printf("[%s] %s\n", t, m)
 }
@@ -104,4 +105,9 @@ func MakeDumpPath(_name string) string {
 
 func CalcDigest(_data []byte) [32]byte {
 	return sha256.Sum256(_data)
+}
+
+func ReadFile(_path string) ([]byte, error) {
+	data, err := ioutil.ReadFile(_path)
+	return data, err
 }

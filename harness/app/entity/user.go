@@ -96,11 +96,10 @@ func (this *User) PrepareUpload(_data []byte, _chunkNum uint32) pdp.TagSet {
 
 	param := pdp.GenParamFromXZ21Param(&xz21Param)
 
-	chunks, err := pdp.SplitData(_data, _chunkNum)
-	if err != nil { panic(err) }
+	setChunk := pdp.GenChunkSet(_data, _chunkNum)
 
-	sk := this.PrivateKeyData.Import(&param)
-	tagSet, _ := pdp.GenTags(&param, sk.Key, chunks)
+	sk := this.PrivateKeyData.Import(param)
+	tagSet, _ := pdp.GenTags(param, sk, setChunk)
 	return tagSet
 }
 
@@ -108,29 +107,26 @@ func (this *User) GenDedupProof(_chal *pdp.ChalData, _data []byte, _chunkNum uin
 	xz21Param, err := this.client.GetParam()
 	if err != nil { panic(err) }
 
-	params := pdp.GenParamFromXZ21Param(&xz21Param)
+	param := pdp.GenParamFromXZ21Param(&xz21Param)
 
-	chunks, err := pdp.SplitData(_data, _chunkNum)
-	if err != nil { panic(err) }
-
-	chal := _chal.Import(&params)
-	proof := pdp.GenProof(&params, &chal, chunks)
-	proofData := proof.Export()
+	chal := _chal.Import(param)
+	_, proof := pdp.GenProof(param, chal, _chunkNum, _data)
+	proofData := proof.Export() // TODO
 
 	return proofData
 }
 
-func (this *User) GenAuditingChal(_hash [32]byte) pdp.ChalData {
+func (this *User) GenAuditingChal(_hash [32]byte) *pdp.ChalData {
 	xz21Param, err := this.client.GetParam()
 	if err != nil { panic(err) }
 
-	params := pdp.GenParamFromXZ21Param(&xz21Param)
+	param := pdp.GenParamFromXZ21Param(&xz21Param)
 
 	fileProp, err := this.client.SearchFile(_hash)
 	if err != nil { panic(err) }
 	if helper.IsEmptyFileProperty(&fileProp) { panic(fmt.Errorf("File property is not found")) }
 
-	chal := pdp.NewChal(&params, fileProp.SplitNum)
+	chal := pdp.NewChal(param, fileProp.SplitNum)
 	chalData := chal.Export()
 
 	return chalData

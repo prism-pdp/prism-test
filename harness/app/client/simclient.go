@@ -67,7 +67,7 @@ func (this *SimClient) EnrollAuditor(_addr common.Address) error {
 	return this.Ledger.EnrollAuditor(_addr)
 }
 
-func (this *SimClient) EnrollUser(_addr common.Address, _pubKey []byte) error {
+func (this *SimClient) EnrollUser(_addr common.Address, _pubKey pdp.PublicKeyData) error {
 	return this.Ledger.EnrollUser(_addr, _pubKey)
 }
 
