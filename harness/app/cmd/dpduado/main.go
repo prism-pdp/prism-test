@@ -85,8 +85,8 @@ func runSetupPhase(_smAddr string, _smPrivKey string, _spAddr string, _spPrivKey
 	// --------------------------
 	// Save entities
 	// --------------------------
-	sm.Dump()
-	sp.Dump()
+	helper.DumpEntity(sm)
+	helper.DumpEntity(sp)
 
 	helper.PrintLog("Finish setup")
 }
@@ -97,7 +97,8 @@ func runEnrollUser(_name string, _addr string, _privKey string) {
 	// --------------------------
 	// Prepare entities
 	// --------------------------
-	sm := entity.LoadManager(nameSM, *simFlag)
+	var sm entity.Manager
+	helper.LoadEntity(nameSM, &sm)
 	su := entity.GenUser(_name, _addr, _privKey, sm.GetParam(), *simFlag)
 
 	// --------------------------
@@ -109,8 +110,8 @@ func runEnrollUser(_name string, _addr string, _privKey string) {
 	// --------------------------
 	// Save entities
 	// --------------------------
-	sm.Dump()
-	su.Dump()
+	helper.DumpEntity(&sm)
+	helper.DumpEntity(su)
 
 	helper.PrintLog("Finish enroll user")
 }
@@ -121,7 +122,8 @@ func runEnrollAuditor(_name string, _addr string) {
 	// --------------------------
 	// Prepare entities
 	// --------------------------
-	sm := entity.LoadManager(nameSM, *simFlag)
+	var sm entity.Manager
+	helper.LoadEntity(nameSM, &sm)
 	tpa := entity.GenAuditor(_name, _addr, *simFlag)
 
 	// --------------------------
@@ -133,8 +135,8 @@ func runEnrollAuditor(_name string, _addr string) {
 	// --------------------------
 	// Save entities
 	// --------------------------
-	sm.Dump()
-	tpa.Dump()
+	helper.DumpEntity(&sm)
+	helper.DumpEntity(tpa)
 
 	helper.PrintLog("Finish enroll auditor")
 }
@@ -145,8 +147,10 @@ func runUploadPhase(_name string, _path string) {
 	// --------------------------
 	// Prepare entities
 	// --------------------------
-	sp := entity.LoadProvider(nameSP, *simFlag)
-	su := entity.LoadUser(_name, *simFlag)
+	var sp entity.Provider
+	var su entity.User
+	helper.LoadEntity(nameSP, &sp)
+	helper.LoadEntity(_name, &su)
 
 	// --------------------------
 	// Main processing
@@ -173,7 +177,7 @@ func runUploadPhase(_name string, _path string) {
 		// (SU sends the proof to SP.)
 
 		// SP verifies the proof.
-		success, err := sp.RegisterOwnerToFile(su, data, chalData, proofData)
+		success, err := sp.RegisterOwnerToFile(&su, data, chalData, proofData)
 		if err != nil { panic(err) }
 
 		if success {
@@ -195,8 +199,8 @@ func runUploadPhase(_name string, _path string) {
 	// --------------------------
 	// Save entities
 	// --------------------------
-	sp.Dump()
-	su.Dump()
+	helper.DumpEntity(&sp)
+	helper.DumpEntity(&su)
 
 	helper.PrintLog("Finish upload")
 }
@@ -207,7 +211,8 @@ func runUploadAuditingChal(_name string) {
 	// --------------------------
 	// Prepare entities
 	// --------------------------
-	su := entity.LoadUser(_name, *simFlag)
+	var su entity.User
+	helper.LoadEntity(_name, &su)
 
 	// --------------------------
 	// Main processing
@@ -224,7 +229,7 @@ func runUploadAuditingChal(_name string) {
 	// --------------------------
 	// Save entities
 	// --------------------------
-	su.Dump()
+	helper.DumpEntity(&su)
 
 	helper.PrintLog("Finish challenge")
 }
@@ -235,7 +240,8 @@ func runUploadAuditingProof() {
 	// --------------------------
 	// Prepare entities
 	// --------------------------
-	sp := entity.LoadProvider(nameSP, *simFlag)
+	var sp entity.Provider
+	helper.LoadEntity(nameSP, &sp)
 
 	// --------------------------
 	// Main processing
@@ -255,7 +261,7 @@ func runUploadAuditingProof() {
 	// --------------------------
 	// Save entities
 	// --------------------------
-	sp.Dump()
+	helper.DumpEntity(&sp)
 
 	helper.PrintLog("Finish proof")
 }
@@ -266,8 +272,10 @@ func runVerifyAuditingProof(_name string) {
 	// --------------------------
 	// Prepare entities
 	// --------------------------
-	sp := entity.LoadProvider(nameSP, *simFlag)
-	tpa := entity.LoadAuditor(_name, *simFlag)
+	var sp entity.Provider
+	var tpa entity.Auditor
+	helper.LoadEntity(nameSP, &sp)
+	helper.LoadEntity(_name, &tpa)
 
 	// --------------------------
 	// Main processing
@@ -293,8 +301,8 @@ func runVerifyAuditingProof(_name string) {
 	// --------------------------
 	// Save entities
 	// --------------------------
-	sp.Dump()
-	tpa.Dump()
+	helper.DumpEntity(&sp)
+	helper.DumpEntity(&tpa)
 
 	helper.PrintLog("Finish auditing")
 }

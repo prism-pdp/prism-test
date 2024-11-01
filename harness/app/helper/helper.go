@@ -9,6 +9,7 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/ethclient"
+	"io"
 	"io/ioutil"
 	"math/big"
 	"os"
@@ -99,10 +100,6 @@ func IsFile(_path string) bool {
     return !info.IsDir()
 }
 
-func MakeDumpPath(_name string) string {
-	return fmt.Sprintf("%s/%s.json", PathDumpDir, _name)
-}
-
 func CalcDigest(_data []byte) [32]byte {
 	return sha256.Sum256(_data)
 }
@@ -110,4 +107,51 @@ func CalcDigest(_data []byte) [32]byte {
 func ReadFile(_path string) ([]byte, error) {
 	data, err := ioutil.ReadFile(_path)
 	return data, err
+}
+
+func MakeDumpDirPath(_name string) string {
+	return fmt.Sprintf("%s/%s", PathDumpDir, _name)
+}
+
+func MakeDumpFilePath(_name string) string {
+	pathDumpDir := MakeDumpDirPath(_name)
+	return fmt.Sprintf("%s/dump.json", pathDumpDir)
+}
+
+func MakeDumpDir(_name string) (string, error) {
+	path := MakeDumpDirPath(_name)
+	err := os.MkdirAll(path, 0755)
+	return path, err
+}
+
+func DumpEntity(_e IfEntity) {
+	pathDir, err := MakeDumpDir(_e.GetName())
+	if err != nil { panic(err) }
+
+	pathFile := fmt.Sprintf("%s/dump.json", pathDir)
+	f, err := os.Create(pathFile)
+	if err != nil { panic(err) }
+	defer f.Close()
+
+	s, err := _e.ToJson()
+	if err != nil { panic(err) }
+
+	_, err = f.Write([]byte(s))
+	if err != nil { panic(err) }
+}
+
+func LoadEntity(_name string, _e IfEntity) error {
+	path := MakeDumpFilePath(_name)
+
+	f, err := os.Open(path)
+	defer f.Close()
+	if err != nil { return err }
+
+	s, err := io.ReadAll(f)
+	if err != nil { return err }
+
+	_e.FromJson(s, true)
+	_e.AfterLoad()
+
+	return nil
 }

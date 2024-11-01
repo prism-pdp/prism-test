@@ -2,14 +2,11 @@ package entity
 
 import (
 	"encoding/json"
-	"io"
-	"os"
 	"github.com/ethereum/go-ethereum/common"
 
 	pdp "github.com/dpduado/dpduado-go/xz21"
 
 	"github.com/dpduado/dpduado-test/harness/client"
-	"github.com/dpduado/dpduado-test/harness/helper"
 )
 
 type Auditor struct {
@@ -31,24 +28,6 @@ func GenAuditor(_name string, _addr string, _simFlag bool) *Auditor {
 	return a
 }
 
-func LoadAuditor(_name string, _simFlag bool) *Auditor {
-	path := helper.MakeDumpPath(_name)
-	f, err := os.Open(path)
-	if err != nil { panic(err) }
-	defer f.Close()
-
-	s, err := io.ReadAll(f)
-	if err != nil { panic(err) }
-
-	a := new(Auditor)
-	json.Unmarshal(s, &a)
-
-	if _simFlag {
-		a.SetupSimClient(client.GetFakeLedger())
-	}
-
-	return a
-}
 
 func (this *Auditor) SetupSimClient(_ledger *client.FakeLedger) {
 	this.client = client.NewSimClient(_ledger, this.Addr)
@@ -97,16 +76,23 @@ func (this *Auditor) UploadAuditingResult(_hash [32]byte, _result bool) {
 	if err != nil { panic(err) }
 }
 
-func (this *Auditor) Dump() {
-	s, err := json.MarshalIndent(this, "", "\t")
-	if err != nil { panic(err) }
+func (this *Auditor) GetName() string {
+	return this.Name
+}
 
-	path := helper.MakeDumpPath(this.Name)
-	f, err := os.Create(path)
-	if err != nil { panic(err) }
-	defer f.Close()
+func (this *Auditor) ToJson() (string, error) {
+	b, err := json.MarshalIndent(this, "", "\t")
+	return string(b), err
+}
 
-	_, err = f.Write(s)
+func (this *Auditor) FromJson(_json []byte, _simFlag bool) {
+	json.Unmarshal(_json, this)
 
-	if err != nil { panic(err) }
+	if _simFlag {
+		this.SetupSimClient(client.GetFakeLedger())
+	}
+}
+
+func (this *Auditor) AfterLoad() {
+	// Do nothing
 }

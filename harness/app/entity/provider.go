@@ -4,8 +4,6 @@ import (
 	"crypto/sha256"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
-	"os"
 
 	"github.com/ethereum/go-ethereum/common"
 
@@ -52,44 +50,8 @@ func GenProvider(_name string, _addr string, _privKey string, _simFlag bool) *Pr
 	return p
 }
 
-func LoadProvider(_name string, _simFlag bool) *Provider {
-	path := helper.MakeDumpPath(_name)
-	f, err := os.Open(path)
-	if err != nil { panic(err) }
-	defer f.Close()
-
-	s, err := ioutil.ReadAll(f)
-	if err != nil { panic(err) }
-
-	p := new(Provider)
-	json.Unmarshal(s, p)
-
-	if p.Files == nil {
-		p.Files = make(map[string]*File)
-	}
-
-	if _simFlag {
-		p.SetupSimClient(client.GetFakeLedger())
-	}
-
-	return p
-}
-
 func (this *Provider) SetupSimClient(_ledger *client.FakeLedger) {
 	this.client = client.NewSimClient(_ledger, this.Addr)
-}
-
-func (this *Provider) Dump() {
-	s, err := json.MarshalIndent(this, "", "\t")
-	if err != nil { panic(err) }
-
-	path := helper.MakeDumpPath(this.Name)
-	f, err := os.Create(path)
-	if err != nil { panic(err) }
-	defer f.Close()
-
-	_, err = f.Write(s)
-	if err != nil { panic(err) }
 }
 
 func (this *Provider) NewFile(_addr common.Address, _hash [32]byte, _data []byte, _tagSet *pdp.TagSet, _pubKey *pdp.PublicKeyData) {
@@ -244,4 +206,27 @@ func (this *Provider) PrepareVerificationData(_hash [32]byte, _chalData *pdp.Cha
 	subsetTagData := file.TagDataSet.DuplicateSubset(fileProp.SplitNum, chal)
 
 	return file.Owners[0], subsetDigest, subsetTagData
+}
+
+func (this *Provider) GetName() string {
+	return this.Name
+}
+
+func (this *Provider) ToJson() (string, error) {
+	b, err := json.MarshalIndent(this, "", "\t")
+	return string(b), err
+}
+
+func (this *Provider) FromJson(_json []byte, _simFlag bool) {
+	json.Unmarshal(_json, this)
+
+	if _simFlag {
+		this.SetupSimClient(client.GetFakeLedger())
+	}
+}
+
+func (this *Provider) AfterLoad() {
+	if this.Files == nil {
+		this.Files = make(map[string]*File)
+	}
 }

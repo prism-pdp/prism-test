@@ -4,8 +4,6 @@ import (
 	"fmt"
 	"crypto/sha256"
 	"encoding/json"
-	"io/ioutil"
-	"os"
 
 	"github.com/ethereum/go-ethereum/common"
 
@@ -45,40 +43,8 @@ func GenUser(_name string, _addr string, _privKey string, _param *pdp.PairingPar
 	return u
 }
 
-func LoadUser(_name string, _simFlag bool) *User {
-	path := helper.MakeDumpPath(_name)
-	f, err := os.Open(path)
-	if err != nil { panic(err) }
-	defer f.Close()
-
-	s, err := ioutil.ReadAll(f)
-	if err != nil { panic(err) }
-
-	u := new(User)
-	json.Unmarshal(s, &u)
-
-	if _simFlag {
-		u.SetupSimClient(client.GetFakeLedger())
-	}
-
-	return u
-}
-
 func (this *User) SetupSimClient(_ledger *client.FakeLedger) {
 	this.client = client.NewSimClient(_ledger, this.Addr)
-}
-
-func (this *User) Dump() {
-	s, err := json.MarshalIndent(this, "", "\t")
-	if err != nil { panic(err) }
-
-	path := helper.MakeDumpPath(this.Name)
-	f, err := os.Create(path)
-	if err != nil { panic(err) }
-	defer f.Close()
-
-	_, err = f.Write(s)
-	if err != nil { panic(err) }
 }
 
 func (this *User) IsUploaded(_data []byte) bool {
@@ -144,4 +110,25 @@ func (this *User) GetFileList() [][32]byte {
 	fileList, err := this.client.GetFileList(this.Addr)
 	if err != nil { panic(err) }
 	return fileList
+}
+
+func (this *User) GetName() string {
+	return this.Name
+}
+
+func (this *User) ToJson() (string, error) {
+	b, err := json.MarshalIndent(this, "", "\t")
+	return string(b), err
+}
+
+func (this *User) FromJson(_json []byte, _simFlag bool) {
+	json.Unmarshal(_json, this)
+
+	if _simFlag {
+		this.SetupSimClient(client.GetFakeLedger())
+	}
+}
+
+func (this *User) AfterLoad() {
+	// Do nothing
 }

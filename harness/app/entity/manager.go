@@ -2,15 +2,12 @@ package entity
 
 import (
 	"encoding/json"
-	"io"
-	"os"
 
 	"github.com/ethereum/go-ethereum/common"
 
 	pdp "github.com/dpduado/dpduado-go/xz21"
 
 	"github.com/dpduado/dpduado-test/harness/client"
-	"github.com/dpduado/dpduado-test/harness/helper"
 )
 
 type Manager struct {
@@ -40,28 +37,6 @@ func GenManager(_name string, _addr string, _privKey string, _simFlag bool) *Man
 	return sm
 }
 
-func LoadManager(_name string, _simFlag bool) *Manager {
-	path := helper.MakeDumpPath(_name)
-
-	f, err := os.Open(path)
-	if err != nil { panic(err) }
-	defer f.Close()
-
-	s, err := io.ReadAll(f)
-	if err != nil { panic(err) }
-
-	sm := new(Manager)
-	json.Unmarshal(s, &sm)
-
-	sm.param = pdp.GenParamFromXZ21Param(sm.ParamXZ21)
-
-	if _simFlag {
-		sm.SetupSimClient(client.GetFakeLedger())
-	}
-
-	return sm
-}
-
 func (this *Manager) SetupSimClient(_ledger *client.FakeLedger) {
 	this.client = client.NewSimClient(_ledger, this.Addr)
 }
@@ -83,20 +58,27 @@ func (this *Manager) EnrollAuditor(_tpa *Auditor)  {
 	this.client.EnrollAuditor(_tpa.Addr)
 }
 
-func (this *Manager) Dump() {
-	s, err := json.MarshalIndent(this, "", "\t")
-	if err != nil { panic(err) }
-
-	path := helper.MakeDumpPath(this.Name)
-	f, err := os.Create(path)
-	if err != nil { panic(err) }
-	defer f.Close()
-
-	_, err = f.Write(s)
-
-	if err != nil { panic(err) }
-}
-
 func (this *Manager) GetParam() *pdp.PairingParam {
 	return this.param
+}
+
+func (this *Manager) GetName() string {
+	return this.Name
+}
+
+func (this *Manager) ToJson() (string, error) {
+	b, err := json.MarshalIndent(this, "", "\t")
+	return string(b), err
+}
+
+func (this *Manager) FromJson(_json []byte, _simFlag bool) {
+	json.Unmarshal(_json, this)
+
+	if _simFlag {
+		this.SetupSimClient(client.GetFakeLedger())
+	}
+}
+
+func (this *Manager) AfterLoad() {
+	this.param = pdp.GenParamFromXZ21Param(this.ParamXZ21)
 }
