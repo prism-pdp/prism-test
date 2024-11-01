@@ -9,7 +9,6 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/ethclient"
-	"io"
 	"math/big"
 	"os"
 
@@ -133,26 +132,17 @@ func DumpEntity(_e IfEntity) {
 	_, err := MakeDumpDir(name)
 	if err != nil { panic(err) }
 
-	pathFile := MakeDumpFilePath(name, "dump.json")
-	f, err := os.Create(pathFile)
-	if err != nil { panic(err) }
-	defer f.Close()
-
 	s, err := _e.ToJson()
 	if err != nil { panic(err) }
 
-	_, err = f.Write([]byte(s))
-	if err != nil { panic(err) }
+	pathFile := MakeDumpFilePath(name, "dump.json")
+	WriteFile(pathFile, []byte(s))
 }
 
 func LoadEntity(_name string, _e IfEntity) error {
 	path := MakeDumpFilePath(_name, "dump.json")
 
-	f, err := os.Open(path)
-	defer f.Close()
-	if err != nil { return err }
-
-	s, err := io.ReadAll(f)
+	s, err := ReadFile(path)
 	if err != nil { return err }
 
 	_e.FromJson(s, true)
