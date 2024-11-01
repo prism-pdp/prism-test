@@ -57,6 +57,12 @@ setup:
 harness@build:
 	$(MAKE) docker-run SERVICE="harness" CMD="go build -o bin/harness ./cmd/dpduado"
 
+harness@upgrade:
+	sed -i '/github.com\/dpduado\/dpduado-go/d' harness/app/go.mod
+	sed -i '/github.com\/dpduado\/dpduado-go/d' harness/app/go.sum
+	$(MAKE) docker-run SERVICE="harness" CMD="go get github.com/dpduado/dpduado-go"
+	$(MAKE) build-img
+
 harness@test-sim:
 	rm -f harness/app/cache/*
 	fallocate -l 100M harness/app/cache/dummy.data
