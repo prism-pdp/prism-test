@@ -82,7 +82,7 @@ func (this *Auditor) VerifyAuditingProof(_hash [32]byte, _setTagData pdp.TagData
 	account, err := this.client.GetAccount(_owner)
 	if err != nil { panic(err) }
 
-	var pubKeyData PublicKeyData
+	var pubKeyData pdp.PublicKeyData
 	pubKeyData.Load(account.PubKey)
 	pubKey := pubKeyData.Import(param)
 
