@@ -82,7 +82,8 @@ func (this *Auditor) VerifyAuditingProof(_hash [32]byte, _setTagData pdp.TagData
 	account, err := this.client.GetAccount(_owner)
 	if err != nil { panic(err) }
 
-	pubKeyData := (pdp.PublicKeyData)(account.PubKey) // TODO
+	var pubKeyData PublicKeyData
+	pubKeyData.Load(account.PubKey)
 	pubKey := pubKeyData.Import(param)
 
 	result, err := pdp.VerifyProof(param, fileProp.SplitNum, subsetTag, _setDigest, auditingReq.Chal, auditingReq.Proof, pubKey)

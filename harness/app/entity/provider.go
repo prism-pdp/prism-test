@@ -215,7 +215,7 @@ func (this *Provider) GenAuditingProof(_hash [32]byte, _chal *pdp.ChalData) pdp.
 	chal := _chal.Import(param)
 	if chal == nil { panic(fmt.Errorf("Invalid chal")) }
 
-	proof, _, _ := pdp.GenProof(param, chal, fileProp.SplitNum, file.Data) // TODO
+	proof, _, _ := pdp.GenProof(param, chal, fileProp.SplitNum, file.Data)
 	proofData := proof.Export()
 
 	return proofData
@@ -235,7 +235,7 @@ func (this *Provider) PrepareVerificationData(_hash [32]byte, _chalData *pdp.Cha
 	chal := _chalData.Import(param)
 
 	file := this.SearchFile(_hash)
-	if file == nil { panic(fmt.Errorf("Unknown file"))} // TODO: hash value
+	if file == nil { panic(fmt.Errorf("Unknown file (hash:%s)", helper.Hex(_hash[:])))}
 
 	fileProp, err := this.client.SearchFile(_hash)
 	if err != nil { panic(err) }

@@ -323,9 +323,9 @@ func main() {
 		runSetupPhase(args[1], args[2], args[3], args[4])
 	case "enroll":
 		if args[1] == "auditor" {
-			runEnrollAuditor(args[2], args[3]) // TODO: optarg
+			runEnrollAuditor(args[2], args[3])
 		} else if args[1] == "user" {
-			runEnrollUser(args[2], args[3], args[4]) // TODO: optarg
+			runEnrollUser(args[2], args[3], args[4])
 		}
 	case "upload":
 		runUploadPhase(args[1], args[2])

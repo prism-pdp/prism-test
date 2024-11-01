@@ -111,7 +111,7 @@ func (this *User) GenDedupProof(_chal *pdp.ChalData, _data []byte, _chunkNum uin
 
 	chal := _chal.Import(param)
 	proof, _, _ := pdp.GenProof(param, chal, _chunkNum, _data)
-	proofData := proof.Export() // TODO
+	proofData := proof.Export()
 
 	return proofData
 }
