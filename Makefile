@@ -64,7 +64,7 @@ harness@upgrade:
 	$(MAKE) build-img
 
 harness@test-sim:
-	rm -f harness/app/cache/*
+	rm -rf harness/app/cache/*
 	fallocate -l 100M harness/app/cache/dummy.data
 	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --sim setup $(ADDRESS_0) $(PRIVKEY_0) $(ADDRESS_1) $(PRIVKEY_1)"
 	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --sim enroll auditor tpa1 $(ADDRESS_2)"
