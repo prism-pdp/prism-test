@@ -14,8 +14,8 @@ import (
 )
 
 type File struct {
-	Data []byte    `json:'data'`
-	TagDataSet pdp.TagDataSet `json:'tag'`
+	Filename string `json:'filename'`
+	TagFilename string `json:'tagfilename'`
 	Owners []common.Address `json:'owners'`
 }
 
@@ -54,15 +54,29 @@ func (this *Provider) SetupSimClient(_ledger *client.FakeLedger) {
 	this.client = client.NewSimClient(_ledger, this.Addr)
 }
 
-func (this *Provider) NewFile(_addr common.Address, _hash [32]byte, _data []byte, _tagSet *pdp.TagSet, _pubKey *pdp.PublicKeyData) {
-	var file File
-	file.Data = _data
-	file.TagDataSet = _tagSet.Export()
-	file.Owners = append(file.Owners, _addr)
+func (this *Provider) NewFile(_addr common.Address, _hash [32]byte, _data []byte, _tagSet *pdp.TagSet, _pubKey *pdp.PublicKeyData) error {
+	hex := helper.Hex(_hash[:])
 
-	this.Files[helper.Hex(_hash[:])] = &file
+	var file File
+	file.Filename = fmt.Sprintf("%s.dat", hex)
+	file.TagFilename = file.Filename + ".tag"
+	file.Owners = append(file.Owners, _addr)
+	this.Files[hex] = &file
+
+	// Save file
+	pathFile := helper.MakeDumpFilePath(this.Name, file.Filename)
+	helper.WriteFile(pathFile, _data)
+
+	// Save tag file
+	setTagData := _tagSet.Export()
+	b, err := json.MarshalIndent(setTagData, "", "\t")
+	if err != nil { return err }
+	pathTagFile := helper.MakeDumpFilePath(this.Name, file.TagFilename)
+	helper.WriteFile(pathTagFile, b)
 
 	this.client.RegisterFile(_hash, _tagSet.Size(), _addr)
+
+	return nil
 }
 
 func (this *Provider) IsUploaded(_data []byte) bool {
@@ -114,8 +128,12 @@ func (this *Provider) RegisterOwnerToFile(_su *User, _data []byte, _chalData *pd
 	proof := _proofData.Import(param)
 	// prepare hash chunks
 	// TODO: function VerifyProof内で必要なタグだけ復元するのがよい
-	tagSet := file.TagDataSet.ImportSubset(param, fileProp.SplitNum, chal)
-	subsetChunk := pdp.GenChunkSubset(file.Data, fileProp.SplitNum, chal)
+	setTagData, err := this.ReadTagFile(file)
+	if err != nil { return false, err }
+	tagSet := setTagData.ImportSubset(param, fileProp.SplitNum, chal)
+	data, err := this.ReadFile(file)
+	if err != nil { return false, err }
+	subsetChunk := pdp.GenChunkSubset(data, fileProp.SplitNum, chal)
 	subsetDigest := subsetChunk.Hash()
 	// verify chal & proof
 	isVerified, err := pdp.VerifyProof(param, fileProp.SplitNum, tagSet, subsetDigest, chal, proof, pk)
@@ -139,10 +157,13 @@ func (this *Provider) GenDedupChal(_data []byte, _addrSU common.Address) *pdp.Ch
 	param := pdp.GenParamFromXZ21Param(&xz21Param)
 
 	hash := sha256.Sum256(_data)
+
 	file := this.SearchFile(hash)
 	if file == nil { panic(fmt.Errorf("File is not found.")) }
 
-	chal := pdp.NewChal(param, file.TagDataSet.Size())
+	fileProp, err := this.client.SearchFile(hash)
+
+	chal := pdp.NewChal(param, fileProp.SplitNum)
 	chalData := chal.Export()
 
 	return chalData
@@ -177,7 +198,10 @@ func (this *Provider) GenAuditingProof(_hash [32]byte, _chal *pdp.ChalData) pdp.
 	chal := _chal.Import(param)
 	if chal == nil { panic(fmt.Errorf("Invalid chal")) }
 
-	proof, _, _ := pdp.GenProof(param, chal, fileProp.SplitNum, file.Data)
+	data, err := this.ReadFile(file)
+	if err != nil { panic(err) }
+
+	proof, _, _ := pdp.GenProof(param, chal, fileProp.SplitNum, data)
 	proofData := proof.Export()
 
 	return proofData
@@ -202,8 +226,13 @@ func (this *Provider) PrepareVerificationData(_hash [32]byte, _chalData *pdp.Cha
 	fileProp, err := this.client.SearchFile(_hash)
 	if err != nil { panic(err) }
 
-	subsetDigest := pdp.GenChunkSubset(file.Data, fileProp.SplitNum, chal).Hash()
-	subsetTagData := file.TagDataSet.DuplicateSubset(fileProp.SplitNum, chal)
+	data, err := this.ReadFile(file)
+	if err != nil { panic(err) }
+	subsetDigest := pdp.GenChunkSubset(data, fileProp.SplitNum, chal).Hash()
+
+	setTagData, err := this.ReadTagFile(file)
+	if err != nil { panic(err) }
+	subsetTagData := setTagData.DuplicateSubset(fileProp.SplitNum, chal)
 
 	return file.Owners[0], subsetDigest, subsetTagData
 }
@@ -229,4 +258,20 @@ func (this *Provider) AfterLoad() {
 	if this.Files == nil {
 		this.Files = make(map[string]*File)
 	}
+}
+
+func (this *Provider) ReadFile(_f *File) ([]byte, error) {
+	path := helper.MakeDumpFilePath(this.Name, _f.Filename)
+	return helper.ReadFile(path)
+}
+
+func (this *Provider) ReadTagFile(_f *File) (*pdp.TagDataSet, error) {
+	path := helper.MakeDumpFilePath(this.Name, _f.TagFilename)
+	data, err := helper.ReadFile(path)
+	if err != nil { return nil, err }
+
+	var setTagData pdp.TagDataSet
+	json.Unmarshal(data, &setTagData)
+
+	return &setTagData, nil
 }
