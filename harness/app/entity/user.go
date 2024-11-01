@@ -110,7 +110,7 @@ func (this *User) GenDedupProof(_chal *pdp.ChalData, _data []byte, _chunkNum uin
 	param := pdp.GenParamFromXZ21Param(&xz21Param)
 
 	chal := _chal.Import(param)
-	_, proof := pdp.GenProof(param, chal, _chunkNum, _data)
+	proof, _, _ := pdp.GenProof(param, chal, _chunkNum, _data)
 	proofData := proof.Export() // TODO
 
 	return proofData

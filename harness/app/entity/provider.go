@@ -215,7 +215,7 @@ func (this *Provider) GenAuditingProof(_hash [32]byte, _chal *pdp.ChalData) pdp.
 	chal := _chal.Import(param)
 	if chal == nil { panic(fmt.Errorf("Invalid chal")) }
 
-	_, proof := pdp.GenProof(param, chal, fileProp.SplitNum, file.Data) // TODO
+	proof, _, _ := pdp.GenProof(param, chal, fileProp.SplitNum, file.Data) // TODO
 	proofData := proof.Export()
 
 	return proofData
