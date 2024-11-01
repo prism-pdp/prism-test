@@ -145,7 +145,7 @@ func LoadEntity(_name string, _e IfEntity) error {
 	s, err := ReadFile(path)
 	if err != nil { return err }
 
-	_e.FromJson(s, true)
+	_e.FromJson(s, *SimFlag)
 	_e.AfterLoad()
 
 	return nil

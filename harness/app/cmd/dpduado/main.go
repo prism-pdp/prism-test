@@ -10,22 +10,6 @@ import (
 	"github.com/dpduado/dpduado-test/harness/helper"
 )
 
-var (
-	helpFlag *bool
-	simFlag *bool
-	optServer *string
-	optContractAddr *string
-	optSenderAddr *string
-	optSenderPrivKey *string
-)
-
-var (
-	server string
-	contractAddr string
-	senderAddr string
-	senderPrivKey string
-)
-
 var command string
 
 var chunkNum uint32
@@ -54,10 +38,10 @@ func setup(_opts []string) {
 
 	// server := toString(optServer)
 	// contractAddr:= toString(optContractAddr)
-	senderAddr = toString(optSenderAddr)
-	senderPrivKey = toString(optSenderPrivKey)
+	helper.SenderAddr = toString(helper.OptSenderAddr)
+	helper.SenderPrivKey = toString(helper.OptSenderPrivKey)
 
-	if *simFlag {
+	if *helper.SimFlag {
 		// make fake ledger
 		if command == "setup" {
 			client.GenFakeLedger()
@@ -73,8 +57,8 @@ func runSetupPhase(_smAddr string, _smPrivKey string, _spAddr string, _spPrivKey
 	// --------------------------
 	// Prepare entities
 	// --------------------------
-	sm := entity.GenManager(nameSM, _smAddr, _smPrivKey, *simFlag)
-	sp := entity.GenProvider(nameSP, _spAddr, _spPrivKey, *simFlag)
+	sm := entity.GenManager(nameSM, _smAddr, _smPrivKey, *helper.SimFlag)
+	sp := entity.GenProvider(nameSP, _spAddr, _spPrivKey, *helper.SimFlag)
 
 	// --------------------------
 	// Main processing
@@ -99,7 +83,7 @@ func runEnrollUser(_name string, _addr string, _privKey string) {
 	// --------------------------
 	var sm entity.Manager
 	helper.LoadEntity(nameSM, &sm)
-	su := entity.GenUser(_name, _addr, _privKey, sm.GetParam(), *simFlag)
+	su := entity.GenUser(_name, _addr, _privKey, sm.GetParam(), *helper.SimFlag)
 
 	// --------------------------
 	// Main processing
@@ -124,7 +108,7 @@ func runEnrollAuditor(_name string, _addr string) {
 	// --------------------------
 	var sm entity.Manager
 	helper.LoadEntity(nameSM, &sm)
-	tpa := entity.GenAuditor(_name, _addr, *simFlag)
+	tpa := entity.GenAuditor(_name, _addr, *helper.SimFlag)
 
 	// --------------------------
 	// Main processing
@@ -309,16 +293,11 @@ func runVerifyAuditingProof(_name string) {
 
 func main() {
 
-	helpFlag = getopt.BoolLong("help", 'h', "display help")
-	simFlag  = getopt.BoolLong("sim", 0, "simulation mode (disable blockchain)")
-	optServer = getopt.StringLong("server", 0, "", "server's URL")
-	optContractAddr = getopt.StringLong("contract", 0, "", "contract address")
-	optSenderAddr = getopt.StringLong("sender-addr", 0, "", "sender's address")
-	optSenderPrivKey = getopt.StringLong("sender-key", 0, "", "sender's private key")
+	helper.SetupOpt()
 
 	getopt.Parse()
 
-	if *helpFlag {
+	if *helper.HelpFlag {
 		getopt.Usage()
 		os.Exit(1)
 	}
@@ -348,7 +327,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	if *simFlag {
+	if *helper.SimFlag {
 		client.GetFakeLedger().Dump()
 	}
 }
