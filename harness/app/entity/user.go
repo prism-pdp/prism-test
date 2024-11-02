@@ -2,7 +2,6 @@ package entity
 
 import (
 	"fmt"
-	"crypto/sha256"
 	"encoding/json"
 
 	"github.com/ethereum/go-ethereum/common"
@@ -45,15 +44,6 @@ func GenUser(_name string, _addr string, _privKey string, _param *pdp.PairingPar
 
 func (this *User) SetupSimClient(_ledger *client.FakeLedger) {
 	this.client = client.NewSimClient(_ledger, this.Addr)
-}
-
-func (this *User) IsUploaded(_data []byte) bool {
-	hash := sha256.Sum256(_data)
-	fileProp, err := this.client.SearchFile(hash)
-	if err != nil { panic(err) }
-
-	if helper.IsEmptyFileProperty(&fileProp) { return false }
-	return true
 }
 
 func (this *User) PrepareUpload(_data []byte, _chunkNum uint32) pdp.TagSet {

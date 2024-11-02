@@ -79,19 +79,19 @@ func (this *Provider) NewFile(_addr common.Address, _hash [32]byte, _data []byte
 	return nil
 }
 
-func (this *Provider) IsUploaded(_data []byte) bool {
+func (this *Provider) IsUploaded(_data []byte) (bool, uint32) {
 	hash := sha256.Sum256(_data)
 	fileProp, err := this.client.SearchFile(hash)
 	if err != nil { panic(err) }
-	if helper.IsEmptyFileProperty(&fileProp) { return false }
+	if helper.IsEmptyFileProperty(&fileProp) { return false, 0 }
 
-	return true
+	return true, fileProp.SplitNum
 }
 
 func (this *Provider) UploadNewFile(_data []byte, _tagSet *pdp.TagSet, _addrSU common.Address, _pubKeySU *pdp.PublicKeyData) error {
 	hash := sha256.Sum256(_data)
 
-	isUploaded := this.IsUploaded(_data)
+	isUploaded, _ := this.IsUploaded(_data)
 
 	if isUploaded {
 		return fmt.Errorf("File is already uploaded. (hash:%s)", helper.Hex(hash[:]))

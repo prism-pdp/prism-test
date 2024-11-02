@@ -2,6 +2,7 @@ package main
 
 import (
 	"os"
+	"strconv"
 
 	"github.com/pborman/getopt/v2"
 
@@ -11,8 +12,6 @@ import (
 )
 
 var command string
-
-var chunkNum uint32
 
 var ledger client.FakeLedger
 
@@ -32,8 +31,6 @@ func toString(_opt *string) string {
 }
 
 func setup(_opts []string) {
-	chunkNum = uint32(100) // TODO: change to option
-
 	command = _opts[0]
 
 	// server := toString(optServer)
@@ -125,7 +122,7 @@ func runEnrollAuditor(_name string, _addr string) {
 	helper.PrintLog("Finish enroll auditor")
 }
 
-func runUploadPhase(_name string, _path string) {
+func runUploadPhase(_name string, _path string, _chunkNum string) {
 	helper.PrintLog("Start upload")
 
 	// --------------------------
@@ -143,8 +140,8 @@ func runUploadPhase(_name string, _path string) {
 	data, err := helper.ReadFile(_path)
 	if err != nil { panic(err) }
 
-	// SU checks whether data is uploaded.
-	isUploaded := su.IsUploaded(data)
+	// SU inquires with SP whether the data is uploaded.
+	isUploaded, chunkNum := sp.IsUploaded(data)
 
 	// Processing differs depending on whether the file has already been uploaded or not.
 	digest := helper.CalcDigest(data)
@@ -156,6 +153,7 @@ func runUploadPhase(_name string, _path string) {
 		// (SP sends the challenge to SU.)
 
 		// SU generates a proof to prove ownership of the data to be uploaded.
+		// Use chunkNum which has been already determined
 		proofData := su.GenDedupProof(chalData, data, chunkNum)
 
 		// (SU sends the proof to SP.)
@@ -170,11 +168,15 @@ func runUploadPhase(_name string, _path string) {
 			helper.PrintLog("Failure registering an owner to a file (owner:%s, file:%s)", su.Name, hex)
 		}
 	} else {
+		tmp, err := strconv.ParseUint(_chunkNum, 10, 32)
+		if err != nil { panic(err) }
+		chunkNum = uint32(tmp) // Overwrite chunkNum with user defined value
+
 		// SU uploads the file.
 		tag := su.PrepareUpload(data, chunkNum)
 
 		// SP accepts the file.
-		err := sp.UploadNewFile(data, &tag, su.Addr, &su.PublicKeyData)
+		err = sp.UploadNewFile(data, &tag, su.Addr, &su.PublicKeyData)
 		if err != nil { panic(err) }
 
 		helper.PrintLog("Upload new file (owner:%s, file:%s)", su.Name, hex)
@@ -315,7 +317,7 @@ func main() {
 			runEnrollUser(args[2], args[3], args[4])
 		}
 	case "upload":
-		runUploadPhase(args[1], args[2])
+		runUploadPhase(args[1], args[2], args[3])
 	case "challenge":
 		runUploadAuditingChal(args[1])
 	case "proof":
