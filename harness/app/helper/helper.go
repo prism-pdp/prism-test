@@ -69,7 +69,14 @@ func GetCreatorAddr(_prop *pdp.XZ21FileProperty) common.Address {
 func PrintLog(format string, args ...interface{}) {
 	t := time.Now().Format(time.StampMilli)
 	m := fmt.Sprintf(format, args...)
-	fmt.Printf("[%s] %s\n", t, m)
+	log := fmt.Sprintf("[%s] %s\n", t, m)
+
+	fmt.Printf("%s", log)
+
+	if *OptPathLogFile != "" {
+		err := AppendFile(*OptPathLogFile, []byte(log))
+		if err != nil { panic(err) }
+	}
 }
 
 func colorText(_color int, _text string) string {
@@ -109,6 +116,18 @@ func ReadFile(_path string) ([]byte, error) {
 
 func WriteFile(_path string, _data []byte) {
 	os.WriteFile(_path, _data, 0755)
+}
+
+func AppendFile(_path string, _data []byte) error {
+	// 追記モードでファイルを開く
+	file, err := os.OpenFile(_path, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0755)
+	if err != nil { return err }
+	defer file.Close()
+
+	// ファイルに書き込み
+	_, err = file.Write(_data)
+
+	return err
 }
 
 func MakeDumpDirPath(_name string) string {

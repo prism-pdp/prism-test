@@ -11,6 +11,7 @@ var (
 	OptContractAddr *string
 	OptSenderAddr *string
 	OptSenderPrivKey *string
+	OptPathLogFile *string
 )
 
 var (
@@ -27,4 +28,5 @@ func SetupOpt() {
 	OptContractAddr = getopt.StringLong("contract", 0, "", "contract address")
 	OptSenderAddr = getopt.StringLong("sender-addr", 0, "", "sender's address")
 	OptSenderPrivKey = getopt.StringLong("sender-key", 0, "", "sender's private key")
+	OptPathLogFile = getopt.StringLong("log", 0, "", "log file path")
 }
