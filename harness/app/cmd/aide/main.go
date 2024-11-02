@@ -53,8 +53,7 @@ func runTestdata(_path string, _unit string, _num string) {
     f, err := os.Create(_path)
     if err != nil { panic(err) }
 
-    for i := range num {
-        fmt.Printf("Write (%d)\n", i)
+    for range num {
         _, err := f.Write(buf)
         if err != nil { panic(err) }
     }
