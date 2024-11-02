@@ -8,6 +8,12 @@ CONTRACT = XZ21
 shell:
 	docker compose run $(SERVICE) bash
 
+aide@build:
+	$(MAKE) docker-run SERVICE="harness" CMD="go build -o bin/aide ./cmd/aide"
+
+aide@testdata:
+	$(MAKE) docker-run SERVICE="harness" CMD="./bin/aide testdata ./cache/1k-100.dat 1K 100"
+
 test@sim:
 	rm -rf ./harness/app/cache/*
 	$(MAKE) harness@build
@@ -76,6 +82,10 @@ harness@test-sim:
 	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --sim challenge su1"
 	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --sim proof"
 	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --sim audit tpa1"
+
+harness@eval-tag:
+
+#harness@eval-proof:
 
 harness@run:
 	$(MAKE) harness@run-setup
