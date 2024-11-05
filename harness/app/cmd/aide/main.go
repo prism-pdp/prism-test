@@ -9,17 +9,18 @@ import(
 	"github.com/dpduado/dpduado-test/harness/helper"
 )
 
-func runTestdata(_path string, _unit string, _num string) {
-    unit, err := helper.ParseSize(_unit)
+
+func runTestdata(_path string, _size string, _val string) {
+    num, bufSize, err := helper.ParseSize(_size)
     if err != nil { panic(err) }
 
-    buf := make([]byte, unit)
-    for i := range unit {
-        buf[i] = byte(i)
+    val, err := strconv.Atoi(_val)
+    if err != nil { panic(err) }
+
+    buf := make([]byte, bufSize)
+    for i := range bufSize {
+        buf[i] = byte(val)
     }
-
-    num, err := strconv.Atoi(_num)
-    if err != nil { panic(err) }
 
     f, err := os.Create(_path)
     if err != nil { panic(err) }

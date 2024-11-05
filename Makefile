@@ -12,16 +12,12 @@ aide@build:
 	$(MAKE) docker-run SERVICE="harness" CMD="go build -o bin/aide ./cmd/aide"
 
 aide@testdata:
-	$(MAKE) docker-run SERVICE="harness" CMD="./bin/aide testdata ./cache/1m-0100.dat 1M 100"
-	$(MAKE) docker-run SERVICE="harness" CMD="./bin/aide testdata ./cache/1m-0200.dat 1M 200"
-	$(MAKE) docker-run SERVICE="harness" CMD="./bin/aide testdata ./cache/1m-0300.dat 1M 300"
-	$(MAKE) docker-run SERVICE="harness" CMD="./bin/aide testdata ./cache/1m-0400.dat 1M 400"
-	$(MAKE) docker-run SERVICE="harness" CMD="./bin/aide testdata ./cache/1m-0500.dat 1M 500"
-	$(MAKE) docker-run SERVICE="harness" CMD="./bin/aide testdata ./cache/1m-0600.dat 1M 600"
-	$(MAKE) docker-run SERVICE="harness" CMD="./bin/aide testdata ./cache/1m-0700.dat 1M 700"
-	$(MAKE) docker-run SERVICE="harness" CMD="./bin/aide testdata ./cache/1m-0800.dat 1M 800"
-	$(MAKE) docker-run SERVICE="harness" CMD="./bin/aide testdata ./cache/1m-0900.dat 1M 900"
-	$(MAKE) docker-run SERVICE="harness" CMD="./bin/aide testdata ./cache/1m-1000.dat 1M 1000"
+	@for i in `seq 10`; do \
+		$(MAKE) docker-run SERVICE="harness" CMD="./bin/aide testdata ./testdata/100m-`printf %02X $$i`.dat 100M $$i"; \
+	done
+
+aide@parselog:
+	$(MAKE) docker-run SERVICE="harness" CMD="./bin/aide parselog ./cache/log.txt"
 
 test@sim:
 	rm -rf ./harness/app/cache/*
