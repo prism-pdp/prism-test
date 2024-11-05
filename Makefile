@@ -4,7 +4,6 @@ include accounts.env
 
 # dpduado-sol/srcの中から選ぶ
 CONTRACT = XZ21
-HUNDRED = "00"
 
 shell:
 	docker compose run $(SERVICE) bash
