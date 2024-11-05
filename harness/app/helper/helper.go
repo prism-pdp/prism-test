@@ -11,6 +11,9 @@ import (
 	"github.com/ethereum/go-ethereum/ethclient"
 	"math/big"
 	"os"
+	"regexp"
+	"strconv"
+	"strings"
 
 	pdp "github.com/dpduado/dpduado-go/xz21"
 )
@@ -26,6 +29,8 @@ const (
 	BLUE
 	PURPLE
 )
+
+const TimeFormat = "2006/01/02 15:04:05.000"
 
 func GenXZ21Session(_server string, _contractAddr string, _privKey string) (*ethclient.Client, pdp.XZ21Session) {
 	cl, err := ethclient.Dial(_server)
@@ -67,7 +72,7 @@ func GetCreatorAddr(_prop *pdp.XZ21FileProperty) common.Address {
 }
 
 func PrintLog(format string, args ...interface{}) {
-	t := time.Now().Format(time.StampMilli)
+	t := time.Now().Format(TimeFormat)
 	m := fmt.Sprintf(format, args...)
 	log := fmt.Sprintf("[%s] %s\n", t, m)
 
@@ -77,6 +82,58 @@ func PrintLog(format string, args ...interface{}) {
 		err := AppendFile(*OptPathLogFile, []byte(log))
 		if err != nil { panic(err) }
 	}
+}
+
+func ParseLog(_log string) (time.Time, string, string) {
+    var datetime time.Time
+    var message, detail string
+    var err error
+
+    re1 := regexp.MustCompile(`\[(.*)\] (.*) \((.*)\)`)
+    re2 := regexp.MustCompile(`\[(.*)\] (.*)`)
+
+    match := re1.FindStringSubmatch(_log)
+
+    if len(match) == 0 {
+        match = re2.FindStringSubmatch(_log)
+        datetime, err = time.Parse(TimeFormat, match[1])
+        if err != nil { panic(err) }
+        message = match[2]
+        detail = ""
+    } else {
+        datetime, err = time.Parse(TimeFormat, match[1])
+        if err != nil { panic(err) }
+        message = match[2]
+        detail = match[3]
+    }
+
+    return datetime, message, detail
+}
+
+func ParseSize(sizeStr string) (int64, error) {
+    sizeStr = strings.TrimSpace(sizeStr)
+    if len(sizeStr) < 2 {
+        return 0, fmt.Errorf("invalid size format")
+    }
+
+    numPart := sizeStr[:len(sizeStr)-1]
+    unitPart := sizeStr[len(sizeStr)-1]
+
+    num, err := strconv.ParseFloat(numPart, 64)
+    if err != nil {
+        return 0, fmt.Errorf("invalid number: %s", numPart)
+    }
+
+    switch strings.ToUpper(string(unitPart)) {
+    case "K":
+        return int64(num * 1024), nil
+    case "M":
+        return int64(num * 1024 * 1024), nil
+    case "G":
+        return int64(num * 1024 * 1024 * 1024), nil
+    default:
+        return 0, fmt.Errorf("unknown unit: %s", string(unitPart))
+    }
 }
 
 func colorText(_color int, _text string) string {

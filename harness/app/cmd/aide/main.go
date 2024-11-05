@@ -1,45 +1,16 @@
 package main
 
 import(
+    "bufio"
 	"fmt"
 	"strconv"
-	"strings"
     "os"
+
+	"github.com/dpduado/dpduado-test/harness/helper"
 )
 
-func ParseSize(sizeStr string) (int64, error) {
-    sizeStr = strings.TrimSpace(sizeStr) // 空白をトリム
-    if len(sizeStr) < 2 {
-        return 0, fmt.Errorf("invalid size format")
-    }
-
-    // 数値部分を取得
-    numPart := sizeStr[:len(sizeStr)-1]
-    unitPart := sizeStr[len(sizeStr)-1]
-
-    // 数値をパース
-    num, err := strconv.ParseFloat(numPart, 64)
-    if err != nil {
-        return 0, fmt.Errorf("invalid number: %s", numPart)
-    }
-
-    // 単位に応じてバイト数を計算
-    switch strings.ToUpper(string(unitPart)) {
-    case "K":
-        return int64(num * 1024), nil
-    case "M":
-        return int64(num * 1024 * 1024), nil
-    case "G":
-        return int64(num * 1024 * 1024 * 1024), nil
-    case "B":
-        return int64(num), nil
-    default:
-        return 0, fmt.Errorf("unknown unit: %s", string(unitPart))
-    }
-}
-
 func runTestdata(_path string, _unit string, _num string) {
-    unit, err := ParseSize(_unit)
+    unit, err := helper.ParseSize(_unit)
     if err != nil { panic(err) }
 
     buf := make([]byte, unit)
@@ -62,6 +33,23 @@ func runTestdata(_path string, _unit string, _num string) {
     if err != nil { panic(err) }
 }
 
+func runParseLog(_path string) {
+    file, err := os.Open(_path)
+    if err != nil { panic(err) }
+    defer file.Close()
+
+    scanner := bufio.NewScanner(file)
+    for scanner.Scan() {
+        line := scanner.Text()
+        dt, msg, detail := helper.ParseLog(line)
+        fmt.Printf("%v -- %s -- %s\n", dt, msg, detail)
+    }
+
+    if err := scanner.Err(); err != nil {
+        panic(err)
+    }
+}
+
 func main() {
     args := os.Args
 
@@ -70,6 +58,8 @@ func main() {
 	switch command {
 	case "testdata":
 		runTestdata(args[2], args[3], args[4])
+    case "parselog":
+        runParseLog(args[2])
 	default:
 		fmt.Println("Unknown command (command:%s)", command)
 	}
