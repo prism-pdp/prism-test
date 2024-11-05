@@ -53,10 +53,10 @@ func (this *User) PrepareUpload(_data []byte, _chunkNum uint32) pdp.TagSet {
 	param := pdp.GenParamFromXZ21Param(&xz21Param)
 	sk := this.PrivateKeyData.Import(param)
 
-	helper.PrintLog("Start to generate tags (chunks:%d)", int(_chunkNum))
+	helper.PrintLog("Start generate tags (chunks:%d)", int(_chunkNum))
 	setChunk := pdp.GenChunkSet(_data, _chunkNum)
 	tagSet, _ := pdp.GenTags(param, sk, setChunk)
-	helper.PrintLog("Finish to generate tags (chunks:%d)", int(_chunkNum))
+	helper.PrintLog("Finish generate tags (chunks:%d)", int(_chunkNum))
 
 	return tagSet
 }

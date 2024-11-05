@@ -1,11 +1,12 @@
 package main
 
 import(
-    "bufio"
+    "encoding/json"
 	"fmt"
 	"strconv"
     "os"
 
+	"github.com/dpduado/dpduado-test/harness/eval"
 	"github.com/dpduado/dpduado-test/harness/helper"
 )
 
@@ -34,21 +35,26 @@ func runTestdata(_path string, _size string, _val string) {
     if err != nil { panic(err) }
 }
 
-func runParseLog(_path string) {
-    file, err := os.Open(_path)
+func runInflateTestdata(_pathIn string, _pathOut string, _scale string) {
+    data, err := helper.ReadFile(_pathIn)
     if err != nil { panic(err) }
-    defer file.Close()
 
-    scanner := bufio.NewScanner(file)
-    for scanner.Scan() {
-        line := scanner.Text()
-        dt, msg, detail := helper.ParseLog(line)
-        fmt.Printf("%v -- %s -- %s\n", dt, msg, detail)
-    }
+    scale, err := strconv.Atoi(_scale)
+    if err != nil { panic(err) }
 
-    if err := scanner.Err(); err != nil {
-        panic(err)
+    for i := 0; i < scale; i++ {
+        helper.AppendFile(_pathOut, data)
     }
+}
+
+func runEvalGenTag(_pathLogDir string) {
+    evalReport := eval.NewEvalReport()
+    evalReport.SetupReport("GenTags", "gentag-", "generate tags")
+
+    evalReport.ProcTimeReport["GenTags"].Run(_pathLogDir)
+
+    tmp, _ := json.MarshalIndent(evalReport, "", "\t")
+    fmt.Println(string(tmp))
 }
 
 func main() {
@@ -59,8 +65,10 @@ func main() {
 	switch command {
 	case "testdata":
 		runTestdata(args[2], args[3], args[4])
-    case "parselog":
-        runParseLog(args[2])
+    case "inflate":
+        runInflateTestdata(args[2], args[3], args[4])
+    case "eval-gentag":
+        runEvalGenTag(args[2])
 	default:
 		fmt.Println("Unknown command (command:%s)", command)
 	}
