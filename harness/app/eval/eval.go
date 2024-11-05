@@ -2,9 +2,11 @@ package eval
 
 import (
 	"bufio"
+	"encoding/csv"
 	"fmt"
 	"os"
 	"path/filepath"
+	"strconv"
 	"strings"
 	"time"
 
@@ -12,6 +14,7 @@ import (
 )
 
 type EvalProcTime struct {
+	Name string
 	Series []int64
 	Mean float64
 
@@ -19,9 +22,9 @@ type EvalProcTime struct {
 }
 
 type EvalProcTimeReport struct {
-    ProcTime map[string]*EvalProcTime
 	TargetMsg string
 	LogFilePrefix string
+    ProcTime []*EvalProcTime
 }
 
 type EvalReport struct {
@@ -36,7 +39,6 @@ func NewEvalReport() *EvalReport {
 
 func (this *EvalReport) SetupReport(_key string, _logFilePrefix string, _msg string) {
 	this.ProcTimeReport[_key] = new(EvalProcTimeReport)
-	this.ProcTimeReport[_key].ProcTime = make(map[string]*EvalProcTime)
 	this.ProcTimeReport[_key].TargetMsg = _msg
 	this.ProcTimeReport[_key].LogFilePrefix = _logFilePrefix
 }
@@ -46,30 +48,76 @@ func (this *EvalProcTimeReport) Run(_pathLogDir string) {
 	files, err := os.ReadDir(_pathLogDir)
 	if err != nil { panic(err) }
 
-	for _, file := range files {
-		if false == strings.HasPrefix(file.Name(), this.LogFilePrefix) {
+	filenameList := make([]string, len(files))
+	for _, v := range files {
+		filenameList = append(filenameList, v.Name())
+	}
+
+	for _, filename := range filenameList {
+		if false == strings.HasPrefix(filename, this.LogFilePrefix) {
 			continue
 		}
 
-		filePath := filepath.Join(_pathLogDir, file.Name())
+		filePath := filepath.Join(_pathLogDir, filename)
 
 		f, err := os.Open(filePath)
 		if err != nil { panic(err) }
 		defer f.Close()
 
-		this.ProcTime[file.Name()] = new(EvalProcTime)
+		evalProcTime := new(EvalProcTime)
+		evalProcTime.Name = filename
 
 		scanner := bufio.NewScanner(f)
 		for scanner.Scan() {
 			line := scanner.Text()
-			this.ProcTime[file.Name()].CalcDuration(this.TargetMsg, line)
+			evalProcTime.CalcDuration(this.TargetMsg, line)
 		}
 
 		if err := scanner.Err(); err != nil {
 			panic(err)
 		}
 
-		this.ProcTime[file.Name()].CalcMean()
+		evalProcTime.CalcMean()
+
+		this.ProcTime = append(this.ProcTime, evalProcTime)
+	}
+}
+
+func (this *EvalProcTimeReport) Dump(_pathDir string) {
+	filePath := filepath.Join(_pathDir, this.LogFilePrefix + ".csv")
+
+	file, err := os.Create(filePath)
+	if err != nil { panic(err) }
+	defer file.Close()
+
+	writer := csv.NewWriter(file)
+	defer writer.Flush()
+
+	var header []string
+	header = append(header, "Name")
+	for i, _ := range this.ProcTime {
+		header = append(header, strconv.Itoa(i))
+	}
+	header = append(header, "Mean")
+
+	if err := writer.Write(header); err != nil {
+		panic(err)
+	}
+
+	var records [][]string
+	for _, v1 := range this.ProcTime {
+		var record []string
+		record = append(record, v1.Name)
+		for _, v2 := range v1.Series {
+			record = append(record, strconv.FormatInt(v2, 10))
+		}
+		record = append(record, strconv.FormatFloat(v1.Mean, 'f', -1, 64))
+		records = append(records, record)
+	}
+
+	if err := writer.WriteAll(records); err != nil {
+		fmt.Println("Error writing records:", err)
+		return
 	}
 }
 

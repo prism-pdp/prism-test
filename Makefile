@@ -20,8 +20,8 @@ aide@testdata:
 aide@inflate:
 	$(MAKE) docker-run SERVICE="harness" CMD="./bin/aide inflate $(IN_FILE) $(OUT_FILE) $(SCALE)"
 
-aide@eval-gentag:
-	$(MAKE) docker-run SERVICE="harness" CMD="./bin/aide eval-gentag ./testlogs"
+aide@eval-gentags:
+	$(MAKE) docker-run SERVICE="harness" CMD="./bin/aide eval-gentags ./testlogs"
 
 test@sim:
 	rm -rf ./harness/app/cache/*
@@ -92,24 +92,24 @@ harness@test-sim:
 	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --sim --log ./cache/log.txt proof"
 	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --sim --log ./cache/log.txt audit tpa1"
 
-harness@eval-gentag:
+harness@eval-gentags:
 	rm -rf ./harness/app/cache/*
 	$(eval BLOCK_NUM := ${SCALE}00)
 	$(eval FILE_SIZE := ${BLOCK_NUM}m)
-	$(eval PATH_LOG := ./testlogs/gentag-${FILE_SIZE}.log)
-	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --sim --log ./cache/eval-gentag.log setup $(ADDRESS_0) $(PRIVKEY_0) $(ADDRESS_1) $(PRIVKEY_1)"
-	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --sim --log ./cache/eval-gentag.log enroll user su $(ADDRESS_4) $(PRIVKEY_4)"
+	$(eval PATH_LOG := ./testlogs/gentags-${FILE_SIZE}.log)
+	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --sim --log ./cache/eval-gentags.log setup $(ADDRESS_0) $(PRIVKEY_0) $(ADDRESS_1) $(PRIVKEY_1)"
+	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --sim --log ./cache/eval-gentags.log enroll user su $(ADDRESS_4) $(PRIVKEY_4)"
 	@for i in `seq 10`; do \
 		rm -f ./harness/app/cache/test.dat; \
 		$(MAKE) aide@inflate IN_FILE="./testdata/100m-`printf %02X $$i`.dat" OUT_FILE="./cache/test.dat" SCALE=$(SCALE); \
-		$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --sim --log ./cache/eval-gentag.log upload su ./cache/test.dat $(BLOCK_NUM)"; \
+		$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --sim --log ./cache/eval-gentags.log upload su ./cache/test.dat $(BLOCK_NUM)"; \
 	done
-	cp ./harness/app/cache/eval-gentag.log ./harness/app/$(PATH_LOG)
+	cp ./harness/app/cache/eval-gentags.log ./harness/app/$(PATH_LOG)
 
-harness@eval-gentag-all:
-	rm -f ./harness/app/testlogs/gentag-*.log
+harness@eval-gentags-all:
+	rm -f ./harness/app/testlogs/gentags-*.log
 	@for i in `seq 10`; do \
-		$(MAKE) harness@eval-gentag SCALE=$$i; \
+		$(MAKE) harness@eval-gentags SCALE=$$i; \
 	done
 
 harness@run:
