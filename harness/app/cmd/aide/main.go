@@ -1,7 +1,6 @@
 package main
 
 import(
-    "encoding/json"
 	"fmt"
 	"strconv"
     "os"
@@ -47,16 +46,14 @@ func runInflateTestdata(_pathIn string, _pathOut string, _scale string) {
     }
 }
 
-func runEvalGenTag(_pathLogDir string) {
+func runEvalGenTag(_pathLogDir string, _pathResultDir string) {
     evalReport := eval.NewEvalReport()
     evalReport.SetupReport("gentags", "gentags", "generate tags")
 
     evalReport.ProcTimeReport["gentags"].Run(_pathLogDir)
 
-    tmp, _ := json.MarshalIndent(evalReport, "", "\t")
-    fmt.Println(string(tmp))
-
-    evalReport.ProcTimeReport["gentags"].Dump("./cache")
+    err := evalReport.ProcTimeReport["gentags"].Dump(_pathResultDir)
+    if err != nil { panic(err) }
 }
 
 func main() {
@@ -70,7 +67,7 @@ func main() {
     case "inflate":
         runInflateTestdata(args[2], args[3], args[4])
     case "eval-gentags":
-        runEvalGenTag(args[2])
+        runEvalGenTag(args[2], args[3])
 	default:
 		fmt.Println("Unknown command (command:%s)", command)
 	}

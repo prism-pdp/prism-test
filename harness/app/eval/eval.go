@@ -3,6 +3,7 @@ package eval
 import (
 	"bufio"
 	"encoding/csv"
+    "encoding/json"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -15,6 +16,7 @@ import (
 
 type EvalProcTime struct {
 	Name string
+	BlockNum int
 	Series []int64
 	Mean float64
 
@@ -44,6 +46,7 @@ func (this *EvalReport) SetupReport(_key string, _logFilePrefix string, _msg str
 }
 
 func (this *EvalProcTimeReport) Run(_pathLogDir string) {
+	var err error
 
 	files, err := os.ReadDir(_pathLogDir)
 	if err != nil { panic(err) }
@@ -66,6 +69,8 @@ func (this *EvalProcTimeReport) Run(_pathLogDir string) {
 
 		evalProcTime := new(EvalProcTime)
 		evalProcTime.Name = filename
+		evalProcTime.BlockNum, err = getBlockNum(filename)
+		if err != nil { panic(err) }
 
 		scanner := bufio.NewScanner(f)
 		for scanner.Scan() {
@@ -83,7 +88,28 @@ func (this *EvalProcTimeReport) Run(_pathLogDir string) {
 	}
 }
 
-func (this *EvalProcTimeReport) Dump(_pathDir string) {
+func (this *EvalProcTimeReport) Dump(_pathDir string) error {
+	var err error
+
+	err = this.DumpJson(_pathDir)
+	if err != nil { return err }
+
+	err = this.DumpCsv(_pathDir)
+	if err != nil { return err }
+
+	return nil
+}
+
+func (this *EvalProcTimeReport) DumpJson(_pathDir string) error {
+    tmp, err := json.MarshalIndent(this, "", "\t")
+	if err != nil { return err }
+	filePath := filepath.Join(_pathDir, this.LogFilePrefix + ".json")
+	helper.WriteFile(filePath, tmp)
+
+	return nil
+}
+
+func (this *EvalProcTimeReport) DumpCsv(_pathDir string) error {
 	filePath := filepath.Join(_pathDir, this.LogFilePrefix + ".csv")
 
 	file, err := os.Create(filePath)
@@ -94,31 +120,28 @@ func (this *EvalProcTimeReport) Dump(_pathDir string) {
 	defer writer.Flush()
 
 	var header []string
-	header = append(header, "Name")
+	header = append(header, "Blocks")
 	for i, _ := range this.ProcTime {
-		header = append(header, strconv.Itoa(i))
+		header = append(header, strconv.Itoa(i+1))
 	}
 	header = append(header, "Mean")
 
 	if err := writer.Write(header); err != nil {
-		panic(err)
+		return err
 	}
 
 	var records [][]string
 	for _, v1 := range this.ProcTime {
-		var record []string
-		record = append(record, v1.Name)
+		var r []string
+		r = append(r, strconv.Itoa(v1.BlockNum))
 		for _, v2 := range v1.Series {
-			record = append(record, strconv.FormatInt(v2, 10))
+			r = append(r, strconv.FormatInt(v2, 10))
 		}
-		record = append(record, strconv.FormatFloat(v1.Mean, 'f', -1, 64))
-		records = append(records, record)
+		r = append(r, strconv.FormatFloat(v1.Mean, 'f', -1, 64))
+		records = append(records, r)
 	}
 
-	if err := writer.WriteAll(records); err != nil {
-		fmt.Println("Error writing records:", err)
-		return
-	}
+	return writer.WriteAll(records)
 }
 
 func (this *EvalProcTime) CalcDuration(_targetMsg string, _log string) {
@@ -164,4 +187,11 @@ func checkMsg(_expected string, _actual string) (bool, bool) {
 		match = true
 	}
 	return match, flagStart
+}
+
+func getBlockNum(_filename string) (int, error) {
+	if strings.HasPrefix(_filename, "gentags") {
+		return strconv.Atoi(_filename[8:12])
+	}
+	return 0, fmt.Errorf("Invalid filename (%s)", _filename)
 }

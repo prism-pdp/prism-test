@@ -21,7 +21,7 @@ aide@inflate:
 	$(MAKE) docker-run SERVICE="harness" CMD="./bin/aide inflate $(IN_FILE) $(OUT_FILE) $(SCALE)"
 
 aide@eval-gentags:
-	$(MAKE) docker-run SERVICE="harness" CMD="./bin/aide eval-gentags ./testlogs"
+	$(MAKE) docker-run SERVICE="harness" CMD="./bin/aide eval-gentags ./testlogs ./testresults"
 
 test@sim:
 	rm -rf ./harness/app/cache/*
