@@ -140,6 +140,8 @@ func runUploadPhase(_name string, _path string, _chunkNum string) {
 	data, err := helper.ReadFile(_path)
 	if err != nil { panic(err) }
 
+	helper.PrintLog("Read file (filesize:%d, path:%s)", len(data), _path)
+
 	// SU inquires with SP whether the data is uploaded.
 	isUploaded, chunkNum := sp.IsUploaded(data)
 
