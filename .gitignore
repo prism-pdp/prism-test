@@ -2,5 +2,7 @@
 
 cache/*
 harness/app/cache/*
+harness/app/testdata/*
+harness/app/testlogs/*
 
 !.gitkeep
