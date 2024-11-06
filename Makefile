@@ -8,9 +8,18 @@ CONTRACT = XZ21
 shell:
 	docker compose run $(SERVICE) bash
 
-eval:
+eval-offchain:
+# build programs
+	$(MAKE) harness@build
+	$(MAKE) aide@build
+# generate testdata
+	$(MAKE) aide@testdata
+# perform evaluation of generating tags
 	$(MAKE) harness@test-gentags-all
 	$(MAKE) aide@eval-gentags
+# perform evaluation of generating proof and verifying proof
+	$(MAKE) harness@test-auditing-all
+	$(MAKE) aide@eval-auditing
 
 aide@build:
 	$(MAKE) docker-run SERVICE="harness" CMD="go build -o bin/aide ./cmd/aide"
