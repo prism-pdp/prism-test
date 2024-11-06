@@ -244,8 +244,8 @@ func runUploadAuditingProof() {
 	}
 
 	for i, f := range fileList {
-		helper.PrintLog("Upload auditing proof (entity:%s, file:%s, index:%d/%d)", sp.Name, helper.Hex(f[:]), i+1, len(fileList))
 		proofData := sp.GenAuditingProof(f, chalDataList[i])
+		helper.PrintLog("Upload auditing proof (entity:%s, file:%s, index:%d/%d)", sp.Name, helper.Hex(f[:]), i+1, len(fileList))
 		sp.UploadAuditingProof(f, proofData)
 	}
 
