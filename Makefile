@@ -27,6 +27,10 @@ aide@eval-gentags:
 	rm -f ./harness/app/eval/gentags/results/*
 	$(MAKE) docker-run SERVICE="harness" CMD="./bin/aide eval-gentags ./eval/gentags/logs ./eval/gentags/results"
 
+aide@eval-auditing:
+	rm -f ./harness/app/eval/auditing/results/*
+	$(MAKE) docker-run SERVICE="harness" CMD="./bin/aide eval-auditing ./eval/auditing/logs ./eval/auditing/results"
+
 test@sim:
 	rm -rf ./harness/app/cache/*
 	$(MAKE) harness@build
@@ -92,7 +96,7 @@ harness@test-sim:
 	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --sim --log ./cache/log.txt enroll user    su2  $(ADDRESS_5) $(PRIVKEY_5)"
 	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --sim --log ./cache/log.txt upload su1 cache/dummy.data 100"
 	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --sim --log ./cache/log.txt upload su2 cache/dummy.data 50"
-	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --sim --log ./cache/log.txt challenge su1 0.8"
+	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --sim --log ./cache/log.txt challenge su1 0.55"
 	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --sim --log ./cache/log.txt proof"
 	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --sim --log ./cache/log.txt audit tpa1"
 
@@ -110,10 +114,31 @@ harness@test-gentags:
 	done
 	cp ./harness/app/cache/test-gentags.log ./harness/app/$(PATH_LOG)
 
+harness@test-auditing:
+	rm -rf ./harness/app/cache/*
+	$(eval PATH_LOG := ./eval/auditing/logs/auditing-$(RATIO).log)
+	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --sim --log ./cache/test-auditing.log setup $(ADDRESS_0) $(PRIVKEY_0) $(ADDRESS_1) $(PRIVKEY_1)"
+	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --sim --log ./cache/test-auditing.log enroll auditor tpa $(ADDRESS_2)"
+	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --sim --log ./cache/test-auditing.log enroll user su $(ADDRESS_3) $(PRIVKEY_3)"
+	$(MAKE) aide@inflate IN_FILE="./eval/testdata/100m-01.dat" OUT_FILE="./cache/test.dat" SCALE=10
+	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --sim --log ./cache/test-auditing.log upload su ./cache/test.dat 1000"
+	@for i in `seq 10`; do \
+		$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --sim --log ./cache/test-auditing.log challenge su $(RATIO)"; \
+		$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --sim --log ./cache/test-auditing.log proof"; \
+		$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --sim --log ./cache/test-auditing.log audit tpa"; \
+	done
+	cp ./harness/app/cache/test-auditing.log ./harness/app/$(PATH_LOG)
+
 harness@test-gentags-all:
 	rm -f ./harness/app/eval/gentags/logs/*
 	@for i in `seq 10`; do \
 		$(MAKE) harness@test-gentags SCALE=$$i; \
+	done
+
+harness@test-auditing-all:
+	rm -f ./harness/app/eval/gentags/logs/*
+	@for i in `seq 0.1 0.1 1.0`; do \
+		$(MAKE) harness@test-auditing RATIO=$$i; \
 	done
 
 harness@run:

@@ -47,12 +47,27 @@ func runInflateTestdata(_pathIn string, _pathOut string, _scale string) {
 }
 
 func runEvalGenTag(_pathLogDir string, _pathResultDir string) {
-    evalReport := eval.NewEvalReport()
-    evalReport.SetupReport("gentags", "generate tags", _pathLogDir, _pathResultDir)
+    evalReport := eval.NewEvalProcTimeReport("gentags", "generate tags", _pathLogDir, _pathResultDir)
 
     evalReport.Run()
 
     err := evalReport.Dump()
+    if err != nil { panic(err) }
+}
+
+func runEvalAuditing(_pathLogDir string, _pathResultDir string) {
+    var err error
+
+    evalGenProofReport := eval.NewEvalProcTimeReport("genproof", "generating proof", _pathLogDir, _pathResultDir)
+    evalVerProofReport := eval.NewEvalProcTimeReport("verifyproof", "verifying proof", _pathLogDir, _pathResultDir)
+
+    evalGenProofReport.Run()
+    evalVerProofReport.Run()
+
+    err = evalGenProofReport.Dump()
+    if err != nil { panic(err) }
+
+    err = evalVerProofReport.Dump()
     if err != nil { panic(err) }
 }
 
@@ -68,6 +83,8 @@ func main() {
         runInflateTestdata(args[2], args[3], args[4])
     case "eval-gentags":
         runEvalGenTag(args[2], args[3])
+    case "eval-auditing":
+        runEvalAuditing(args[2], args[3])
 	default:
 		fmt.Println("Unknown command (command:%s)", command)
 	}

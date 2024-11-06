@@ -3,5 +3,7 @@ cache/*
 eval/testdata/*
 eval/gentags/logs/*
 eval/gentags/results/*
+eval/auditing/logs/*
+eval/auditing/results/*
 
 !.gitkeep

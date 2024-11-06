@@ -26,35 +26,20 @@ type EvalProcTime struct {
 }
 
 type EvalProcTimeReport struct {
-	TargetMsg string
 	ReportName string
+	TargetMsg string
 	PathLogDir string
 	PathResultDir string
     ProcTime []*EvalProcTime
 }
 
-type EvalReport struct {
-	ProcTimeReport []*EvalProcTimeReport
-}
-
-func NewEvalReport() *EvalReport {
-	obj := new(EvalReport)
-	return obj
-}
-
-func (this *EvalReport) SetupReport(_key string, _msg string, _pathLogDir string, _pathResultDir string) {
+func NewEvalProcTimeReport(_reportName, _targetMsg, _pathLogDir, _pathResultDir string) *EvalProcTimeReport {
 	obj := new(EvalProcTimeReport)
-	obj.TargetMsg = _msg
-	obj.ReportName = _key
+	obj.ReportName = _reportName
+	obj.TargetMsg = _targetMsg
 	obj.PathLogDir = _pathLogDir
 	obj.PathResultDir = _pathResultDir
-	this.ProcTimeReport = append(this.ProcTimeReport, obj)
-}
-
-func (this *EvalReport) Run() {
-	for _, v := range this.ProcTimeReport {
-		v.Run()
-	}
+	return obj
 }
 
 func (this *EvalProcTimeReport) Run() {
@@ -97,14 +82,6 @@ func (this *EvalProcTimeReport) Run() {
 	}
 }
 
-func (this *EvalReport) Dump() error {
-	for _, v := range this.ProcTimeReport {
-		err := v.Dump()
-		if err != nil { return err }
-	}
-	return nil
-}
-
 func (this *EvalProcTimeReport) Dump() error {
 	var err error
 
@@ -138,7 +115,7 @@ func (this *EvalProcTimeReport) DumpCsv(_pathDir string) error {
 
 	var header []string
 	header = append(header, "Blocks")
-	for i, _ := range this.ProcTime {
+	for i, _ := range this.ProcTime[0].Series {
 		header = append(header, strconv.Itoa(i+1))
 	}
 	header = append(header, "Mean")
@@ -220,6 +197,10 @@ func checkMsg(_expected string, _actual string) (bool, bool) {
 func getBlockNum(_filename string) (int, error) {
 	if strings.HasPrefix(_filename, "gentags") {
 		return strconv.Atoi(_filename[8:12])
+	} else if strings.HasPrefix(_filename, "auditing") {
+		val, err := strconv.ParseFloat(_filename[9:12], 32)
+		if err != nil { return 0, err }
+		return int(val * 1000.0), nil
 	}
 	return 0, fmt.Errorf("Invalid filename (%s)", _filename)
 }

@@ -203,7 +203,11 @@ func (this *Provider) GenAuditingProof(_hash [32]byte, _chal *pdp.ChalData) pdp.
 	data, err := this.ReadFile(file)
 	if err != nil { panic(err) }
 
+	target := chal.GetTargetBlockCount()
+	helper.PrintLog("Start generating proof (chunks:%d, target:%d)", fileProp.SplitNum, target)
 	proof, _, _ := pdp.GenProof(param, chal, fileProp.SplitNum, data)
+	helper.PrintLog("Finish generating proof (chunks:%d, target:%d)", fileProp.SplitNum, target)
+
 	proofData := proof.Export()
 
 	return proofData
