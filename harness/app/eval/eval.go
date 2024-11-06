@@ -5,6 +5,7 @@ import (
 	"encoding/csv"
     "encoding/json"
 	"fmt"
+	"math"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -19,6 +20,7 @@ type EvalProcTime struct {
 	BlockNum int
 	Series []int64
 	Mean float64
+	StdDev float64
 
 	start time.Time
 }
@@ -89,6 +91,8 @@ func (this *EvalProcTimeReport) Run() {
 
 		evalProcTime.CalcMean()
 
+		evalProcTime.CalcStandardDeviation()
+
 		this.ProcTime = append(this.ProcTime, evalProcTime)
 	}
 }
@@ -138,6 +142,7 @@ func (this *EvalProcTimeReport) DumpCsv(_pathDir string) error {
 		header = append(header, strconv.Itoa(i+1))
 	}
 	header = append(header, "Mean")
+	header = append(header, "Standard Deviation")
 
 	if err := writer.Write(header); err != nil {
 		return err
@@ -151,6 +156,7 @@ func (this *EvalProcTimeReport) DumpCsv(_pathDir string) error {
 			r = append(r, strconv.FormatInt(v2, 10))
 		}
 		r = append(r, strconv.FormatFloat(v1.Mean, 'f', -1, 64))
+		r = append(r, strconv.FormatFloat(v1.StdDev, 'f', -1, 64))
 		records = append(records, r)
 	}
 
@@ -174,6 +180,15 @@ func (this *EvalProcTime) CalcMean() {
 		sum += v
 	}
 	this.Mean = float64(sum) / float64(count)
+}
+
+func (this *EvalProcTime) CalcStandardDeviation() {
+	var variance float64
+	for _, v := range this.Series {
+		variance += math.Pow(float64(v)-this.Mean, 2)
+	}
+	variance /= float64(len(this.Series))
+	this.StdDev = math.Sqrt(variance)
 }
 
 func (this *EvalProcTime) update(_flagStart bool, _datetime time.Time) error {
