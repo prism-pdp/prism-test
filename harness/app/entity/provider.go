@@ -163,7 +163,9 @@ func (this *Provider) GenDedupChal(_data []byte, _addrSU common.Address) *pdp.Ch
 
 	fileProp, err := this.client.SearchFile(hash)
 
-	chal := pdp.NewChal(param, fileProp.SplitNum)
+	chal, err := pdp.NewChal(param, fileProp.SplitNum, 1.0)
+	if err != nil { panic(err) }
+
 	chalData := chal.Export()
 
 	return chalData

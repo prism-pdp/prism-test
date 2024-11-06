@@ -7,6 +7,7 @@ import (
 	pdp "github.com/dpduado/dpduado-go/xz21"
 
 	"github.com/dpduado/dpduado-test/harness/client"
+	"github.com/dpduado/dpduado-test/harness/helper"
 )
 
 type Auditor struct {
@@ -65,6 +66,7 @@ func (this *Auditor) VerifyAuditingProof(_hash [32]byte, _setTagData pdp.TagData
 	pubKeyData.Load(account.PubKey)
 	pubKey := pubKeyData.Import(param)
 
+	helper.PrintLog("Verify proof (file:%s, splitNum:%d, blockCount:%d)", helper.Hex(_hash[:]), fileProp.SplitNum, auditingReq.Chal.GetTargetBlockCount())
 	result, err := pdp.VerifyProof(param, fileProp.SplitNum, subsetTag, _setDigest, auditingReq.Chal, auditingReq.Proof, pubKey)
 	if err != nil { return false, err }
 

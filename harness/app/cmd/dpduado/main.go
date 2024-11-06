@@ -193,7 +193,7 @@ func runUploadPhase(_name string, _path string, _chunkNum string) {
 	helper.PrintLog("Finish upload")
 }
 
-func runUploadAuditingChal(_name string) {
+func runUploadAuditingChal(_name string, _ratio string) {
 	helper.PrintLog("Start challenge")
 
 	// --------------------------
@@ -206,11 +206,14 @@ func runUploadAuditingChal(_name string) {
 	// Main processing
 	// --------------------------
 	// SU gets the list of his/her files.
+	ratio, err := strconv.ParseFloat(_ratio, 64)
+	if err != nil { panic(err) }
+
 	fileList := su.GetFileList()
 	// SU generates challenge and requests to audit each file
 	for i, f := range fileList {
 		helper.PrintLog("Upload auditing chal (file:%s, index:%d/%d)", helper.Hex(f[:]), i+1, len(fileList))
-		chalData := su.GenAuditingChal(f)
+		chalData := su.GenAuditingChal(f, ratio)
 		su.UploadAuditingChal(f, chalData)
 	}
 
@@ -321,7 +324,7 @@ func main() {
 	case "upload":
 		runUploadPhase(args[1], args[2], args[3])
 	case "challenge":
-		runUploadAuditingChal(args[1])
+		runUploadAuditingChal(args[1], args[2])
 	case "proof":
 		runUploadAuditingProof()
 	case "audit":

@@ -74,7 +74,7 @@ func (this *User) GenDedupProof(_chal *pdp.ChalData, _data []byte, _chunkNum uin
 	return proofData
 }
 
-func (this *User) GenAuditingChal(_hash [32]byte) *pdp.ChalData {
+func (this *User) GenAuditingChal(_hash [32]byte, _ratio float64) *pdp.ChalData {
 	xz21Param, err := this.client.GetParam()
 	if err != nil { panic(err) }
 
@@ -84,7 +84,9 @@ func (this *User) GenAuditingChal(_hash [32]byte) *pdp.ChalData {
 	if err != nil { panic(err) }
 	if helper.IsEmptyFileProperty(&fileProp) { panic(fmt.Errorf("File property is not found")) }
 
-	chal := pdp.NewChal(param, fileProp.SplitNum)
+	chal, err := pdp.NewChal(param, fileProp.SplitNum, _ratio)
+	if err != nil { panic(err) }
+
 	chalData := chal.Export()
 
 	return chalData

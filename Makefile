@@ -92,7 +92,7 @@ harness@test-sim:
 	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --sim --log ./cache/log.txt enroll user    su2  $(ADDRESS_5) $(PRIVKEY_5)"
 	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --sim --log ./cache/log.txt upload su1 cache/dummy.data 100"
 	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --sim --log ./cache/log.txt upload su2 cache/dummy.data 50"
-	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --sim --log ./cache/log.txt challenge su1"
+	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --sim --log ./cache/log.txt challenge su1 0.8"
 	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --sim --log ./cache/log.txt proof"
 	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --sim --log ./cache/log.txt audit tpa1"
 
