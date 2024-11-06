@@ -48,11 +48,11 @@ func runInflateTestdata(_pathIn string, _pathOut string, _scale string) {
 
 func runEvalGenTag(_pathLogDir string, _pathResultDir string) {
     evalReport := eval.NewEvalReport()
-    evalReport.SetupReport("gentags", "generate tags")
+    evalReport.SetupReport("gentags", "generate tags", _pathLogDir, _pathResultDir)
 
-    evalReport.ProcTimeReport["gentags"].Run(_pathLogDir)
+    evalReport.Run()
 
-    err := evalReport.ProcTimeReport["gentags"].Dump(_pathResultDir)
+    err := evalReport.Dump()
     if err != nil { panic(err) }
 }
 

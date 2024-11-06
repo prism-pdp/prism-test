@@ -25,51 +25,56 @@ type EvalProcTime struct {
 
 type EvalProcTimeReport struct {
 	TargetMsg string
-	LogFilePrefix string
+	ReportName string
+	PathLogDir string
+	PathResultDir string
     ProcTime []*EvalProcTime
 }
 
 type EvalReport struct {
-	ProcTimeReport map[string]*EvalProcTimeReport
+	ProcTimeReport []*EvalProcTimeReport
 }
 
 func NewEvalReport() *EvalReport {
 	obj := new(EvalReport)
-	obj.ProcTimeReport = make(map[string]*EvalProcTimeReport)
 	return obj
 }
 
-func (this *EvalReport) SetupReport(_key string, _msg string) {
-	this.ProcTimeReport[_key] = new(EvalProcTimeReport)
-	this.ProcTimeReport[_key].TargetMsg = _msg
-	this.ProcTimeReport[_key].LogFilePrefix = _key
+func (this *EvalReport) SetupReport(_key string, _msg string, _pathLogDir string, _pathResultDir string) {
+	obj := new(EvalProcTimeReport)
+	obj.TargetMsg = _msg
+	obj.ReportName = _key
+	obj.PathLogDir = _pathLogDir
+	obj.PathResultDir = _pathResultDir
+	this.ProcTimeReport = append(this.ProcTimeReport, obj)
 }
 
-func (this *EvalProcTimeReport) Run(_pathLogDir string) {
+func (this *EvalReport) Run() {
+	for _, v := range this.ProcTimeReport {
+		v.Run()
+	}
+}
+
+func (this *EvalProcTimeReport) Run() {
 	var err error
 
-	files, err := os.ReadDir(_pathLogDir)
+	dirEntries, err := os.ReadDir(this.PathLogDir)
 	if err != nil { panic(err) }
 
-	filenameList := make([]string, len(files))
-	for _, v := range files {
-		filenameList = append(filenameList, v.Name())
-	}
-
-	for _, filename := range filenameList {
-		if false == strings.HasPrefix(filename, this.LogFilePrefix) {
+	for _, e := range dirEntries {
+		if strings.HasPrefix(e.Name(), ".") {
 			continue
 		}
 
-		filePath := filepath.Join(_pathLogDir, filename)
+		filePath := filepath.Join(this.PathLogDir, e.Name())
 
 		f, err := os.Open(filePath)
 		if err != nil { panic(err) }
 		defer f.Close()
 
 		evalProcTime := new(EvalProcTime)
-		evalProcTime.Name = filename
-		evalProcTime.BlockNum, err = getBlockNum(filename)
+		evalProcTime.Name = e.Name()
+		evalProcTime.BlockNum, err = getBlockNum(e.Name())
 		if err != nil { panic(err) }
 
 		scanner := bufio.NewScanner(f)
@@ -88,13 +93,21 @@ func (this *EvalProcTimeReport) Run(_pathLogDir string) {
 	}
 }
 
-func (this *EvalProcTimeReport) Dump(_pathDir string) error {
+func (this *EvalReport) Dump() error {
+	for _, v := range this.ProcTimeReport {
+		err := v.Dump()
+		if err != nil { return err }
+	}
+	return nil
+}
+
+func (this *EvalProcTimeReport) Dump() error {
 	var err error
 
-	err = this.DumpJson(_pathDir)
+	err = this.DumpJson(this.PathResultDir)
 	if err != nil { return err }
 
-	err = this.DumpCsv(_pathDir)
+	err = this.DumpCsv(this.PathResultDir)
 	if err != nil { return err }
 
 	return nil
@@ -103,14 +116,14 @@ func (this *EvalProcTimeReport) Dump(_pathDir string) error {
 func (this *EvalProcTimeReport) DumpJson(_pathDir string) error {
     tmp, err := json.MarshalIndent(this, "", "\t")
 	if err != nil { return err }
-	filePath := filepath.Join(_pathDir, this.LogFilePrefix + ".json")
+	filePath := filepath.Join(_pathDir, this.ReportName + ".json")
 	helper.WriteFile(filePath, tmp)
 
 	return nil
 }
 
 func (this *EvalProcTimeReport) DumpCsv(_pathDir string) error {
-	filePath := filepath.Join(_pathDir, this.LogFilePrefix + ".csv")
+	filePath := filepath.Join(_pathDir, this.ReportName + ".csv")
 
 	file, err := os.Create(filePath)
 	if err != nil { panic(err) }
