@@ -39,10 +39,10 @@ func NewEvalReport() *EvalReport {
 	return obj
 }
 
-func (this *EvalReport) SetupReport(_key string, _logFilePrefix string, _msg string) {
+func (this *EvalReport) SetupReport(_key string, _msg string) {
 	this.ProcTimeReport[_key] = new(EvalProcTimeReport)
 	this.ProcTimeReport[_key].TargetMsg = _msg
-	this.ProcTimeReport[_key].LogFilePrefix = _logFilePrefix
+	this.ProcTimeReport[_key].LogFilePrefix = _key
 }
 
 func (this *EvalProcTimeReport) Run(_pathLogDir string) {
