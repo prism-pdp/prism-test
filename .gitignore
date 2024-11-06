@@ -1,9 +1,5 @@
 .env
 
 cache/*
-harness/app/cache/*
-harness/app/testdata/*
-harness/app/testlogs/*
-harness/app/testresults/*
 
 !.gitkeep

@@ -1,3 +1,7 @@
 bin/*
+cache/*
+eval/testdata/*
+eval/gentags/logs/*
+eval/gentags/results/*
 
 !.gitkeep

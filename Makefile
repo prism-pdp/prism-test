@@ -17,15 +17,15 @@ aide@build:
 
 aide@testdata:
 	@for i in `seq 10`; do \
-		$(MAKE) docker-run SERVICE="harness" CMD="./bin/aide testdata ./testdata/100m-`printf %02X $$i`.dat 100M $$i"; \
+		$(MAKE) docker-run SERVICE="harness" CMD="./bin/aide testdata ./eval/testdata/100m-`printf %02X $$i`.dat 100M $$i"; \
 	done
 
 aide@inflate:
 	$(MAKE) docker-run SERVICE="harness" CMD="./bin/aide inflate $(IN_FILE) $(OUT_FILE) $(SCALE)"
 
 aide@eval-gentags:
-	rm ./harness/app/testresults/gentags.*
-	$(MAKE) docker-run SERVICE="harness" CMD="./bin/aide eval-gentags ./testlogs ./testresults"
+	rm ./harness/app/eval/gentags/results/*
+	$(MAKE) docker-run SERVICE="harness" CMD="./bin/aide eval-gentags ./eval/gentags/logs ./eval/gentags/results"
 
 test@sim:
 	rm -rf ./harness/app/cache/*
@@ -100,18 +100,18 @@ harness@test-gentags:
 	rm -rf ./harness/app/cache/*
 	$(eval BLOCK_NUM := $(SCALE)00)
 	$(eval FILE_SIZE := $(shell printf "%04dm" $(BLOCK_NUM)))
-	$(eval PATH_LOG := ./testlogs/gentags-$(FILE_SIZE).log)
+	$(eval PATH_LOG := ./eval/gentags/logs/gentags-$(FILE_SIZE).log)
 	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --sim --log ./cache/test-gentags.log setup $(ADDRESS_0) $(PRIVKEY_0) $(ADDRESS_1) $(PRIVKEY_1)"
 	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --sim --log ./cache/test-gentags.log enroll user su $(ADDRESS_4) $(PRIVKEY_4)"
 	@for i in `seq 10`; do \
 		rm -f ./harness/app/cache/test.dat; \
-		$(MAKE) aide@inflate IN_FILE="./testdata/100m-`printf %02X $$i`.dat" OUT_FILE="./cache/test.dat" SCALE=$(SCALE); \
+		$(MAKE) aide@inflate IN_FILE="./eval/testdata/100m-`printf %02X $$i`.dat" OUT_FILE="./cache/test.dat" SCALE=$(SCALE); \
 		$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --sim --log ./cache/test-gentags.log upload su ./cache/test.dat $(BLOCK_NUM)"; \
 	done
 	cp ./harness/app/cache/test-gentags.log ./harness/app/$(PATH_LOG)
 
 harness@test-gentags-all:
-	rm -f ./harness/app/testlogs/gentags-*.log
+	rm -f ./harness/app/eval/gentags/logs/*
 	@for i in `seq 10`; do \
 		$(MAKE) harness@test-gentags SCALE=$$i; \
 	done
