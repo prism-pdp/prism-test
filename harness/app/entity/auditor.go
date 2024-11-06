@@ -3,6 +3,8 @@ package entity
 import (
 	"encoding/json"
 	"github.com/ethereum/go-ethereum/common"
+	"golang.org/x/exp/maps"
+	"sort"
 
 	pdp "github.com/dpduado/dpduado-go/xz21"
 
@@ -66,7 +68,15 @@ func (this *Auditor) VerifyAuditingProof(_hash [32]byte, _setTagData pdp.TagData
 	pubKeyData.Load(account.PubKey)
 	pubKey := pubKeyData.Import(param)
 
-	helper.PrintLog("Verify proof (file:%s, splitNum:%d, blockCount:%d)", helper.Hex(_hash[:]), fileProp.SplitNum, auditingReq.Chal.GetTargetBlockCount())
+	blockList := maps.Keys(subsetTag)
+	sort.Slice(blockList, func(i, j int) bool {
+		return blockList[i] < blockList[j]
+	})
+	helper.PrintLog("Verify proof (file:%s, splitNum:%d, blockCount:%d, blocks:%v)",
+		helper.Hex(_hash[:]),
+		fileProp.SplitNum,
+		auditingReq.Chal.GetTargetBlockCount(),
+		blockList)
 	result, err := pdp.VerifyProof(param, fileProp.SplitNum, subsetTag, _setDigest, auditingReq.Chal, auditingReq.Proof, pubKey)
 	if err != nil { return false, err }
 
