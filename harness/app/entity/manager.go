@@ -8,6 +8,7 @@ import (
 	pdp "github.com/dpduado/dpduado-go/xz21"
 
 	"github.com/dpduado/dpduado-test/harness/client"
+	"github.com/dpduado/dpduado-test/harness/helper"
 )
 
 type Manager struct {
@@ -32,6 +33,8 @@ func GenManager(_name string, _addr string, _privKey string, _simFlag bool) *Man
 
 	if _simFlag {
 		sm.SetupSimClient(client.GetFakeLedger())
+	} else {
+		sm.SetupEthClient()
 	}
 
 	return sm
@@ -39,6 +42,10 @@ func GenManager(_name string, _addr string, _privKey string, _simFlag bool) *Man
 
 func (this *Manager) SetupSimClient(_ledger *client.FakeLedger) {
 	this.client = client.NewSimClient(_ledger, this.Addr)
+}
+
+func (this *Manager) SetupEthClient() {
+	this.client = client.NewEthClient(helper.Server, helper.ContractAddr, helper.SenderPrivKey, helper.SenderAddr)
 }
 
 func (this *Manager) RegisterParam() {
@@ -81,4 +88,10 @@ func (this *Manager) FromJson(_json []byte, _simFlag bool) {
 
 func (this *Manager) AfterLoad() {
 	this.param = pdp.GenParamFromXZ21Param(this.ParamXZ21)
+
+	if *helper.SimFlag {
+		this.SetupSimClient(client.GetFakeLedger())
+	} else {
+		this.SetupEthClient()
+	}
 }

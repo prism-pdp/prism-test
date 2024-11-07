@@ -45,6 +45,8 @@ func GenProvider(_name string, _addr string, _privKey string, _simFlag bool) *Pr
 
 	if _simFlag {
 		p.SetupSimClient(client.GetFakeLedger())
+	} else {
+		p.SetupEthClient()
 	}
 
 	return p
@@ -52,6 +54,10 @@ func GenProvider(_name string, _addr string, _privKey string, _simFlag bool) *Pr
 
 func (this *Provider) SetupSimClient(_ledger *client.FakeLedger) {
 	this.client = client.NewSimClient(_ledger, this.Addr)
+}
+
+func (this *Provider) SetupEthClient() {
+	this.client = client.NewEthClient(helper.Server, helper.ContractAddr, helper.SenderPrivKey, helper.SenderAddr)
 }
 
 func (this *Provider) NewFile(_addr common.Address, _hash [32]byte, _data []byte, _tagSet *pdp.TagSet, _pubKey *pdp.PublicKeyData) error {
@@ -263,6 +269,11 @@ func (this *Provider) FromJson(_json []byte, _simFlag bool) {
 func (this *Provider) AfterLoad() {
 	if this.Files == nil {
 		this.Files = make(map[string]*File)
+	}
+	if *helper.SimFlag {
+		this.SetupSimClient(client.GetFakeLedger())
+	} else {
+		this.SetupEthClient()
 	}
 }
 

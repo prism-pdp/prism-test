@@ -37,6 +37,8 @@ func GenUser(_name string, _addr string, _privKey string, _param *pdp.PairingPar
 
 	if _simFlag {
 		u.SetupSimClient(client.GetFakeLedger())
+	} else {
+		u.SetupEthClient()
 	}
 
 	return u
@@ -44,6 +46,10 @@ func GenUser(_name string, _addr string, _privKey string, _param *pdp.PairingPar
 
 func (this *User) SetupSimClient(_ledger *client.FakeLedger) {
 	this.client = client.NewSimClient(_ledger, this.Addr)
+}
+
+func (this *User) SetupEthClient() {
+	this.client = client.NewEthClient(helper.Server, helper.ContractAddr, helper.SenderPrivKey, helper.SenderAddr)
 }
 
 func (this *User) PrepareUpload(_data []byte, _chunkNum uint32) pdp.TagSet {
@@ -122,5 +128,9 @@ func (this *User) FromJson(_json []byte, _simFlag bool) {
 }
 
 func (this *User) AfterLoad() {
-	// Do nothing
+	if *helper.SimFlag {
+		this.SetupSimClient(client.GetFakeLedger())
+	} else {
+		this.SetupEthClient()
+	}
 }

@@ -1,6 +1,7 @@
 package helper
 
 import (
+	"github.com/ethereum/go-ethereum/common"
 	"github.com/pborman/getopt/v2"
 )
 
@@ -17,7 +18,7 @@ var (
 var (
 	Server string
 	ContractAddr string
-	SenderAddr string
+	SenderAddr common.Address
 	SenderPrivKey string
 )
 

@@ -3,7 +3,7 @@ package main
 import (
 	"os"
 	"strconv"
-
+	"github.com/ethereum/go-ethereum/common"
 	"github.com/pborman/getopt/v2"
 
 	"github.com/dpduado/dpduado-test/harness/client"
@@ -33,9 +33,9 @@ func toString(_opt *string) string {
 func setup(_opts []string) {
 	command = _opts[0]
 
-	// server := toString(optServer)
-	// contractAddr:= toString(optContractAddr)
-	helper.SenderAddr = toString(helper.OptSenderAddr)
+	helper.Server = toString(helper.OptServer)
+	helper.ContractAddr = toString(helper.OptContractAddr)
+	helper.SenderAddr = common.HexToAddress(toString(helper.OptSenderAddr))
 	helper.SenderPrivKey = toString(helper.OptSenderPrivKey)
 
 	if *helper.SimFlag {

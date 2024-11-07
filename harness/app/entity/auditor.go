@@ -24,14 +24,19 @@ func GenAuditor(_name string, _addr string, _simFlag bool) *Auditor {
 
 	if _simFlag {
 		a.SetupSimClient(client.GetFakeLedger())
+	} else {
+		a.SetupEthClient()
 	}
 
 	return a
 }
 
-
 func (this *Auditor) SetupSimClient(_ledger *client.FakeLedger) {
 	this.client = client.NewSimClient(_ledger, this.Addr)
+}
+
+func (this *Auditor) SetupEthClient() {
+	this.client = client.NewEthClient(helper.Server, helper.ContractAddr, helper.SenderPrivKey, helper.SenderAddr)
 }
 
 func (this *Auditor) GetAuditingReqList() ([][32]byte, []pdp.AuditingReqData) {
@@ -97,5 +102,9 @@ func (this *Auditor) FromJson(_json []byte, _simFlag bool) {
 }
 
 func (this *Auditor) AfterLoad() {
-	// Do nothing
+	if *helper.SimFlag {
+		this.SetupSimClient(client.GetFakeLedger())
+	} else {
+		this.SetupEthClient()
+	}
 }
