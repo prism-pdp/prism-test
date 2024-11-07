@@ -2,13 +2,17 @@ package main
 
 import(
 	"fmt"
+	"github.com/ethereum/go-ethereum/common"
+	"github.com/pborman/getopt/v2"
 	"strconv"
     "os"
 
+	"github.com/dpduado/dpduado-test/harness/client"
 	"github.com/dpduado/dpduado-test/harness/eval"
 	"github.com/dpduado/dpduado-test/harness/helper"
 )
 
+var baseclient client.BaseClient
 
 func runTestdata(_path string, _size string, _val string) {
     num, bufSize, err := helper.ParseSize(_size)
@@ -71,21 +75,40 @@ func runEvalAuditing(_pathLogDir string, _pathResultDir string) {
     if err != nil { panic(err) }
 }
 
-func main() {
-    args := os.Args
+func runShowAccount(_addr string) {
+	baseclient = client.NewEthClient(*helper.OptServer, *helper.OptContractAddr, *helper.OptSenderPrivKey, common.HexToAddress(*helper.OptSenderAddr))
+    account, err := baseclient.GetAccount(common.HexToAddress(_addr))
+    if err != nil { panic(err) }
 
-    command := args[1]
+    fmt.Printf("%+v\n", account)
+}
+
+func main() {
+	helper.SetupOpt()
+
+	getopt.Parse()
+
+	if *helper.HelpFlag {
+		getopt.Usage()
+		os.Exit(1)
+	}
+
+	args := getopt.Args()
+
+    command := args[0]
 
 	switch command {
 	case "testdata":
-		runTestdata(args[2], args[3], args[4])
+		runTestdata(args[1], args[2], args[3])
     case "inflate":
-        runInflateTestdata(args[2], args[3], args[4])
+        runInflateTestdata(args[1], args[2], args[3])
     case "eval-gentags":
-        runEvalGenTag(args[2], args[3])
+        runEvalGenTag(args[1], args[2])
     case "eval-auditing":
-        runEvalAuditing(args[2], args[3])
+        runEvalAuditing(args[1], args[2])
+    case "show-account":
+        runShowAccount(args[1])
 	default:
-		fmt.Println("Unknown command (command:%s)", command)
+		fmt.Printf("Unknown command (command:%s)\n", command)
 	}
 }
