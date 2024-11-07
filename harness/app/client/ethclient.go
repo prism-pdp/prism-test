@@ -93,20 +93,20 @@ func (this *EthClient) EnrollUser(_addr common.Address, _pubKey pdp.PublicKeyDat
 }
 
 func (this *EthClient) enroll(_type int, _addr common.Address, _pubKey pdp.PublicKeyData) error {
-	t := big.NewInt(int64(0))
+	t := big.NewInt(int64(_type))
 	tx, err := this.Session.EnrollAccount(t, _addr, _pubKey.Base())
 	if err != nil {
-		helper.PrintLog("Failed to call EnrollAccount contract (caller:%s, addr:%s, key:%s)", this.Addr, _addr, helper.Hex(_pubKey[:]))
+		helper.PrintLog("Failed to call EnrollAccount contract (caller:%s, type:%d, addr:%s, key:%s)", this.Addr, _type, _addr, helper.Hex(_pubKey.Base()))
 		return err
 	}
 
 	receipt, err := bind.WaitMined(context.Background(), this.Client, tx)
 	if err != nil {
-		helper.PrintLog("Failed to complete EnrollAccount contract (caller:%s, addr:%s, key:%s)", this.Addr, _addr, helper.Hex(_pubKey[:]))
+		helper.PrintLog("Failed to complete EnrollAccount contract (caller:%s, type:%d, addr:%s, key:%s)", this.Addr, _type, _addr, helper.Hex(_pubKey.Base()))
 		return err
 	}
 	
-	helper.PrintLog("Completed EnrollAccount contract (caller:%s, addr:%s, key:%s, gasUsed:%d)", this.Addr, _addr, helper.Hex(_pubKey[:]), receipt.GasUsed)
+	helper.PrintLog("Completed EnrollAccount contract (caller:%s, type:%d, addr:%s, key:%s, gasUsed:%d)", this.Addr, _type, _addr, helper.Hex(_pubKey.Base()), receipt.GasUsed)
 
 	return err
 }
