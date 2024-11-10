@@ -84,9 +84,9 @@ func PrintLog(format string, args ...interface{}) {
 	}
 }
 
-func ParseLog(_log string) (time.Time, string, string) {
+func ParseLog(_log string) (time.Time, string, map[string]string) {
     var datetime time.Time
-    var message, detail string
+    var message, tmpDetail string
     var err error
 
     re1 := regexp.MustCompile(`\[(.*)\] (.*) \((.*)\)`)
@@ -99,13 +99,25 @@ func ParseLog(_log string) (time.Time, string, string) {
         datetime, err = time.Parse(TimeFormat, match[1])
         if err != nil { panic(err) }
         message = match[2]
-        detail = ""
+        tmpDetail = ""
     } else {
         datetime, err = time.Parse(TimeFormat, match[1])
         if err != nil { panic(err) }
         message = match[2]
-        detail = match[3]
+        tmpDetail = match[3]
     }
+
+	detail := make(map[string]string)
+	if tmpDetail != "" {
+		arr := strings.Split(tmpDetail, ",")
+		for _, a1 := range arr {
+			a2 := strings.TrimSpace(a1)
+			a3 := strings.Split(a2, ":")
+			k := a3[0]
+			v := a3[1]
+			detail[k] = v
+		}
+	}
 
     return datetime, message, detail
 }
