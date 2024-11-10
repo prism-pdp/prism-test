@@ -46,7 +46,7 @@ func (this *EthClient) RegisterParam(_params string, _g []byte, _u []byte) error
 		return err
 	}
 
-	helper.PrintLog("Completed RegisterParam contract (caller:%s, gasUsed:%d)", this.Addr, receipt.GasUsed)
+	helper.PrintLog("Completed smart contract (name:RegisterParam, caller:%s, gasUsed:%d, gasPrice:%d)", this.Addr, receipt.GasUsed, receipt.EffectiveGasPrice)
 
 	return err
 }
@@ -64,7 +64,7 @@ func (this *EthClient) RegisterFile(_hash [32]byte, _splitNum uint32, _owner com
 		return err
 	}
 
-	helper.PrintLog("Completed RegisterFile contract (caller:%s, owner:%s, file:%s, gasUsed:%d)", this.Addr, _owner, helper.Hex(_hash[:]), receipt.GasUsed)
+	helper.PrintLog("Completed smart contract (name:RegisterFile, caller:%s, gasUsed:%d, gasPrice:%d, owner:%s, file:%s)", this.Addr, receipt.GasUsed, receipt.EffectiveGasPrice, _owner, helper.Hex(_hash[:]))
 
 	return err
 }
@@ -106,7 +106,7 @@ func (this *EthClient) enroll(_type int, _addr common.Address, _pubKey pdp.Publi
 		return err
 	}
 	
-	helper.PrintLog("Completed EnrollAccount contract (caller:%s, type:%d, addr:%s, key:%s, gasUsed:%d)", this.Addr, _type, _addr, helper.Hex(_pubKey.Base()), receipt.GasUsed)
+	helper.PrintLog("Completed smart contract (name:EnrollAccount, caller:%s, gasUsed:%d, gasPrice:%d, type:%d, addr:%s, key:%s)", this.Addr, receipt.GasUsed, receipt.EffectiveGasPrice, _type, _addr, helper.Hex(_pubKey.Base()))
 
 	return err
 }
@@ -124,7 +124,7 @@ func (this *EthClient) AppendOwner(_hash [32]byte, _owner common.Address) error 
 		return err
 	}
 
-	helper.PrintLog("Completed AppendOwner contract (caller:%s, owner:%s, file:%s, gasUsed:%d)", this.Addr, _owner, helper.Hex(_hash[:]), receipt.GasUsed)
+	helper.PrintLog("Completed smart contract (name:AppendOwner, caller:%s, gasUsed:%d, gasPrice:%d, owner:%s, file:%s)", this.Addr, receipt.GasUsed, receipt.EffectiveGasPrice, _owner, helper.Hex(_hash[:]))
 
 	return err
 }
@@ -148,7 +148,7 @@ func (this *EthClient) SetChal(_hash [32]byte, _chalBytes []byte) error {
 		return err
 	}
 
-	helper.PrintLog("Completed SetChal contract (caller:%s, file:%s, gasUsed:%d)", this.Addr, helper.Hex(_hash[:]), receipt.GasUsed)
+	helper.PrintLog("Completed smart contract (name:SetChal, caller:%s, gasUsed:%d, gasPrice:%d, file:%s)", this.Addr, receipt.GasUsed, receipt.EffectiveGasPrice, helper.Hex(_hash[:]))
 
 	return nil
 }
@@ -166,7 +166,7 @@ func (this *EthClient) SetProof(_hash [32]byte, _proofBytes []byte) error {
 		return err
 	}
 
-	helper.PrintLog("Completed SetProof contract (caller:%s, file:%s, gasUsed:%d)", this.Addr, helper.Hex(_hash[:]), receipt.GasUsed)
+	helper.PrintLog("Completed smart contract (name:SetProof, caller:%s, gasUsed:%d, gasPrice:%d, file:%s)", this.Addr, receipt.GasUsed, receipt.EffectiveGasPrice, helper.Hex(_hash[:]))
 
 	return err
 }
@@ -189,7 +189,7 @@ func (this *EthClient) SetAuditingResult(_hash [32]byte, _result bool) error {
 		return err
 	}
 
-	helper.PrintLog("Completed SetAuditingResult contract (caller:%s, file:%s, result:%t, gasUsed:%d)", this.Addr, helper.Hex(_hash[:]), _result, receipt.GasUsed)
+	helper.PrintLog("Completed smart contract (name:SetAuditingResult, caller:%s, gasUsed:%d, gasPrice:%d, file:%s, result:%t)", this.Addr, receipt.GasUsed, receipt.EffectiveGasPrice, helper.Hex(_hash[:]), _result)
 
 	return err
 }
