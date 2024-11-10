@@ -40,6 +40,10 @@ aide@eval-auditing:
 	rm -f ./harness/app/eval/auditing/results/*
 	$(MAKE) docker-run SERVICE="harness" CMD="./bin/aide eval-auditing ./eval/auditing/logs ./eval/auditing/results"
 
+aide@eval-contract:
+	rm -f ./harness/app/eval/contract/results/*
+	$(MAKE) docker-run SERVICE="harness" CMD="./bin/aide eval-contract ./eval/contract/logs ./eval/contract/results"
+
 test@sim:
 	rm -rf ./harness/app/cache/*
 	$(MAKE) harness@build

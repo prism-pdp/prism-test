@@ -5,5 +5,7 @@ eval/gentags/logs/*
 eval/gentags/results/*
 eval/auditing/logs/*
 eval/auditing/results/*
+eval/contract/logs/*
+eval/contract/results/*
 
 !.gitkeep

@@ -75,6 +75,17 @@ func runEvalAuditing(_pathLogDir string, _pathResultDir string) {
     if err != nil { panic(err) }
 }
 
+func runEvalContract(_pathLogDir string, _pathResultDir string) {
+    var err error
+
+    bundleReport := eval.NewEvalContractReportBundle(_pathLogDir, _pathResultDir)
+    err = bundleReport.Run()
+    if err != nil { panic(err) }
+
+    err = bundleReport.Dump()
+    if err != nil { panic(err) }
+}
+
 func runShowAccount(_addr string) {
 	baseclient = client.NewEthClient(*helper.OptServer, *helper.OptContractAddr, *helper.OptSenderPrivKey, common.HexToAddress(*helper.OptSenderAddr))
     account, err := baseclient.GetAccount(common.HexToAddress(_addr))
@@ -106,6 +117,8 @@ func main() {
         runEvalGenTag(args[1], args[2])
     case "eval-auditing":
         runEvalAuditing(args[1], args[2])
+    case "eval-contract":
+        runEvalContract(args[1], args[2])
     case "show-account":
         runShowAccount(args[1])
 	default:
