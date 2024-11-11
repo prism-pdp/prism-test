@@ -1,6 +1,9 @@
+SHELL := /bin/bash
+
 MAKEFLAGS += --no-print-directory
 
 include accounts.env
+-include ./cache/contract-addr.env
 
 # dpduado-sol/srcの中から選ぶ
 CONTRACT = XZ21
@@ -69,7 +72,8 @@ testnet/clean:
 
 testnet/up:
 	docker compose up -d testnet
-	@$(MAKE) docker-exec SERVICE="testnet" CMD="deploy $(CONTRACT)" | tee ./cache/contract.addr
+	$(MAKE) docker-exec SERVICE="testnet" CMD="deploy $(CONTRACT)" | tee ./cache/contract.addr
+	echo CONTRACT_ADDR=`cat ./cache/contract.addr` > ./cache/contract-addr.env
 
 testnet/down:
 	docker compose down testnet
@@ -114,21 +118,27 @@ harness@simtest:
 	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --sim --log ./cache/log.txt audit tpa1"
 
 harness@ethtest:
-	rm -rf harness/app/cache/*
-	fallocate -l 100M harness/app/cache/dummy.data
+	$(MAKE) harness@ethtest-setup
 	$(MAKE) testnet/down
 	$(MAKE) testnet/up
-	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --server ws://testnet:8545 --contract $(file < ./cache/contract.addr) --sender-addr $(ADDRESS_0) --sender-key $(PRIVKEY_0) --log ./cache/log.txt setup $(ADDRESS_0) $(PRIVKEY_0) $(ADDRESS_1) $(PRIVKEY_1)"
-	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --server ws://testnet:8545 --contract $(file < ./cache/contract.addr) --sender-addr $(ADDRESS_0) --sender-key $(PRIVKEY_0) --log ./cache/log.txt enroll auditor tpa1 $(ADDRESS_2)"
-	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --server ws://testnet:8545 --contract $(file < ./cache/contract.addr) --sender-addr $(ADDRESS_0) --sender-key $(PRIVKEY_0) --log ./cache/log.txt enroll auditor tpa2 $(ADDRESS_3)"
-	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --server ws://testnet:8545 --contract $(file < ./cache/contract.addr) --sender-addr $(ADDRESS_0) --sender-key $(PRIVKEY_0) --log ./cache/log.txt enroll user    su1  $(ADDRESS_4) $(PRIVKEY_4)"
-	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --server ws://testnet:8545 --contract $(file < ./cache/contract.addr) --sender-addr $(ADDRESS_0) --sender-key $(PRIVKEY_0) --log ./cache/log.txt enroll user    su2  $(ADDRESS_5) $(PRIVKEY_5)"
-	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --server ws://testnet:8545 --contract $(file < ./cache/contract.addr) --sender-addr $(ADDRESS_4) --sender-key $(PRIVKEY_4) --log ./cache/log.txt upload su1 cache/dummy.data 100"
-	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --server ws://testnet:8545 --contract $(file < ./cache/contract.addr) --sender-addr $(ADDRESS_5) --sender-key $(PRIVKEY_5) --log ./cache/log.txt upload su2 cache/dummy.data 50"
-	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --server ws://testnet:8545 --contract $(file < ./cache/contract.addr) --sender-addr $(ADDRESS_4) --sender-key $(PRIVKEY_4) --log ./cache/log.txt challenge su1 0.55"
-	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --server ws://testnet:8545 --contract $(file < ./cache/contract.addr) --sender-addr $(ADDRESS_1) --sender-key $(PRIVKEY_1) --log ./cache/log.txt proof"
-	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --server ws://testnet:8545 --contract $(file < ./cache/contract.addr) --sender-addr $(ADDRESS_2) --sender-key $(PRIVKEY_2) --log ./cache/log.txt audit tpa1"
+	$(MAKE) harness@ethtest-main
 	$(MAKE) testnet/down
+
+harness@ethtest-setup:
+	rm -rf ./harness/app/cache/*
+	fallocate -l 100M harness/app/cache/dummy.data
+
+harness@ethtest-main:
+	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --server ws://testnet:8545 --contract $(CONTRACT_ADDR) --sender-addr $(ADDRESS_0) --sender-key $(PRIVKEY_0) --log ./cache/log.txt setup $(ADDRESS_0) $(PRIVKEY_0) $(ADDRESS_1) $(PRIVKEY_1)"
+	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --server ws://testnet:8545 --contract $(CONTRACT_ADDR) --sender-addr $(ADDRESS_0) --sender-key $(PRIVKEY_0) --log ./cache/log.txt enroll auditor tpa1 $(ADDRESS_2)"
+	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --server ws://testnet:8545 --contract $(CONTRACT_ADDR) --sender-addr $(ADDRESS_0) --sender-key $(PRIVKEY_0) --log ./cache/log.txt enroll auditor tpa2 $(ADDRESS_3)"
+	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --server ws://testnet:8545 --contract $(CONTRACT_ADDR) --sender-addr $(ADDRESS_0) --sender-key $(PRIVKEY_0) --log ./cache/log.txt enroll user    su1  $(ADDRESS_4) $(PRIVKEY_4)"
+	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --server ws://testnet:8545 --contract $(CONTRACT_ADDR) --sender-addr $(ADDRESS_0) --sender-key $(PRIVKEY_0) --log ./cache/log.txt enroll user    su2  $(ADDRESS_5) $(PRIVKEY_5)"
+	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --server ws://testnet:8545 --contract $(CONTRACT_ADDR) --sender-addr $(ADDRESS_4) --sender-key $(PRIVKEY_4) --log ./cache/log.txt upload su1 cache/dummy.data 100"
+	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --server ws://testnet:8545 --contract $(CONTRACT_ADDR) --sender-addr $(ADDRESS_5) --sender-key $(PRIVKEY_5) --log ./cache/log.txt upload su2 cache/dummy.data 50"
+	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --server ws://testnet:8545 --contract $(CONTRACT_ADDR) --sender-addr $(ADDRESS_4) --sender-key $(PRIVKEY_4) --log ./cache/log.txt challenge su1 0.55"
+	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --server ws://testnet:8545 --contract $(CONTRACT_ADDR) --sender-addr $(ADDRESS_1) --sender-key $(PRIVKEY_1) --log ./cache/log.txt proof"
+	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --server ws://testnet:8545 --contract $(CONTRACT_ADDR) --sender-addr $(ADDRESS_2) --sender-key $(PRIVKEY_2) --log ./cache/log.txt audit tpa1"
 
 harness@test-gentags:
 	rm -rf ./harness/app/cache/*
@@ -176,11 +186,11 @@ harness@run:
 	$(MAKE) harness@run-upload
 	$(MAKE) harness@run-audit
 harness@run-setup:
-	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness eth setup ws://testnet:8545 $(file < cache/contract.addr)"
+	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness eth setup ws://testnet:8545 $(CONTRACT_ADDR)"
 harness@run-upload:
-	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness eth upload ws://testnet:8545 $(file < cache/contract.addr)"
+	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness eth upload ws://testnet:8545 $(CONTRACT_ADDR)"
 harness@run-audit:
-	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness eth audit ws://testnet:8545 $(file < cache/contract.addr)"
+	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness eth audit ws://testnet:8545 $(CONTRACT_ADDR)"
 
 harness/clean:
 	rm -rf ./harness/app/cache/*
