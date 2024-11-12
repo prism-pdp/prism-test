@@ -189,6 +189,25 @@ harness@test-auditing-all:
 		$(MAKE) harness@test-auditing RATIO=$$i; \
 	done
 
+harness@test-contract-all:
+	$(eval PATH_LOG := ./eval/contract/logs/contract.log)
+	rm -rf ./harness/app/cache/*
+	$(MAKE) testnet/down
+	$(MAKE) testnet/up
+	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness $(ETHERNET_OPTS) $(ETHERNET_SENDER_OPTS_0) --log $(PATH_LOG) setup $(ADDRESS_0) $(PRIVKEY_0) $(ADDRESS_1) $(PRIVKEY_1)"
+	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness $(ETHERNET_OPTS) $(ETHERNET_SENDER_OPTS_0) --log $(PATH_LOG) enroll auditor tpa1 $(ADDRESS_2)"
+	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness $(ETHERNET_OPTS) $(ETHERNET_SENDER_OPTS_0) --log $(PATH_LOG) enroll user    su1  $(ADDRESS_4) $(PRIVKEY_4)"
+	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness $(ETHERNET_OPTS) $(ETHERNET_SENDER_OPTS_0) --log $(PATH_LOG) enroll user    su2  $(ADDRESS_5) $(PRIVKEY_5)"
+	for i in `seq 10`; do \
+		$(MAKE) aide@testdata FILE_PATH="./cache/test.dat" FILE_SIZE=10M FILE_VAL=$$i; \
+		$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness $(ETHERNET_OPTS) $(ETHERNET_SENDER_OPTS_4) --log $(PATH_LOG) upload su1 ./cache/test.dat 10"; \
+		$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness $(ETHERNET_OPTS) $(ETHERNET_SENDER_OPTS_5) --log $(PATH_LOG) upload su2 ./cache/test.dat 10"; \
+	done
+	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness $(ETHERNET_OPTS) $(ETHERNET_SENDER_OPTS_4) --log $(PATH_LOG) challenge su1 0.6"
+	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness $(ETHERNET_OPTS) $(ETHERNET_SENDER_OPTS_1) --log $(PATH_LOG) proof"
+	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness $(ETHERNET_OPTS) $(ETHERNET_SENDER_OPTS_2) --log $(PATH_LOG) audit tpa1"
+	$(MAKE) testnet/down
+
 harness@run:
 	$(MAKE) harness@run-setup
 	$(MAKE) harness@run-upload
