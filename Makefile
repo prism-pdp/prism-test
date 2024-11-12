@@ -191,6 +191,24 @@ harness@test-contract:
 	@$(MAKE) harness@cmd-audit     X_PATH_LOG=$(PATH_LOG) X_ETHERNET_SENDER_OPTS="$(ETHERNET_SENDER_OPTS_2)" X_AUDITOR_NAME=tpa1
 	$(MAKE) testnet/down
 
+xxx0:
+	fallocate -l $(X_FILE_SIZE) $(X_FILE_PATH)
+	printf -v binary_data '\\x%02X\\x%02X' $$(( ($(X_VAL) >> 8) & 0xFF )) $$(( $(X_VAL) & 0xFF )); \
+	echo -ne "$$binary_data" | dd of=$(X_FILE_PATH) bs=1 count=2 conv=notrunc 2> /dev/null
+
+xxx1:
+	rm -rf ./harness/app/cache/*
+	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --sim --log ./cache/log.txt setup $(ADDRESS_0) $(PRIVKEY_0) $(ADDRESS_1) $(PRIVKEY_1)"
+	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --sim --log ./cache/log.txt enroll auditor tpa1 $(ADDRESS_2)"
+	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --sim --log ./cache/log.txt enroll user    su1  $(ADDRESS_4) $(PRIVKEY_4)"
+	@for i in `seq 1000`; do \
+		$(MAKE) xxx0 X_VAL=$$i X_FILE_PATH=./harness/app/cache/test.dat X_FILE_SIZE=1M; \
+		$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --sim --log ./cache/log.txt upload su1 ./cache/test.dat 100"; \
+	done
+
+xxx2:
+	$(MAKE) aide@corruption X_PATH_LOG $(X_PATH_LOG) X_FILE_DIR="./cache/sp" X_DAMAGE_RATE=0.003
+
 harness@cmd-setup:
 	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness $(ETHERNET_OPTS) $(ETHERNET_SENDER_OPTS_0) --log $(X_PATH_LOG) setup $(ADDRESS_0) $(PRIVKEY_0) $(ADDRESS_1) $(PRIVKEY_1)"
 
