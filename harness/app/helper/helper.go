@@ -122,8 +122,8 @@ func ParseLog(_log string) (time.Time, string, map[string]string) {
     return datetime, message, detail
 }
 
-func ParseSize(sizeStr string) (int, int64, error) {
-    sizeStr = strings.TrimSpace(sizeStr)
+func ParseSize(_sizeStr string) (int, int64, error) {
+    sizeStr := strings.TrimSpace(_sizeStr)
     if len(sizeStr) < 2 {
         return 0, 0, fmt.Errorf("invalid size format")
     }
@@ -136,18 +136,18 @@ func ParseSize(sizeStr string) (int, int64, error) {
         return 0, 0, fmt.Errorf("invalid number: %s", numPart)
     }
 
-	var bufSize int64
+	var unitSize int64
     switch strings.ToUpper(string(unitPart)) {
     case "K":
-		bufSize = int64(1024)
+		unitSize = int64(1024)
     case "M":
-		bufSize = int64(1024 * 1024)
+		unitSize = int64(1024 * 1024)
     case "G":
-		bufSize = int64(1024 * 1024 * 1024)
+		unitSize = int64(1024 * 1024 * 1024)
     default:
-        return 0, 0, fmt.Errorf("unknown unit: %s", string(unitPart))
+        return 0, 0, fmt.Errorf("unknown unit: [%s]", string(unitPart))
     }
-	return num, bufSize, nil
+	return num, unitSize, nil
 }
 
 func colorText(_color int, _text string) string {
