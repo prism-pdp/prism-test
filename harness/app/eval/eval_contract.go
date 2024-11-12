@@ -124,10 +124,16 @@ func (this *EvalContractReportBundle) Dump() error {
 }
 
 func (this *EvalContractReport) Dump(_pathDir string) error {
+	var err error
+	err = this.DumpJson(_pathDir)
+	return err
+}
+
+func (this *EvalContractReport) DumpJson(_pathDir string) error {
 	tmp, err := json.MarshalIndent(this, "", "\t")
 	if err != nil { return err }
 
-	filePath := filepath.Join(_pathDir, this.Name)
+	filePath := filepath.Join(_pathDir, "contract.json")
 	helper.WriteFile(filePath, tmp)
 
 	return nil
