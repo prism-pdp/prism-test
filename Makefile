@@ -166,17 +166,16 @@ harness@test-gentags:
 harness@test-auditing:
 	rm -rf ./harness/app/cache/*
 	$(eval PATH_LOG := ./eval/auditing/logs/auditing-$(RATIO).log)
-	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --sim --log ./cache/test-auditing.log setup $(ADDRESS_0) $(PRIVKEY_0) $(ADDRESS_1) $(PRIVKEY_1)"
-	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --sim --log ./cache/test-auditing.log enroll auditor tpa $(ADDRESS_2)"
-	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --sim --log ./cache/test-auditing.log enroll user su $(ADDRESS_3) $(PRIVKEY_3)"
-	$(MAKE) aide@inflate IN_FILE="./eval/testdata/100m-01.dat" OUT_FILE="./cache/test.dat" SCALE=10
-	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --sim --log ./cache/test-auditing.log upload su ./cache/test.dat 1000"
+	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --sim --log $(PATH_LOG) setup $(ADDRESS_0) $(PRIVKEY_0) $(ADDRESS_1) $(PRIVKEY_1)"
+	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --sim --log $(PATH_LOG) enroll auditor tpa $(ADDRESS_2)"
+	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --sim --log $(PATH_LOG) enroll user su $(ADDRESS_3) $(PRIVKEY_3)"
+	$(MAKE) aide@testdata FILE_PATH="./cache/test.dat" FILE_SIZE=1000M FILE_VAL=255
+	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --sim --log $(PATH_LOG) upload su ./cache/test.dat 1000"
 	@for i in `seq 10`; do \
-		$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --sim --log ./cache/test-auditing.log challenge su $(RATIO)"; \
-		$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --sim --log ./cache/test-auditing.log proof"; \
-		$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --sim --log ./cache/test-auditing.log audit tpa"; \
+		$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --sim --log $(PATH_LOG) challenge su $(RATIO)"; \
+		$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --sim --log $(PATH_LOG) proof"; \
+		$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --sim --log $(PATH_LOG) audit tpa"; \
 	done
-	cp ./harness/app/cache/test-auditing.log ./harness/app/$(PATH_LOG)
 
 harness@test-gentags-all:
 	rm -f ./harness/app/eval/gentags/logs/*
