@@ -191,6 +191,7 @@ harness@test-auditing-all:
 
 harness@test-contract-all:
 	$(eval PATH_LOG := ./eval/contract/logs/contract.log)
+	rm -f ./harness/app/eval/contract/logs/*
 	rm -rf ./harness/app/cache/*
 	$(MAKE) testnet/down
 	$(MAKE) testnet/up
