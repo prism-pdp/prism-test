@@ -21,25 +21,22 @@ ETHERNET_SENDER_OPTS_5 = --sender-addr $(ADDRESS_5) --sender-key $(PRIVKEY_5)
 shell:
 	docker compose run $(SERVICE) bash
 
-eval-offchain:
+eval:
 # build programs
 	$(MAKE) harness@build
 	$(MAKE) aide@build
-# generate testdata
-	$(MAKE) aide@testdata
-# perform evaluation of generating tags
-	$(MAKE) harness@test-gentags-all
-	$(MAKE) aide@eval-gentags
+# perform evaluation
+	$(MAKE) eval-offchain
+	$(MAKE) eval-onchain
+
+eval-offchain:
 # perform evaluation of generating proof and verifying proof
-	$(MAKE) harness@test-auditing-all
+	$(MAKE) harness@test-auditing
 	$(MAKE) aide@eval-auditing
 
 eval-onchain:
-# build programs
-	$(MAKE) harness@build
-	$(MAKE) aide@build
 # perform evaluation of gas consumption of contracts
-	$(MAKE) harness@test-contract-all
+	$(MAKE) harness@test-contract
 	$(MAKE) aide@eval-contract
 
 aide@build:
