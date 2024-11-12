@@ -8,7 +8,7 @@ include accounts.env
 # dpduado-sol/srcの中から選ぶ
 CONTRACT = XZ21
 
-TRIAL_COUNT = 500
+TRIAL_COUNT = 3
 
 ETHERNET_OPTS = --server ws://testnet:8545 --contract $(CONTRACT_ADDR)
 ETHERNET_SENDER_OPTS_0 = --sender-addr $(ADDRESS_0) --sender-key $(PRIVKEY_0)
@@ -136,19 +136,19 @@ harness@ethtest-main:
 	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness $(ETHERNET_OPTS) $(ETHERNET_SENDER_OPTS_1) --log ./cache/log.txt proof"
 	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness $(ETHERNET_OPTS) $(ETHERNET_SENDER_OPTS_2) --log ./cache/log.txt audit tpa1"
 
-harness@test-gentags:
+harness@test-gentags-main:
 	rm -rf ./harness/app/cache/*
 	$(eval BLOCK_NUM := $(SCALE)00)
 	$(eval PATH_LOG := $(shell printf "./eval/gentags/logs/gentags-%04dM.log" $(BLOCK_NUM)))
 	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --sim --log $(PATH_LOG) setup $(ADDRESS_0) $(PRIVKEY_0) $(ADDRESS_1) $(PRIVKEY_1)"
 	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --sim --log $(PATH_LOG) enroll user su $(ADDRESS_4) $(PRIVKEY_4)"
-	@for i in `seq 10`; do \
+	@for i in `seq $(TRIAL_COUNT)`; do \
 		rm -f ./harness/app/cache/test.dat; \
 		$(MAKE) aide@testdata FILE_PATH=./cache/test.dat FILE_SIZE=$(BLOCK_NUM)M FILE_VAL=$$i; \
 		$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --sim --log $(PATH_LOG) upload su ./cache/test.dat $(BLOCK_NUM)"; \
 	done
 
-harness@test-auditing:
+harness@test-auditing-main:
 	rm -rf ./harness/app/cache/*
 	$(eval PATH_LOG := ./eval/auditing/logs/auditing-$(RATIO).log)
 	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --sim --log $(PATH_LOG) setup $(ADDRESS_0) $(PRIVKEY_0) $(ADDRESS_1) $(PRIVKEY_1)"
@@ -156,43 +156,64 @@ harness@test-auditing:
 	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --sim --log $(PATH_LOG) enroll user su $(ADDRESS_3) $(PRIVKEY_3)"
 	$(MAKE) aide@testdata FILE_PATH="./cache/test.dat" FILE_SIZE=1000M FILE_VAL=255
 	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --sim --log $(PATH_LOG) upload su ./cache/test.dat 1000"
-	@for i in `seq 10`; do \
+	@for i in `seq $(TRIAL_COUNT)`; do \
 		$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --sim --log $(PATH_LOG) challenge su $(RATIO)"; \
 		$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --sim --log $(PATH_LOG) proof"; \
 		$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --sim --log $(PATH_LOG) audit tpa"; \
 	done
 
-harness@test-gentags-all:
+harness@test-gentags:
 	rm -f ./harness/app/eval/gentags/logs/*
 	@for i in `seq 10`; do \
-		$(MAKE) harness@test-gentags SCALE=$$i; \
+		$(MAKE) harness@test-gentags-main SCALE=$$i; \
 	done
 
-harness@test-auditing-all:
+harness@test-auditing:
 	rm -f ./harness/app/eval/gentags/logs/*
 	@for i in `seq 0.1 0.1 1.0`; do \
-		$(MAKE) harness@test-auditing RATIO=$$i; \
+		$(MAKE) harness@test-auditing-main RATIO=$$i; \
 	done
 
-harness@test-contract-all:
+harness@test-contract:
 	$(eval PATH_LOG := ./eval/contract/logs/contract.log)
 	rm -f ./harness/app/eval/contract/logs/*
 	rm -rf ./harness/app/cache/*
 	$(MAKE) testnet/down
 	$(MAKE) testnet/up
-	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness $(ETHERNET_OPTS) $(ETHERNET_SENDER_OPTS_0) --log $(PATH_LOG) setup $(ADDRESS_0) $(PRIVKEY_0) $(ADDRESS_1) $(PRIVKEY_1)"
-	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness $(ETHERNET_OPTS) $(ETHERNET_SENDER_OPTS_0) --log $(PATH_LOG) enroll auditor tpa1 $(ADDRESS_2)"
-	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness $(ETHERNET_OPTS) $(ETHERNET_SENDER_OPTS_0) --log $(PATH_LOG) enroll user    su1  $(ADDRESS_4) $(PRIVKEY_4)"
-	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness $(ETHERNET_OPTS) $(ETHERNET_SENDER_OPTS_0) --log $(PATH_LOG) enroll user    su2  $(ADDRESS_5) $(PRIVKEY_5)"
-	for i in `seq $(TRIAL_COUNT)`; do \
+	@$(MAKE) harness@cmd-setup          X_PATH_LOG=$(PATH_LOG)
+	@$(MAKE) harness@cmd-enroll-auditor X_PATH_LOG=$(PATH_LOG) X_NAME=tpa1 X_ADDR=$(ADDRESS_2)
+	@$(MAKE) harness@cmd-enroll-user    X_PATH_LOG=$(PATH_LOG) X_NAME=su1  X_ADDR=$(ADDRESS_4) X_KEY=$(PRIVKEY_4)
+	@$(MAKE) harness@cmd-enroll-user    X_PATH_LOG=$(PATH_LOG) X_NAME=su2  X_ADDR=$(ADDRESS_5) X_KEY=$(PRIVKEY_5)
+	@for i in `seq $(TRIAL_COUNT)`; do \
 		$(MAKE) aide@testdata FILE_PATH="./cache/test.dat" FILE_SIZE=10M FILE_VAL=$$i; \
-		$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness $(ETHERNET_OPTS) $(ETHERNET_SENDER_OPTS_4) --log $(PATH_LOG) upload su1 ./cache/test.dat 10"; \
-		$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness $(ETHERNET_OPTS) $(ETHERNET_SENDER_OPTS_5) --log $(PATH_LOG) upload su2 ./cache/test.dat 10"; \
+		$(MAKE) harness@cmd-upload X_PATH_LOG=$(PATH_LOG) X_ETHERNET_SENDER_OPTS="$(ETHERNET_SENDER_OPTS_4)" X_USER_NAME=su1 X_PATH_FILE=./cache/test.dat X_SPLIT_COUNT=10; \
+		$(MAKE) harness@cmd-upload X_PATH_LOG=$(PATH_LOG) X_ETHERNET_SENDER_OPTS="$(ETHERNET_SENDER_OPTS_5)" X_USER_NAME=su2 X_PATH_FILE=./cache/test.dat X_SPLIT_COUNT=10; \
 	done
-	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness $(ETHERNET_OPTS) $(ETHERNET_SENDER_OPTS_4) --log $(PATH_LOG) challenge su1 0.6"
-	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness $(ETHERNET_OPTS) $(ETHERNET_SENDER_OPTS_1) --log $(PATH_LOG) proof"
-	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness $(ETHERNET_OPTS) $(ETHERNET_SENDER_OPTS_2) --log $(PATH_LOG) audit tpa1"
+	@$(MAKE) harness@cmd-challenge X_PATH_LOG=$(PATH_LOG) X_ETHERNET_SENDER_OPTS="$(ETHERNET_SENDER_OPTS_4)" X_USER_NAME=su1 X_CHECK_RATIO=0.6
+	@$(MAKE) harness@cmd-proof     X_PATH_LOG=$(PATH_LOG)
+	@$(MAKE) harness@cmd-audit     X_PATH_LOG=$(PATH_LOG) X_ETHERNET_SENDER_OPTS="$(ETHERNET_SENDER_OPTS_2)" X_AUDITOR_NAME=tpa1
 	$(MAKE) testnet/down
+
+harness@cmd-setup:
+	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness $(ETHERNET_OPTS) $(ETHERNET_SENDER_OPTS_0) --log $(X_PATH_LOG) setup $(ADDRESS_0) $(PRIVKEY_0) $(ADDRESS_1) $(PRIVKEY_1)"
+
+harness@cmd-enroll-auditor:
+	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness $(ETHERNET_OPTS) $(ETHERNET_SENDER_OPTS_0) --log $(X_PATH_LOG) enroll auditor $(X_NAME) $(X_ADDR)"
+
+harness@cmd-enroll-user:
+	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness $(ETHERNET_OPTS) $(ETHERNET_SENDER_OPTS_0) --log $(X_PATH_LOG) enroll user    $(X_NAME) $(X_ADDR) $(X_KEY)"
+
+harness@cmd-upload:
+	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness $(ETHERNET_OPTS) $(X_ETHERNET_SENDER_OPTS) --log $(X_PATH_LOG) upload $(X_USER_NAME) $(X_PATH_FILE) $(X_SPLIT_COUNT)"
+
+harness@cmd-challenge:
+	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness $(ETHERNET_OPTS) $(X_ETHERNET_SENDER_OPTS) --log $(X_PATH_LOG) challenge $(X_USER_NAME) $(X_CHECK_RATIO)"
+
+harness@cmd-proof:
+	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness $(ETHERNET_OPTS) $(ETHERNET_SENDER_OPTS_1) --log $(X_PATH_LOG) proof"
+
+harness@cmd-audit:
+	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness $(ETHERNET_OPTS) $(X_ETHERNET_SENDER_OPTS) --log $(X_PATH_LOG) audit $(X_AUDITOR_NAME)"
 
 show-accounts:
 	@$(MAKE) docker-run SERVICE="testnet" CMD="show-accounts"
