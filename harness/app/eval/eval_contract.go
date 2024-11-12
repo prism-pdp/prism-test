@@ -169,11 +169,11 @@ func (this *EvalContractReport) DumpCsv(_pathDir string) error {
 
 	var header []string
 	header = append(header, "Contract")
+	header = append(header, "Mean")
+	header = append(header, "Standard Deviation")
 	for i, _ := range this.EvalDataGasUsed[target[0]].Series {
 		header = append(header, strconv.Itoa(i+1))
 	}
-	header = append(header, "Mean")
-	header = append(header, "Standard Deviation")
 	if err := writer.Write(header); err != nil {
 		return err
 	}
@@ -183,11 +183,11 @@ func (this *EvalContractReport) DumpCsv(_pathDir string) error {
 		e := this.EvalDataGasUsed[v1]
 		var r []string
 		r = append(r, v1)
+		r = append(r, strconv.FormatFloat(e.Mean, 'f', -1, 64))
+		r = append(r, strconv.FormatFloat(e.StdDev, 'f', -1, 64))
 		for _, v2 := range e.Series {
 			r = append(r, strconv.FormatInt(v2, 10))
 		}
-		r = append(r, strconv.FormatFloat(e.Mean, 'f', -1, 64))
-		r = append(r, strconv.FormatFloat(e.StdDev, 'f', -1, 64))
 		records = append(records, r)
 	}
 

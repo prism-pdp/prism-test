@@ -114,11 +114,11 @@ func (this *EvalProcTimeReport) DumpCsv(_pathDir string) error {
 
 	var header []string
 	header = append(header, "Blocks")
+	header = append(header, "Mean")
+	header = append(header, "Standard Deviation")
 	for i, _ := range this.ProcTime[0].Series {
 		header = append(header, strconv.Itoa(i+1))
 	}
-	header = append(header, "Mean")
-	header = append(header, "Standard Deviation")
 
 	if err := writer.Write(header); err != nil {
 		return err
@@ -128,11 +128,11 @@ func (this *EvalProcTimeReport) DumpCsv(_pathDir string) error {
 	for _, v1 := range this.ProcTime {
 		var r []string
 		r = append(r, strconv.Itoa(v1.BlockNum))
+		r = append(r, strconv.FormatFloat(v1.Mean, 'f', -1, 64))
+		r = append(r, strconv.FormatFloat(v1.StdDev, 'f', -1, 64))
 		for _, v2 := range v1.Series {
 			r = append(r, strconv.FormatInt(v2, 10))
 		}
-		r = append(r, strconv.FormatFloat(v1.Mean, 'f', -1, 64))
-		r = append(r, strconv.FormatFloat(v1.StdDev, 'f', -1, 64))
 		records = append(records, r)
 	}
 
