@@ -8,6 +8,8 @@ include accounts.env
 # dpduado-sol/srcの中から選ぶ
 CONTRACT = XZ21
 
+TRIAL_COUNT = 500
+
 ETHERNET_OPTS = --server ws://testnet:8545 --contract $(CONTRACT_ADDR)
 ETHERNET_SENDER_OPTS_0 = --sender-addr $(ADDRESS_0) --sender-key $(PRIVKEY_0)
 ETHERNET_SENDER_OPTS_1 = --sender-addr $(ADDRESS_1) --sender-key $(PRIVKEY_1)
@@ -31,6 +33,14 @@ eval-offchain:
 # perform evaluation of generating proof and verifying proof
 	$(MAKE) harness@test-auditing-all
 	$(MAKE) aide@eval-auditing
+
+eval-onchain:
+# build programs
+	$(MAKE) harness@build
+	$(MAKE) aide@build
+# perform evaluation of gas consumption of contracts
+	$(MAKE) harness@test-contract-all
+	$(MAKE) aide@eval-contract
 
 aide@build:
 	$(MAKE) docker-run SERVICE="harness" CMD="go build -o bin/aide ./cmd/aide"
@@ -199,7 +209,7 @@ harness@test-contract-all:
 	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness $(ETHERNET_OPTS) $(ETHERNET_SENDER_OPTS_0) --log $(PATH_LOG) enroll auditor tpa1 $(ADDRESS_2)"
 	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness $(ETHERNET_OPTS) $(ETHERNET_SENDER_OPTS_0) --log $(PATH_LOG) enroll user    su1  $(ADDRESS_4) $(PRIVKEY_4)"
 	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness $(ETHERNET_OPTS) $(ETHERNET_SENDER_OPTS_0) --log $(PATH_LOG) enroll user    su2  $(ADDRESS_5) $(PRIVKEY_5)"
-	for i in `seq 10`; do \
+	for i in `seq $(TRIAL_COUNT)`; do \
 		$(MAKE) aide@testdata FILE_PATH="./cache/test.dat" FILE_SIZE=10M FILE_VAL=$$i; \
 		$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness $(ETHERNET_OPTS) $(ETHERNET_SENDER_OPTS_4) --log $(PATH_LOG) upload su1 ./cache/test.dat 10"; \
 		$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness $(ETHERNET_OPTS) $(ETHERNET_SENDER_OPTS_5) --log $(PATH_LOG) upload su2 ./cache/test.dat 10"; \
