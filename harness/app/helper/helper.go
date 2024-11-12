@@ -9,6 +9,7 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/ethclient"
+	"math"
 	"math/big"
 	"os"
 	"regexp"
@@ -239,4 +240,22 @@ func LoadEntity(_name string, _e IfEntity) error {
 	_e.AfterLoad()
 
 	return nil
+}
+
+func CalcMean(_array []int64) float64 {
+	var sum int64 = 0
+	var count int64 = int64(len(_array))
+	for _, v := range _array {
+		sum += v
+	}
+	return float64(sum) / float64(count)
+}
+
+func CalcStandardDeviation(_array []int64, _mean float64) float64 {
+	var variance float64
+	for _, v := range _array {
+		variance += math.Pow(float64(v) - _mean, 2)
+	}
+	variance /= float64(len(_array))
+	return math.Sqrt(variance)
 }

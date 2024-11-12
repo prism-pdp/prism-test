@@ -2,15 +2,12 @@ package eval
 
 import (
 	"bufio"
-	// "encoding/csv"
+	"encoding/csv"
     "encoding/json"
-	// "fmt"
-	// "math"
 	"os"
 	"path/filepath"
 	"strconv"
 	"strings"
-	// "time"
 
 	"github.com/dpduado/dpduado-test/harness/helper"
 )
@@ -112,6 +109,11 @@ func (this *EvalContractReport) Run(_file *os.File) error {
 		}
 	}
 
+	for _, v1 := range this.EvalDataGasUsed {
+		v1.CalcMean()
+		v1.CalcStandardDeviation()
+	}
+
 	return nil
 }
 
@@ -125,16 +127,77 @@ func (this *EvalContractReportBundle) Dump() error {
 
 func (this *EvalContractReport) Dump(_pathDir string) error {
 	var err error
-	err = this.DumpJson(_pathDir)
-	return err
+
+	if err = this.DumpJson(_pathDir); err != nil {
+		return err
+	}
+
+	if err = this.DumpCsv(_pathDir); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (this *EvalContractReport) DumpJson(_pathDir string) error {
+	filePath := filepath.Join(_pathDir, "contract.json")
+
 	tmp, err := json.MarshalIndent(this, "", "\t")
 	if err != nil { return err }
 
-	filePath := filepath.Join(_pathDir, "contract.json")
 	helper.WriteFile(filePath, tmp)
 
 	return nil
+}
+
+func (this *EvalContractReport) DumpCsv(_pathDir string) error {
+	filePath := filepath.Join(_pathDir, "contract.csv")
+	target := []string{
+		"RegisterFile",
+		"AppendOwner",
+		"SetChal",
+		"SetProof",
+		"SetAuditingResult",
+	}
+
+	file, err := os.Create(filePath)
+	if err != nil { panic(err) }
+	defer file.Close()
+
+	writer := csv.NewWriter(file)
+	defer writer.Flush()
+
+	var header []string
+	header = append(header, "Contract")
+	for i, _ := range this.EvalDataGasUsed[target[0]].Series {
+		header = append(header, strconv.Itoa(i+1))
+	}
+	header = append(header, "Mean")
+	header = append(header, "Standard Deviation")
+	if err := writer.Write(header); err != nil {
+		return err
+	}
+
+	var records [][]string
+	for _, v1 := range target {
+		e := this.EvalDataGasUsed[v1]
+		var r []string
+		r = append(r, v1)
+		for _, v2 := range e.Series {
+			r = append(r, strconv.FormatInt(v2, 10))
+		}
+		r = append(r, strconv.FormatFloat(e.Mean, 'f', -1, 64))
+		r = append(r, strconv.FormatFloat(e.StdDev, 'f', -1, 64))
+		records = append(records, r)
+	}
+
+	return writer.WriteAll(records)
+}
+
+func (this *EvalContract) CalcMean() {
+	this.Mean = helper.CalcMean(this.Series)
+}
+
+func (this *EvalContract) CalcStandardDeviation() {
+	this.StdDev = helper.CalcStandardDeviation(this.Series, this.Mean)
 }
