@@ -48,11 +48,6 @@ aide@build:
 aide@testdata:
 	$(MAKE) docker-run SERVICE="harness" CMD="./bin/aide testdata $(FILE_PATH) $(FILE_SIZE) $(FILE_VAL)"
 
-aide@genevaldata:
-	@for i in `seq 10`; do \
-		$(MAKE) aide@testdata FILE_PATH=./eval/testdata/100M-`printf %04X $$i`.dat FILE_SIZE=100M FILE_VAL=$$i; \
-	done
-
 aide@eval-gentags:
 	rm -f ./harness/app/eval/gentags/results/*
 	$(MAKE) docker-run SERVICE="harness" CMD="./bin/aide eval-gentags ./eval/gentags/logs ./eval/gentags/results"
@@ -64,23 +59,6 @@ aide@eval-auditing:
 aide@eval-contract:
 	rm -f ./harness/app/eval/contract/results/*
 	$(MAKE) docker-run SERVICE="harness" CMD="./bin/aide eval-contract ./eval/contract/logs ./eval/contract/results"
-
-test@sim:
-	rm -rf ./harness/app/cache/*
-	$(MAKE) harness@build
-	$(MAKE) harness@run@sim
-
-test:
-	rm -rf ./harness/app/cache/*
-	$(MAKE) testnet/down
-	$(MAKE) testnet/up
-	$(MAKE) harness@build
-	$(MAKE) harness@run
-
-test-clean:
-	rm -rf ./cache/*
-	$(MAKE) testnet/clean
-	$(MAKE) harness/clean
 
 testnet/build:
 	$(MAKE) docker-run SERVICE="testnet" CMD='forge build'
@@ -215,20 +193,6 @@ harness@test-contract-all:
 	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness $(ETHERNET_OPTS) $(ETHERNET_SENDER_OPTS_1) --log $(PATH_LOG) proof"
 	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness $(ETHERNET_OPTS) $(ETHERNET_SENDER_OPTS_2) --log $(PATH_LOG) audit tpa1"
 	$(MAKE) testnet/down
-
-harness@run:
-	$(MAKE) harness@run-setup
-	$(MAKE) harness@run-upload
-	$(MAKE) harness@run-audit
-harness@run-setup:
-	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness eth setup ws://testnet:8545 $(CONTRACT_ADDR)"
-harness@run-upload:
-	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness eth upload ws://testnet:8545 $(CONTRACT_ADDR)"
-harness@run-audit:
-	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness eth audit ws://testnet:8545 $(CONTRACT_ADDR)"
-
-harness/clean:
-	rm -rf ./harness/app/cache/*
 
 show-accounts:
 	@$(MAKE) docker-run SERVICE="testnet" CMD="show-accounts"
