@@ -36,11 +36,11 @@ aide@build:
 	$(MAKE) docker-run SERVICE="harness" CMD="go build -o bin/aide ./cmd/aide"
 
 aide@testdata:
-	$(MAKE) docker-run SERVICE="harness" CMD="./bin/aide testdata $(FILE_DIR) $(FILE_SIZE) $(FILE_VAL)"
+	$(MAKE) docker-run SERVICE="harness" CMD="./bin/aide testdata $(FILE_PATH) $(FILE_SIZE) $(FILE_VAL)"
 
 aide@genevaldata:
 	@for i in `seq 10`; do \
-		$(MAKE) aide@testdata FILE_DIR=./eval/testdata FILE_SIZE=100M FILE_VAL=$$i; \
+		$(MAKE) aide@testdata FILE_PATH=./eval/testdata/100M-`printf %04X $$i`.dat FILE_SIZE=100M FILE_VAL=$$i; \
 	done
 
 aide@inflate:

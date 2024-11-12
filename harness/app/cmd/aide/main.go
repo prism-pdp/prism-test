@@ -7,7 +7,6 @@ import(
 	"github.com/pborman/getopt/v2"
 	"strconv"
     "os"
-    "path/filepath"
 
 	"github.com/dpduado/dpduado-test/harness/client"
 	"github.com/dpduado/dpduado-test/harness/eval"
@@ -16,7 +15,7 @@ import(
 
 var baseclient client.BaseClient
 
-func runTestdata(_pathDir string, _size string, _val string) {
+func runTestdata(_path string, _size string, _val string) {
     num, unitSize, err := helper.ParseSize(_size)
     if err != nil { panic(err) }
 
@@ -29,10 +28,7 @@ func runTestdata(_pathDir string, _size string, _val string) {
         binary.BigEndian.PutUint16(buf[i:i+2], value)
     }
 
-    filename := fmt.Sprintf("%s-%04x.dat", _size, value)
-    path := filepath.Join(_pathDir, filename)
-
-    f, err := os.Create(path)
+    f, err := os.Create(_path)
     if err != nil { panic(err) }
 
     for range num {
