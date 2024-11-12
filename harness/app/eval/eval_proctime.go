@@ -5,7 +5,6 @@ import (
 	"encoding/csv"
     "encoding/json"
 	"fmt"
-	"math"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -151,21 +150,11 @@ func (this *EvalProcTime) CalcDuration(_targetMsg string, _log string) {
 }
 
 func (this *EvalProcTime) CalcMean() {
-	var sum int64 = 0
-	var count int64 = int64(len(this.Series))
-	for _, v := range this.Series {
-		sum += v
-	}
-	this.Mean = float64(sum) / float64(count)
+	this.Mean = helper.CalcMean(this.Series)
 }
 
 func (this *EvalProcTime) CalcStandardDeviation() {
-	var variance float64
-	for _, v := range this.Series {
-		variance += math.Pow(float64(v)-this.Mean, 2)
-	}
-	variance /= float64(len(this.Series))
-	this.StdDev = math.Sqrt(variance)
+	this.StdDev = helper.CalcStandardDeviation(this.Series, this.Mean)
 }
 
 func (this *EvalProcTime) update(_flagStart bool, _datetime time.Time) error {
