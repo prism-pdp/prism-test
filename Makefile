@@ -154,16 +154,14 @@ harness@ethtest-main:
 harness@test-gentags:
 	rm -rf ./harness/app/cache/*
 	$(eval BLOCK_NUM := $(SCALE)00)
-	$(eval FILE_SIZE := $(shell printf "%04dm" $(BLOCK_NUM)))
-	$(eval PATH_LOG := ./eval/gentags/logs/gentags-$(FILE_SIZE).log)
-	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --sim --log ./cache/test-gentags.log setup $(ADDRESS_0) $(PRIVKEY_0) $(ADDRESS_1) $(PRIVKEY_1)"
-	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --sim --log ./cache/test-gentags.log enroll user su $(ADDRESS_4) $(PRIVKEY_4)"
+	$(eval PATH_LOG := $(shell printf "./eval/gentags/logs/gentags-%04dM.log" $(BLOCK_NUM)))
+	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --sim --log $(PATH_LOG) setup $(ADDRESS_0) $(PRIVKEY_0) $(ADDRESS_1) $(PRIVKEY_1)"
+	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --sim --log $(PATH_LOG) enroll user su $(ADDRESS_4) $(PRIVKEY_4)"
 	@for i in `seq 10`; do \
 		rm -f ./harness/app/cache/test.dat; \
-		$(MAKE) aide@inflate IN_FILE="./eval/testdata/100m-`printf %02X $$i`.dat" OUT_FILE="./cache/test.dat" SCALE=$(SCALE); \
-		$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --sim --log ./cache/test-gentags.log upload su ./cache/test.dat $(BLOCK_NUM)"; \
+		$(MAKE) aide@testdata FILE_PATH=./cache/test.dat FILE_SIZE=$(BLOCK_NUM)M FILE_VAL=$$i; \
+		$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --sim --log $(PATH_LOG) upload su ./cache/test.dat $(BLOCK_NUM)"; \
 	done
-	cp ./harness/app/cache/test-gentags.log ./harness/app/$(PATH_LOG)
 
 harness@test-auditing:
 	rm -rf ./harness/app/cache/*
