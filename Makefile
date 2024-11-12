@@ -53,9 +53,6 @@ aide@genevaldata:
 		$(MAKE) aide@testdata FILE_PATH=./eval/testdata/100M-`printf %04X $$i`.dat FILE_SIZE=100M FILE_VAL=$$i; \
 	done
 
-aide@inflate:
-	$(MAKE) docker-run SERVICE="harness" CMD="./bin/aide inflate $(IN_FILE) $(OUT_FILE) $(SCALE)"
-
 aide@eval-gentags:
 	rm -f ./harness/app/eval/gentags/results/*
 	$(MAKE) docker-run SERVICE="harness" CMD="./bin/aide eval-gentags ./eval/gentags/logs ./eval/gentags/results"

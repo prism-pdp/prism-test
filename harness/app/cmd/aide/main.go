@@ -40,18 +40,6 @@ func runTestdata(_path string, _size string, _val string) {
     if err != nil { panic(err) }
 }
 
-func runInflateTestdata(_pathIn string, _pathOut string, _scale string) {
-    data, err := helper.ReadFile(_pathIn)
-    if err != nil { panic(err) }
-
-    scale, err := strconv.Atoi(_scale)
-    if err != nil { panic(err) }
-
-    for i := 0; i < scale; i++ {
-        helper.AppendFile(_pathOut, data)
-    }
-}
-
 func runEvalGenTag(_pathLogDir string, _pathResultDir string) {
     evalReport := eval.NewEvalProcTimeReport("gentags", "generate tags", _pathLogDir, _pathResultDir)
 
@@ -113,8 +101,6 @@ func main() {
 	switch command {
 	case "testdata":
 		runTestdata(args[1], args[2], args[3])
-    case "inflate":
-        runInflateTestdata(args[1], args[2], args[3])
     case "eval-gentags":
         runEvalGenTag(args[1], args[2])
     case "eval-auditing":
