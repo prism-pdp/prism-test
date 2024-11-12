@@ -17,15 +17,15 @@ import (
 
 type EvalContract struct {
 	Name string
-	GasUsedSeries []int64
-	GasPriceSeries []int64
+	Series []int64
 	Mean float64
 	StdDev float64
 }
 
 type EvalContractReport struct {
 	Name string // Log's filename
-	EvalData map[string]*EvalContract
+	EvalDataGasUsed map[string]*EvalContract
+	EvalDataGasPrice map[string]*EvalContract
 }
 
 type EvalContractReportBundle struct {
@@ -43,7 +43,8 @@ func NewEvalContract(_name string) *EvalContract {
 func NewEvalContractReport(_name string) *EvalContractReport {
 	obj := new(EvalContractReport)
 	obj.Name = _name
-	obj.EvalData = make(map[string]*EvalContract)
+	obj.EvalDataGasUsed = make(map[string]*EvalContract)
+	obj.EvalDataGasPrice = make(map[string]*EvalContract)
 	return obj
 }
 
@@ -92,19 +93,22 @@ func (this *EvalContractReport) Run(_file *os.File) error {
 
 		if msg == "Completed smart contract" {
 			nameContract := detail["name"]
-			// var evalData *EvalContract
-			if _, ok := this.EvalData[nameContract]; !ok {
-				this.EvalData[nameContract] = NewEvalContract(nameContract)
+			if _, ok := this.EvalDataGasUsed[nameContract]; !ok {
+				this.EvalDataGasUsed[nameContract] = NewEvalContract(nameContract)
 			}
-			e := this.EvalData[nameContract]
+			if _, ok := this.EvalDataGasPrice[nameContract]; !ok {
+				this.EvalDataGasPrice[nameContract] = NewEvalContract(nameContract)
+			}
+			e1 := this.EvalDataGasUsed[nameContract]
+			e2 := this.EvalDataGasPrice[nameContract]
 
 			gasUsed, err := strconv.ParseInt(detail["gasUsed"], 10, 64)
 			if err != nil { return err }
-			e.GasUsedSeries = append(e.GasUsedSeries, gasUsed)
+			e1.Series = append(e1.Series, gasUsed)
 
 			gasPrice, err := strconv.ParseInt(detail["gasPrice"], 10, 64)
 			if err != nil { return err }
-			e.GasPriceSeries = append(e.GasPriceSeries, gasPrice)
+			e2.Series = append(e2.Series, gasPrice)
 		}
 	}
 
