@@ -5,8 +5,11 @@ import(
 	"fmt"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/pborman/getopt/v2"
+    "math/rand"
 	"strconv"
     "os"
+    "path/filepath"
+    "time"
 
 	"github.com/dpduado/dpduado-test/harness/client"
 	"github.com/dpduado/dpduado-test/harness/eval"
@@ -23,6 +26,7 @@ func runTestdata(_path string, _size string, _val string) {
     if err != nil { panic(err) }
     value := uint16(tmpVal)
 
+    // TODO: WriteFileUint16
     buf := make([]byte, unitSize)
     for i:= 0; i < len(buf); i += 2 {
         binary.BigEndian.PutUint16(buf[i:i+2], value)
@@ -38,6 +42,50 @@ func runTestdata(_path string, _size string, _val string) {
 
     err = f.Close()
     if err != nil { panic(err) }
+}
+
+func runCorruption(_pathDir string, _damageRate string) {
+    damageRate, err := strconv.ParseFloat(_damageRate, 64)
+    if err != nil { panic(err) }
+
+    rand.Seed(time.Now().UnixNano())
+
+	dirEntries, err := os.ReadDir(_pathDir)
+	if err != nil { panic(err) }
+
+	for _, e := range dirEntries {
+		fileName := e.Name()
+        if filepath.Ext(fileName) != ".dat" {
+            continue
+        }
+
+        r1 := rand.Float64()
+        if damageRate < r1 {
+            continue
+        }
+
+		filePath := filepath.Join(_pathDir, fileName)
+
+        data, err := helper.ReadFile(filePath)
+        if err != nil { panic(err) }
+
+        r2 := rand.Float64()
+        pos := uint32(r2 * float64(len(data) * 8))
+
+        index, offset := helper.ToggleBit(data, pos)
+        helper.PrintLog("File corruption (file:%s, index:%d, offset:%d)", fileName, index, offset)
+
+        helper.WriteFile(filePath, data)
+    }
+}
+
+func runRepair(_path string) {
+    data, err := helper.ReadFile(_path)
+    if err != nil { panic(err) }
+
+    val := helper.MostFrequentValue(data, 32)
+
+    helper.WriteFileUint16(_path, 1, int64(len(data)), val)
 }
 
 func runEvalGenTag(_pathLogDir string, _pathResultDir string) {
@@ -101,6 +149,10 @@ func main() {
 	switch command {
 	case "testdata":
 		runTestdata(args[1], args[2], args[3])
+    case "corruption":
+		runCorruption(args[1], args[2])
+    case "repair":
+		runRepair(args[1])
     case "eval-gentags":
         runEvalGenTag(args[1], args[2])
     case "eval-auditing":

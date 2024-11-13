@@ -1,6 +1,8 @@
 package helper
 
 import (
+	"bytes"
+    "encoding/binary"
 	"time"
 	"crypto/sha256"
 	"encoding/hex"
@@ -190,6 +192,26 @@ func WriteFile(_path string, _data []byte) {
 	os.WriteFile(_path, _data, 0755)
 }
 
+func WriteFileUint16(_path string, _num int, _unitSize int64, _val uint16) error {
+    buf := make([]byte, _unitSize)
+    for i:= 0; i < len(buf); i += 2 {
+        binary.BigEndian.PutUint16(buf[i:i+2], _val)
+    }
+
+    f, err := os.Create(_path)
+    if err != nil { return err }
+
+    for range _num {
+        _, err := f.Write(buf)
+		if err != nil { return err }
+    }
+
+    err = f.Close()
+	if err != nil { return err }
+
+	return nil
+}
+
 func AppendFile(_path string, _data []byte) error {
 	// 追記モードでファイルを開く
 	file, err := os.OpenFile(_path, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0755)
@@ -258,4 +280,39 @@ func CalcStandardDeviation(_array []int64, _mean float64) float64 {
 	}
 	variance /= float64(len(_array))
 	return math.Sqrt(variance)
+}
+
+func ToggleBit(_data []byte, _pos uint32) (uint32, uint32) {
+	index  := uint32(_pos / 8)
+	offset := uint32(_pos % 8)
+
+	_data[index] ^= (1 << offset)
+
+	return index, offset
+}
+
+func MostFrequentValue(_data []byte, _limit int) uint16 {
+    lut := make(map[uint16]int)
+
+    // checks up the first 32 bytes
+    for i := 0; i < _limit; i += 2 {
+        var num uint16
+        err := binary.Read(bytes.NewReader(_data[i:i+2]), binary.BigEndian, &num)
+        if err != nil { panic(err) }
+
+        if _, ok := lut[num]; !ok {
+            lut[num] = 0
+        }
+        lut[num] += 1
+    }
+
+	var maxKey uint16
+	var maxValue int = 0
+	for k, v := range lut {
+		if maxValue < v {
+			maxKey = k
+		}
+	}
+
+	return maxKey
 }
