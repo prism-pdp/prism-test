@@ -13,6 +13,7 @@ var (
 	OptSenderAddr *string
 	OptSenderPrivKey *string
 	OptPathLogFile *string
+	OptDetectedList *string
 )
 
 var (
@@ -30,4 +31,5 @@ func SetupOpt() {
 	OptSenderAddr = getopt.StringLong("sender-addr", 0, "", "sender's address")
 	OptSenderPrivKey = getopt.StringLong("sender-key", 0, "", "sender's private key")
 	OptPathLogFile = getopt.StringLong("log", 0, "", "log file path")
+	OptDetectedList = getopt.StringLong("detected-list", 0, "", "detected list")
 }

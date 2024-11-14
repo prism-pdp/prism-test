@@ -253,6 +253,10 @@ func (this *Provider) GetName() string {
 	return this.Name
 }
 
+func (this *Provider) GetFilePath(_f *File) string {
+	return helper.MakeDumpFilePath(this.Name, _f.Filename)
+}
+
 func (this *Provider) ToJson() (string, error) {
 	b, err := json.MarshalIndent(this, "", "\t")
 	return string(b), err

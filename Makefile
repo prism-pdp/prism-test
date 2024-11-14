@@ -58,10 +58,19 @@ aide@eval-contract:
 	$(MAKE) docker-run SERVICE="harness" CMD="./bin/aide eval-contract ./eval/contract/logs ./eval/contract/results"
 
 aide@corruption:
-	$(MAKE) docker-run SERVICE="harness" CMD="./bin/aide --log $(X_PATH_LOG) corruption $(X_DIR_TARGET) $(X_DAMAGE_RATE)"
+	$(MAKE) docker-run SERVICE="harness" CMD="./bin/aide --log $(X_PATH_LOG) corruption $(X_DIR_TARGET) $(X_DAMAGE_RATE) $(X_PATH_RESULT)"
+
+aide@list-corrupted-files:
+	@$(MAKE) docker-run SERVICE="harness" CMD="./bin/aide list-corrupted-files $(X_TPA_NAME)"
 
 aide@repair:
-	$(MAKE) docker-run SERVICE="harness" CMD="./bin/aide repair $(X_PATH_FILE)"
+	$(MAKE) docker-run SERVICE="harness" CMD="./bin/aide --log $(X_PATH_LOG) repair $(X_PATH_FILE)"
+
+aide@repair-batch:
+	$(MAKE) docker-run SERVICE="harness" CMD="./bin/aide --log $(X_PATH_LOG) repair-batch $(X_PATH_LIST)"
+
+aide@write-log:
+	$(MAKE) docker-run SERVICE="harness" CMD="./bin/aide --log $(X_PATH_LOG) write-log \"$(X_LOG)\""
 
 testnet/build:
 	$(MAKE) docker-run SERVICE="testnet" CMD='forge build'
@@ -104,17 +113,19 @@ harness@upgrade:
 
 harness@simtest:
 	rm -rf harness/app/cache/*
-	fallocate -l 100M harness/app/cache/dummy.data
 	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --sim --log ./cache/log.txt setup $(ADDRESS_0) $(PRIVKEY_0) $(ADDRESS_1) $(PRIVKEY_1)"
 	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --sim --log ./cache/log.txt enroll auditor tpa1 $(ADDRESS_2)"
 	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --sim --log ./cache/log.txt enroll auditor tpa2 $(ADDRESS_3)"
 	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --sim --log ./cache/log.txt enroll user    su1  $(ADDRESS_4) $(PRIVKEY_4)"
 	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --sim --log ./cache/log.txt enroll user    su2  $(ADDRESS_5) $(PRIVKEY_5)"
+	$(MAKE) aide@testdata FILE_PATH=./cache/dummy.data FILE_SIZE=1M FILE_VAL=1
+	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --sim --log ./cache/log.txt upload su1 cache/dummy.data 100"
+	$(MAKE) aide@testdata FILE_PATH=./cache/dummy.data FILE_SIZE=1M FILE_VAL=2
 	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --sim --log ./cache/log.txt upload su1 cache/dummy.data 100"
 	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --sim --log ./cache/log.txt upload su2 cache/dummy.data 50"
-	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --sim --log ./cache/log.txt challenge su1 0.55"
+	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --sim --log ./cache/log.txt challenge su1 0.55 1.0"
 	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --sim --log ./cache/log.txt proof"
-	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --sim --log ./cache/log.txt audit tpa1"
+	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --sim --log ./cache/log.txt --detected-list ./cache/detected.list audit tpa1"
 
 harness@ethtest:
 	$(MAKE) harness@ethtest-setup
@@ -135,7 +146,7 @@ harness@ethtest-main:
 	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness $(ETHERNET_OPTS) $(ETHERNET_SENDER_OPTS_0) --log ./cache/log.txt enroll user    su2  $(ADDRESS_5) $(PRIVKEY_5)"
 	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness $(ETHERNET_OPTS) $(ETHERNET_SENDER_OPTS_4) --log ./cache/log.txt upload su1 cache/dummy.data 100"
 	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness $(ETHERNET_OPTS) $(ETHERNET_SENDER_OPTS_5) --log ./cache/log.txt upload su2 cache/dummy.data 50"
-	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness $(ETHERNET_OPTS) $(ETHERNET_SENDER_OPTS_4) --log ./cache/log.txt challenge su1 0.55"
+	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness $(ETHERNET_OPTS) $(ETHERNET_SENDER_OPTS_4) --log ./cache/log.txt challenge su1 0.55 1.0"
 	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness $(ETHERNET_OPTS) $(ETHERNET_SENDER_OPTS_1) --log ./cache/log.txt proof"
 	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness $(ETHERNET_OPTS) $(ETHERNET_SENDER_OPTS_2) --log ./cache/log.txt audit tpa1"
 
@@ -160,7 +171,7 @@ harness@test-auditing-main:
 	$(MAKE) aide@testdata FILE_PATH="./cache/test.dat" FILE_SIZE=1000M FILE_VAL=255
 	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --sim --log $(PATH_LOG) upload su ./cache/test.dat 1000"
 	@for i in `seq $(TRIAL_COUNT)`; do \
-		$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --sim --log $(PATH_LOG) challenge su $(RATIO)"; \
+		$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --sim --log $(PATH_LOG) challenge su $(RATIO) 1.0"; \
 		$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --sim --log $(PATH_LOG) proof"; \
 		$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --sim --log $(PATH_LOG) audit tpa"; \
 	done
@@ -192,23 +203,54 @@ harness@test-contract:
 		$(MAKE) harness@cmd-upload X_PATH_LOG=$(PATH_LOG) X_ETHERNET_SENDER_OPTS="$(ETHERNET_SENDER_OPTS_4)" X_USER_NAME=su1 X_PATH_FILE=./cache/test.dat X_SPLIT_COUNT=10; \
 		$(MAKE) harness@cmd-upload X_PATH_LOG=$(PATH_LOG) X_ETHERNET_SENDER_OPTS="$(ETHERNET_SENDER_OPTS_5)" X_USER_NAME=su2 X_PATH_FILE=./cache/test.dat X_SPLIT_COUNT=10; \
 	done
-	@$(MAKE) harness@cmd-challenge X_PATH_LOG=$(PATH_LOG) X_ETHERNET_SENDER_OPTS="$(ETHERNET_SENDER_OPTS_4)" X_USER_NAME=su1 X_CHECK_RATIO=0.6
+	@$(MAKE) harness@cmd-challenge X_PATH_LOG=$(PATH_LOG) X_ETHERNET_SENDER_OPTS="$(ETHERNET_SENDER_OPTS_4)" X_USER_NAME=su1 X_DATA_RATIO=0.6 X_FILE_RATIO=1.0
 	@$(MAKE) harness@cmd-proof     X_PATH_LOG=$(PATH_LOG)
 	@$(MAKE) harness@cmd-audit     X_PATH_LOG=$(PATH_LOG) X_ETHERNET_SENDER_OPTS="$(ETHERNET_SENDER_OPTS_2)" X_AUDITOR_NAME=tpa1
 	$(MAKE) testnet/down
 
-xxx1:
-	rm -rf ./harness/app/cache/*
-	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --sim --log ./cache/log.txt setup $(ADDRESS_0) $(PRIVKEY_0) $(ADDRESS_1) $(PRIVKEY_1)"
-	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --sim --log ./cache/log.txt enroll auditor tpa1 $(ADDRESS_2)"
-	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --sim --log ./cache/log.txt enroll user    su1  $(ADDRESS_4) $(PRIVKEY_4)"
-	@for i in `seq 10`; do \
-		$(MAKE) aide@testdata FILE_PATH="./cache/test.dat" FILE_SIZE=1M FILE_VAL=$$i; \
-		$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --sim --log ./cache/log.txt upload su1 ./cache/test.dat 100"; \
+eval-frequency:
+	$(eval PATH_LOG := ./eval/frequency/logs/frequency.log)
+	$(MAKE) eval-frequency-setup X_PATH_LOG=$(PATH_LOG) X_FILE_NUM=10 X_BLOCK_NUM=100
+	@for fr in `seq 0.1 0.1 0.5`; do \
+		for dr in `seq 0.1 0.1 1.0`; do \
+			$(MAKE) eval-frequency-main X_PATH_LOG=$(PATH_LOG) X_DATA_RATIO=$$dr X_FILE_RATIO=$$fr X_DAMAGE_RATE=0.3 X_CYCLE=10; \
+		done; \
 	done
 
-xxx2:
-	$(MAKE) aide@corruption X_PATH_LOG=./cache/corruption.log X_DIR_TARGET="./cache/sp" X_DAMAGE_RATE=0.3
+eval-frequency-setup:
+	rm -rf ./harness/app/cache/*
+	rm -f ./harness/app/eval/frequency/logs/*
+	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --sim --log $(X_PATH_LOG) setup $(ADDRESS_0) $(PRIVKEY_0) $(ADDRESS_1) $(PRIVKEY_1)"
+	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --sim --log $(X_PATH_LOG) enroll auditor tpa1 $(ADDRESS_2)"
+	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --sim --log $(X_PATH_LOG) enroll user    su1  $(ADDRESS_4) $(PRIVKEY_4)"
+	@for i in `seq $(X_FILE_NUM)`; do \
+		$(MAKE) aide@testdata FILE_PATH="./cache/test.dat" FILE_SIZE=1M FILE_VAL=$$i; \
+		$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --sim --log $(X_PATH_LOG) upload su1 ./cache/test.dat $(X_BLOCK_NUM)"; \
+	done
+
+eval-frequency-main:
+	@rm -f ./harness/app/cache/log.txt
+	@$(MAKE) aide@write-log X_PATH_LOG=$(X_PATH_LOG) X_LOG="Start frequency evaluation (DataRatio:$(X_DATA_RATIO), FileRatio:$(X_FILE_RATIO), DamageRate:$(X_DAMAGE_RATE))"
+	@for i in `seq $(X_CYCLE)`; do \
+		$(MAKE) aide@write-log X_PATH_LOG=$(X_PATH_LOG) X_LOG="Start cycle (cycle:$$i)"; \
+		$(MAKE) eval-frequency-core X_PATH_LOG=$(X_PATH_LOG) X_DATA_RATIO=$(X_DATA_RATIO) X_FILE_RATIO=$(X_FILE_RATIO) X_DAMAGE_RATE=$(X_DAMAGE_RATE); \
+		$(MAKE) aide@write-log X_PATH_LOG=$(X_PATH_LOG) X_LOG="Finish cycle (cycle:$$i)"; \
+	done
+	@$(MAKE) aide@write-log X_PATH_LOG=$(X_PATH_LOG) X_LOG="Finish frequency evaluation (DataRatio:$(X_DATA_RATIO), FileRatio:$(X_FILE_RATIO), DamageRate:$(X_DAMAGE_RATE))"
+	@$(MAKE) aide@repair-batch X_PATH_LOG=$(X_PATH_LOG) X_PATH_LIST="./cache/corrupted-filepath-list.txt"
+
+eval-frequency-reset:
+	@for p in `(cd ./harness/app; ls ./cache/sp/*.dat)`; do \
+		$(MAKE) aide@repair X_PATH_LOG=$(X_PATH_LOG) X_PATH_FILE=$$p; \
+	done
+
+eval-frequency-core:
+	$(MAKE) aide@corruption X_PATH_LOG=$(X_PATH_LOG) X_DIR_TARGET="./cache/sp" X_DAMAGE_RATE=$(X_DAMAGE_RATE) X_PATH_RESULT=./cache/corrupted-filepath-list.txt
+	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --sim --log $(X_PATH_LOG) challenge su1 $(X_DATA_RATIO) $(X_FILE_RATIO)"
+	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --sim --log $(X_PATH_LOG) proof"
+	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --sim --log $(X_PATH_LOG) --detected-list ./cache/detected.list audit tpa1"
+	$(MAKE) aide@repair-batch X_PATH_LOG=$(X_PATH_LOG) X_PATH_LIST="./cache/detected.list"
+	rm -f ./harness/app/cache/detected.list
 
 harness@cmd-setup:
 	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness $(ETHERNET_OPTS) $(ETHERNET_SENDER_OPTS_0) --log $(X_PATH_LOG) setup $(ADDRESS_0) $(PRIVKEY_0) $(ADDRESS_1) $(PRIVKEY_1)"
@@ -223,7 +265,7 @@ harness@cmd-upload:
 	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness $(ETHERNET_OPTS) $(X_ETHERNET_SENDER_OPTS) --log $(X_PATH_LOG) upload $(X_USER_NAME) $(X_PATH_FILE) $(X_SPLIT_COUNT)"
 
 harness@cmd-challenge:
-	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness $(ETHERNET_OPTS) $(X_ETHERNET_SENDER_OPTS) --log $(X_PATH_LOG) challenge $(X_USER_NAME) $(X_CHECK_RATIO)"
+	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness $(ETHERNET_OPTS) $(X_ETHERNET_SENDER_OPTS) --log $(X_PATH_LOG) challenge $(X_USER_NAME) $(X_DATA_RATIO) $(X_FILE_RATIO)"
 
 harness@cmd-proof:
 	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness $(ETHERNET_OPTS) $(ETHERNET_SENDER_OPTS_1) --log $(X_PATH_LOG) proof"

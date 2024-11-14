@@ -10,9 +10,15 @@ import (
 	"github.com/dpduado/dpduado-test/harness/helper"
 )
 
+type AuditingSummary struct {
+	File []string
+	Result []bool
+}
+
 type Auditor struct {
 	Name string
 	Addr common.Address
+	Summary []*AuditingSummary
 
 	client client.BaseClient
 }
@@ -29,6 +35,13 @@ func GenAuditor(_name string, _addr string, _simFlag bool) *Auditor {
 	}
 
 	return a
+}
+
+func NewAuditingSummary(_len int) *AuditingSummary{
+	obj := new(AuditingSummary)
+	obj.File = make([]string, _len)
+	obj.Result = make([]bool, _len)
+	return obj
 }
 
 func (this *Auditor) SetupSimClient(_ledger *client.FakeLedger) {
@@ -82,6 +95,36 @@ func (this *Auditor) VerifyAuditingProof(_hash [32]byte, _setTagData pdp.TagData
 func (this *Auditor) UploadAuditingResult(_hash [32]byte, _result bool) {
 	err := this.client.SetAuditingResult(_hash, _result)
 	if err != nil { panic(err) }
+}
+
+func (this *Auditor) SaveSummary(_fileList [][32]byte, _resultList []bool) {
+	len := len(_fileList)
+	s := NewAuditingSummary(len)
+
+	for i := 0; i < len; i++ {
+		s.File[i] = helper.Hex(_fileList[i][:])
+		s.Result[i] = _resultList[i]
+	}
+
+	this.Summary = append(this.Summary, s)
+}
+
+func (this *Auditor) ListCorruptedFiles() []string {
+	var list []string
+
+	len := len(this.Summary)
+	if len == 0 {
+		return list
+	}
+
+	s := this.Summary[len-1]
+	for i, v := range s.Result {
+		if !v {
+			list = append(list, s.File[i])
+		}
+	}
+
+	return list
 }
 
 func (this *Auditor) GetName() string {

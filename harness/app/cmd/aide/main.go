@@ -12,6 +12,7 @@ import(
     "time"
 
 	"github.com/dpduado/dpduado-test/harness/client"
+	"github.com/dpduado/dpduado-test/harness/entity"
 	"github.com/dpduado/dpduado-test/harness/eval"
 	"github.com/dpduado/dpduado-test/harness/helper"
 )
@@ -44,7 +45,9 @@ func runTestdata(_path string, _size string, _val string) {
     if err != nil { panic(err) }
 }
 
-func runCorruption(_pathDir string, _damageRate string) {
+func runCorruption(_pathDir string, _damageRate string, _pathOutput string) {
+    var err error
+
     damageRate, err := strconv.ParseFloat(_damageRate, 64)
     if err != nil { panic(err) }
 
@@ -52,6 +55,12 @@ func runCorruption(_pathDir string, _damageRate string) {
 
 	dirEntries, err := os.ReadDir(_pathDir)
 	if err != nil { panic(err) }
+
+    var corruptedFilePathList []string
+    if helper.IsFile(_pathOutput) {
+        corruptedFilePathList, err = helper.ReadAllLine(_pathOutput)
+        if err != nil { panic(err) }
+    }
 
 	for _, e := range dirEntries {
 		fileName := e.Name()
@@ -76,6 +85,33 @@ func runCorruption(_pathDir string, _damageRate string) {
         helper.PrintLog("File corruption (file:%s, index:%d, offset:%d)", fileName, index, offset)
 
         helper.WriteFile(filePath, data)
+
+        corruptedFilePathList = append(corruptedFilePathList, filePath)
+    }
+
+    corruptedFilePathList = helper.Uniq(corruptedFilePathList)
+
+    if len(corruptedFilePathList) > 0 {
+        s := fmt.Sprintf("%s\n", corruptedFilePathList[0])
+        helper.WriteFile(_pathOutput, []byte(s))
+    }
+    if len(corruptedFilePathList) > 1 {
+        for i := 1; i < len(corruptedFilePathList); i++ {
+            s := fmt.Sprintf("%s\n", corruptedFilePathList[i])
+            helper.AppendFile(_pathOutput, []byte(s))
+        }
+    }
+}
+
+func runListCoruptedFiles(_name string) {
+    *helper.SimFlag = true
+
+	var tpa entity.Auditor
+	helper.LoadEntity(_name, &tpa)
+
+    list := tpa.ListCorruptedFiles()
+    for _, v := range list {
+        fmt.Printf("%s ", v)
     }
 }
 
@@ -86,6 +122,25 @@ func runRepair(_path string) {
     val := helper.MostFrequentValue(data, 32)
 
     helper.WriteFileUint16(_path, 1, int64(len(data)), val)
+
+    helper.PrintLog("Repair (file:%s)", filepath.Base(_path))
+}
+
+func runRepairBatch(_path string) {
+    if helper.IsFile(_path) == false {
+        return
+    }
+
+    lines, err := helper.ReadAllLine(_path)
+    if err != nil { panic(err) }
+
+    for _, f := range lines {
+        runRepair(f)
+    }
+}
+
+func runWriteLog(_log string) {
+    helper.PrintLog(_log)
 }
 
 func runEvalGenTag(_pathLogDir string, _pathResultDir string) {
@@ -150,9 +205,15 @@ func main() {
 	case "testdata":
 		runTestdata(args[1], args[2], args[3])
     case "corruption":
-		runCorruption(args[1], args[2])
+		runCorruption(args[1], args[2], args[3])
+    case "list-corrupted-files":
+		runListCoruptedFiles(args[1])
     case "repair":
 		runRepair(args[1])
+    case "repair-batch":
+		runRepairBatch(args[1])
+    case "write-log":
+		runWriteLog(args[1])
     case "eval-gentags":
         runEvalGenTag(args[1], args[2])
     case "eval-auditing":

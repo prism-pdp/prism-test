@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"os"
 	"strconv"
 	"github.com/ethereum/go-ethereum/common"
@@ -193,7 +194,7 @@ func runUploadPhase(_name string, _path string, _chunkNum string) {
 	helper.PrintLog("Finish upload")
 }
 
-func runUploadAuditingChal(_name string, _ratio string) {
+func runUploadAuditingChal(_name string, _ratioData string, _ratioFile string) {
 	helper.PrintLog("Start challenge")
 
 	// --------------------------
@@ -206,15 +207,20 @@ func runUploadAuditingChal(_name string, _ratio string) {
 	// Main processing
 	// --------------------------
 	// SU gets the list of his/her files.
-	ratio, err := strconv.ParseFloat(_ratio, 64)
+	ratioData, err := strconv.ParseFloat(_ratioData, 64)
+	if err != nil { panic(err) }
+
+	ratioFile, err := strconv.ParseFloat(_ratioFile, 64)
 	if err != nil { panic(err) }
 
 	fileList := su.GetFileList()
 	// SU generates challenge and requests to audit each file
 	for i, f := range fileList {
-		helper.PrintLog("Upload auditing chal (file:%s, index:%d/%d)", helper.Hex(f[:]), i+1, len(fileList))
-		chalData := su.GenAuditingChal(f, ratio)
-		su.UploadAuditingChal(f, chalData)
+		if helper.DrawLots(ratioFile) {
+			helper.PrintLog("Upload auditing chal (file:%s, index:%d/%d)", helper.Hex(f[:]), i+1, len(fileList))
+			chalData := su.GenAuditingChal(f, ratioData)
+			su.UploadAuditingChal(f, chalData)
+		}
 	}
 
 	// --------------------------
@@ -277,6 +283,7 @@ func runVerifyAuditingProof(_name string) {
 		helper.PrintLog("Download auditing req (file:%s, index:%d/%d)", helper.Hex(f[:]), i+1, len(fileList))
 	}
 
+	var resultList []bool
 	for i, f := range fileList {
 		// TPA gets M (list of hash of chunks) from SP.
 		owner, setDigest, tagDataSet := sp.PrepareVerificationData(f, reqDataList[i].ChalData)
@@ -287,7 +294,19 @@ func runVerifyAuditingProof(_name string) {
 
 		helper.PrintLog("Upload auditing result (file:%s, result:%t)", helper.Hex(f[:]), result)
 		tpa.UploadAuditingResult(f, result)
+
+		resultList = append(resultList, result)
+
+		if helper.OptDetectedList != nil && result == false {
+			if foundFile := sp.SearchFile(f); foundFile != nil {
+				path := sp.GetFilePath(foundFile)
+				s := fmt.Sprintf("%s\n", path)
+				helper.AppendFile(*helper.OptDetectedList, []byte(s))
+			}
+		}
 	}
+
+	tpa.SaveSummary(fileList, resultList)
 
 	// --------------------------
 	// Save entities
@@ -324,7 +343,7 @@ func main() {
 	case "upload":
 		runUploadPhase(args[1], args[2], args[3])
 	case "challenge":
-		runUploadAuditingChal(args[1], args[2])
+		runUploadAuditingChal(args[1], args[2], args[3])
 	case "proof":
 		runUploadAuditingProof()
 	case "audit":

@@ -1,6 +1,7 @@
 package helper
 
 import (
+	"bufio"
 	"bytes"
     "encoding/binary"
 	"time"
@@ -11,8 +12,10 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/ethclient"
+	"golang.org/x/exp/slices"
 	"math"
 	"math/big"
+	"math/rand"
 	"os"
 	"regexp"
 	"strconv"
@@ -188,6 +191,22 @@ func ReadFile(_path string) ([]byte, error) {
 	return data, err
 }
 
+func ReadAllLine(_path string) ([]string, error) {
+	var lines []string
+
+	f, err := os.Open(_path)
+	if err != nil { return lines, err }
+	defer f.Close()
+
+	scanner := bufio.NewScanner(f)
+
+	for scanner.Scan() {
+		lines = append(lines, scanner.Text())
+	}
+
+	return lines, scanner.Err()
+}
+
 func WriteFile(_path string, _data []byte) {
 	os.WriteFile(_path, _data, 0755)
 }
@@ -222,6 +241,12 @@ func AppendFile(_path string, _data []byte) error {
 	_, err = file.Write(_data)
 
 	return err
+}
+
+func Uniq(_array []string) []string {
+	slices.Sort(_array)
+	unique := slices.Compact(_array)
+	return unique
 }
 
 func MakeDumpDirPath(_name string) string {
@@ -315,4 +340,9 @@ func MostFrequentValue(_data []byte, _limit int) uint16 {
 	}
 
 	return maxKey
+}
+
+func DrawLots(_probability float64) bool {
+	rand.Seed(time.Now().UnixNano())
+	return rand.Float64() < _probability
 }

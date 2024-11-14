@@ -7,5 +7,7 @@ eval/auditing/logs/*
 eval/auditing/results/*
 eval/contract/logs/*
 eval/contract/results/*
+eval/frequency/logs/*
+eval/frequency/results/*
 
 !.gitkeep
