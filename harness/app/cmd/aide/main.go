@@ -58,7 +58,7 @@ func runCorruption(_pathDir string, _damageRate string, _pathOutput string) {
 
     var corruptedFilePathList []string
     if helper.IsFile(_pathOutput) {
-        corruptedFilePathList, err = helper.ReadAllLine(_pathOutput)
+        corruptedFilePathList, err = helper.ReadLines(_pathOutput)
         if err != nil { panic(err) }
     }
 
@@ -131,7 +131,7 @@ func runRepairBatch(_path string) {
         return
     }
 
-    lines, err := helper.ReadAllLine(_path)
+    lines, err := helper.ReadLines(_path)
     if err != nil { panic(err) }
 
     for _, f := range lines {
@@ -179,6 +179,18 @@ func runEvalContract(_pathLogDir string, _pathResultDir string) {
     if err != nil { panic(err) }
 }
 
+func runEvalFrequency(_pathLogDir string, _pathResultDir string) {
+    var err error
+
+    report := eval.NewEvalFrequencyReport(_pathLogDir, _pathResultDir)
+
+    err = report.Run()
+    if err != nil { panic(err) }
+
+    err = report.Dump()
+    if err != nil { panic(err) }
+}
+
 func runShowAccount(_addr string) {
 	baseclient = client.NewEthClient(*helper.OptServer, *helper.OptContractAddr, *helper.OptSenderPrivKey, common.HexToAddress(*helper.OptSenderAddr))
     account, err := baseclient.GetAccount(common.HexToAddress(_addr))
@@ -220,6 +232,8 @@ func main() {
         runEvalAuditing(args[1], args[2])
     case "eval-contract":
         runEvalContract(args[1], args[2])
+    case "eval-frequency":
+        runEvalFrequency(args[1], args[2])
     case "show-account":
         runShowAccount(args[1])
 	default:

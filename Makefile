@@ -57,6 +57,10 @@ aide@eval-contract:
 	rm -f ./harness/app/eval/contract/results/*
 	$(MAKE) docker-run SERVICE="harness" CMD="./bin/aide eval-contract ./eval/contract/logs ./eval/contract/results"
 
+aide@eval-frequency:
+	rm -f ./harness/app/eval/frequency/results/*
+	$(MAKE) docker-run SERVICE="harness" CMD="./bin/aide eval-frequency ./eval/frequency/logs/frequency.log ./eval/frequency/results"
+
 aide@corruption:
 	$(MAKE) docker-run SERVICE="harness" CMD="./bin/aide --log $(X_PATH_LOG) corruption $(X_DIR_TARGET) $(X_DAMAGE_RATE) $(X_PATH_RESULT)"
 

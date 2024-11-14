@@ -191,7 +191,7 @@ func ReadFile(_path string) ([]byte, error) {
 	return data, err
 }
 
-func ReadAllLine(_path string) ([]string, error) {
+func ReadLines(_path string) ([]string, error) {
 	var lines []string
 
 	f, err := os.Open(_path)
@@ -247,6 +247,15 @@ func Uniq(_array []string) []string {
 	slices.Sort(_array)
 	unique := slices.Compact(_array)
 	return unique
+}
+
+func Remove(_array []string, _value string) []string {
+	for i, v := range _array {
+		if v == _value {
+			return append(_array[:i], _array[i+1:]...)
+		}
+	}
+	return _array
 }
 
 func MakeDumpDirPath(_name string) string {
@@ -345,4 +354,11 @@ func MostFrequentValue(_data []byte, _limit int) uint16 {
 func DrawLots(_probability float64) bool {
 	rand.Seed(time.Now().UnixNano())
 	return rand.Float64() < _probability
+}
+
+func ToFloat64(_val string) float64 {
+	val, err := strconv.ParseFloat(_val, 64)
+	if err != nil { panic(err) }
+
+	return val
 }
