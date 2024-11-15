@@ -39,6 +39,10 @@ eval-onchain:
 	$(MAKE) test-contract
 	$(MAKE) aide@eval-contract
 
+eval-frequency:
+	$(MAKE) test-frequency
+	$(MAKE) aide@eval-frequency
+
 test-gentags:
 	rm -f ./harness/app/eval/gentags/logs/*
 	@for i in `seq 10`; do \
