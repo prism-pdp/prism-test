@@ -5,7 +5,7 @@ MAKEFLAGS += --no-print-directory
 include accounts.env
 -include ./cache/contract-addr.env
 
-# dpduado-sol/srcの中から選ぶ
+# chose one from dpduado-sol/src
 CONTRACT = XZ21
 
 TRIAL_COUNT = 3
@@ -59,7 +59,7 @@ aide@eval-contract:
 
 aide@eval-frequency:
 	rm -f ./harness/app/eval/frequency/results/*
-	$(MAKE) docker-run SERVICE="harness" CMD="./bin/aide eval-frequency ./eval/frequency/logs/frequency.log ./eval/frequency/results"
+	$(MAKE) docker-run SERVICE="harness" CMD="./bin/aide eval-frequency ./eval/frequency/logs ./eval/frequency/results"
 
 aide@corruption:
 	$(MAKE) docker-run SERVICE="harness" CMD="./bin/aide --log $(X_PATH_LOG) corruption $(X_DIR_TARGET) $(X_DAMAGE_RATE) $(X_PATH_RESULT)"
@@ -213,47 +213,47 @@ harness@test-contract:
 	$(MAKE) testnet/down
 
 eval-frequency:
-	$(eval PATH_LOG := ./eval/frequency/logs/frequency.log)
-	$(MAKE) eval-frequency-setup X_PATH_LOG=$(PATH_LOG) X_FILE_NUM=10 X_BLOCK_NUM=100
-	@for fr in `seq 0.1 0.1 0.5`; do \
-		for dr in `seq 0.1 0.1 1.0`; do \
-			$(MAKE) eval-frequency-main X_PATH_LOG=$(PATH_LOG) X_DATA_RATIO=$$dr X_FILE_RATIO=$$fr X_DAMAGE_RATE=0.3 X_CYCLE=10; \
-		done; \
-	done
-
-eval-frequency-setup:
 	rm -rf ./harness/app/cache/*
 	rm -f ./harness/app/eval/frequency/logs/*
-	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --sim --log $(X_PATH_LOG) setup $(ADDRESS_0) $(PRIVKEY_0) $(ADDRESS_1) $(PRIVKEY_1)"
-	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --sim --log $(X_PATH_LOG) enroll auditor tpa1 $(ADDRESS_2)"
-	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --sim --log $(X_PATH_LOG) enroll user    su1  $(ADDRESS_4) $(PRIVKEY_4)"
+	$(MAKE) eval-frequency-setup X_FILE_NUM=100 X_BLOCK_NUM=100
+	@for fr in `seq 0.1 0.1 1.0`; do \
+		for dr in `seq 0.1 0.1 1.0`; do \
+			$(MAKE) eval-frequency-main X_DATA_RATIO=$$dr X_FILE_RATIO=$$fr X_DAMAGE_RATE=0.03 X_CYCLE=10; \
+		done; \
+	done
+	mv ./harness/app/cache/dpduado.log ./harness/app/eval/frequency/logs/frequency-`date +%y%m%d-%H%M%S`.log
+
+eval-frequency-setup:
+	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --sim setup $(ADDRESS_0) $(PRIVKEY_0) $(ADDRESS_1) $(PRIVKEY_1)"
+	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --sim enroll auditor tpa1 $(ADDRESS_2)"
+	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --sim enroll user    su1  $(ADDRESS_4) $(PRIVKEY_4)"
 	@for i in `seq $(X_FILE_NUM)`; do \
 		$(MAKE) aide@testdata FILE_PATH="./cache/test.dat" FILE_SIZE=1M FILE_VAL=$$i; \
-		$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --sim --log $(X_PATH_LOG) upload su1 ./cache/test.dat $(X_BLOCK_NUM)"; \
+		$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --sim upload su1 ./cache/test.dat $(X_BLOCK_NUM)"; \
 	done
 
 eval-frequency-main:
 	@rm -f ./harness/app/cache/log.txt
-	@$(MAKE) aide@write-log X_PATH_LOG=$(X_PATH_LOG) X_LOG="Start frequency evaluation (DataRatio:$(X_DATA_RATIO), FileRatio:$(X_FILE_RATIO), DamageRate:$(X_DAMAGE_RATE))"
+	@$(MAKE) aide@write-log X_LOG="Start frequency evaluation (DataRatio:$(X_DATA_RATIO), FileRatio:$(X_FILE_RATIO), DamageRate:$(X_DAMAGE_RATE))"
 	@for i in `seq $(X_CYCLE)`; do \
-		$(MAKE) aide@write-log X_PATH_LOG=$(X_PATH_LOG) X_LOG="Start cycle (cycle:$$i)"; \
-		$(MAKE) eval-frequency-core X_PATH_LOG=$(X_PATH_LOG) X_DATA_RATIO=$(X_DATA_RATIO) X_FILE_RATIO=$(X_FILE_RATIO) X_DAMAGE_RATE=$(X_DAMAGE_RATE); \
-		$(MAKE) aide@write-log X_PATH_LOG=$(X_PATH_LOG) X_LOG="Finish cycle (cycle:$$i)"; \
+		$(MAKE) aide@write-log X_LOG="Start cycle (cycle:$$i)"; \
+		$(MAKE) eval-frequency-core X_DATA_RATIO=$(X_DATA_RATIO) X_FILE_RATIO=$(X_FILE_RATIO) X_DAMAGE_RATE=$(X_DAMAGE_RATE); \
+		$(MAKE) aide@write-log X_LOG="Finish cycle (cycle:$$i)"; \
 	done
-	@$(MAKE) aide@write-log X_PATH_LOG=$(X_PATH_LOG) X_LOG="Finish frequency evaluation (DataRatio:$(X_DATA_RATIO), FileRatio:$(X_FILE_RATIO), DamageRate:$(X_DAMAGE_RATE))"
-	@$(MAKE) aide@repair-batch X_PATH_LOG=$(X_PATH_LOG) X_PATH_LIST="./cache/corrupted-filepath-list.txt"
+	@$(MAKE) aide@write-log X_LOG="Finish frequency evaluation (DataRatio:$(X_DATA_RATIO), FileRatio:$(X_FILE_RATIO), DamageRate:$(X_DAMAGE_RATE))"
+	@$(MAKE) aide@repair-batch X_PATH_LIST="./cache/corrupted-filepath-list.txt"
 
 eval-frequency-reset:
 	@for p in `(cd ./harness/app; ls ./cache/sp/*.dat)`; do \
-		$(MAKE) aide@repair X_PATH_LOG=$(X_PATH_LOG) X_PATH_FILE=$$p; \
+		$(MAKE) aide@repair X_PATH_FILE=$$p; \
 	done
 
 eval-frequency-core:
-	$(MAKE) aide@corruption X_PATH_LOG=$(X_PATH_LOG) X_DIR_TARGET="./cache/sp" X_DAMAGE_RATE=$(X_DAMAGE_RATE) X_PATH_RESULT=./cache/corrupted-filepath-list.txt
-	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --sim --log $(X_PATH_LOG) challenge su1 $(X_DATA_RATIO) $(X_FILE_RATIO)"
-	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --sim --log $(X_PATH_LOG) proof"
-	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --sim --log $(X_PATH_LOG) --detected-list ./cache/detected.list audit tpa1"
-	$(MAKE) aide@repair-batch X_PATH_LOG=$(X_PATH_LOG) X_PATH_LIST="./cache/detected.list"
+	$(MAKE) aide@corruption X_DIR_TARGET="./cache/sp" X_DAMAGE_RATE=$(X_DAMAGE_RATE) X_PATH_RESULT=./cache/corrupted-filepath-list.txt
+	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --sim challenge su1 $(X_DATA_RATIO) $(X_FILE_RATIO)"
+	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --sim proof"
+	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --sim --detected-list ./cache/detected.list audit tpa1"
+	$(MAKE) aide@repair-batch X_PATH_LIST="./cache/detected.list"
 	rm -f ./harness/app/cache/detected.list
 
 harness@cmd-setup:

@@ -362,3 +362,11 @@ func ToFloat64(_val string) float64 {
 
 	return val
 }
+
+func Float64ToString(_val float64) string {
+	return strconv.FormatFloat(_val, 'f', -1, 64)
+}
+
+func IntToString(_val int) string {
+	return strconv.Itoa(_val)
+}
