@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"regexp"
 	"strconv"
 	"strings"
 	"time"
@@ -185,7 +186,9 @@ func checkMsg(_expected string, _actual string) (bool, bool) {
 
 func getBlockNum(_filename string) (int, error) {
 	if strings.HasPrefix(_filename, "gentags") {
-		return strconv.Atoi(_filename[8:12])
+		re := regexp.MustCompile(`gentags-(\d+)\.log`)
+		matches := re.FindStringSubmatch(_filename)
+		return strconv.Atoi(matches[1])
 	} else if strings.HasPrefix(_filename, "auditing") {
 		val, err := strconv.ParseFloat(_filename[9:12], 32)
 		if err != nil { return 0, err }
