@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strconv"
 
 	"github.com/dpduado/dpduado-test/harness/helper"
 )
@@ -151,7 +152,11 @@ func (this *EvalFrequencyReport) Dump() error {
 		return err
 	}
 
-	if err = this.DumpCsv(this.PathResultDir); err != nil {
+	if err = this.DumpCsvHeatMap(this.PathResultDir); err != nil {
+		return err
+	}
+
+	if err = this.DumpCsvHistory(this.PathResultDir); err != nil {
 		return err
 	}
 
@@ -170,9 +175,56 @@ func (this *EvalFrequencyReport) DumpJson(_pathDir string) error {
 	return nil
 }
 
-func (this *EvalFrequencyReport) DumpCsv(_pathDir string) error {
+func (this *EvalFrequencyReport) DumpCsvHistory(_pathDir string) error {
 	fileName := filepath.Base(this.PathLogFile)
-	filePath := filepath.Join(_pathDir, fileName + ".csv")
+	filePath := filepath.Join(_pathDir, fileName + "-history.csv")
+
+	file, err := os.Create(filePath)
+	if err != nil { panic(err) }
+	defer file.Close()
+
+	writer := csv.NewWriter(file)
+	defer writer.Flush()
+
+	header := []string{
+		"Type", "File Ratio", "Block Ratio",
+		 "1",  "2",  "3",  "4",  "5",  "6",  "7",  "8",  "9",  "10",
+		"11", "12", "13", "14", "15", "16", "17", "18", "19",  "20",
+		"21", "22", "23", "24", "25", "26", "27", "28", "29",  "30",
+		"31", "32", "33", "34", "35", "36", "37", "38", "39",  "40",
+		"41", "42", "43", "44", "45", "46", "47", "48", "49",  "50",
+		"51", "52", "53", "54", "55", "56", "57", "58", "59",  "60",
+		"61", "62", "63", "64", "65", "66", "67", "68", "69",  "70",
+		"71", "72", "73", "74", "75", "76", "77", "78", "79",  "80",
+		"81", "82", "83", "84", "85", "86", "87", "88", "89",  "90",
+		"91", "92", "93", "94", "95", "96", "97", "98", "99", "100",
+	}
+
+	var records [][]string
+	for _, v := range this.EvalData {
+		fr := fmt.Sprintf("%.1f", v.FileRatio)
+		dr := fmt.Sprintf("%.1f", v.DataRatio)
+		r1 := []string{ "Corruption", fr, dr }
+		r2 := []string{ "Repair", fr, dr }
+		for _, c := range v.HistoryCorruptedFileCount {
+			r1 = append(r1, strconv.Itoa(c))
+		}
+		for _, c := range v.HistoryRepairedFileCount {
+			r2 = append(r2, strconv.Itoa(c))
+		}
+		records = append(records, r1)
+		records = append(records, r2)
+	}
+
+	if err := writer.Write(header); err != nil {
+		return err
+	}
+	return writer.WriteAll(records)
+}
+
+func (this *EvalFrequencyReport) DumpCsvHeatMap(_pathDir string) error {
+	fileName := filepath.Base(this.PathLogFile)
+	filePath := filepath.Join(_pathDir, fileName + "-heatmap.csv")
 
 	file, err := os.Create(filePath)
 	if err != nil { panic(err) }
