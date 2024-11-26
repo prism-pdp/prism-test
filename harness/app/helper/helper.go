@@ -25,7 +25,6 @@ import (
 )
 
 const escape = "\x1b"
-const PathDumpDir = "./cache"
 
 const (
 	NONE = iota
@@ -259,7 +258,7 @@ func Remove(_array []string, _value string) []string {
 }
 
 func MakeDumpDirPath(_name string) string {
-	return fmt.Sprintf("%s/%s", PathDumpDir, _name)
+	return fmt.Sprintf("%s/%s", *OptPathCacheDir, _name)
 }
 
 func MakeDumpFilePath(_name string, _filename string) string {

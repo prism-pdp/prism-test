@@ -109,5 +109,5 @@ func (this *FakeLedger) Dump() {
 }
 
 func makePath() string {
-	return helper.PathDumpDir + "/fake-ledger.json"
+	return *helper.OptPathCacheDir + "/fake-ledger.json"
 }
