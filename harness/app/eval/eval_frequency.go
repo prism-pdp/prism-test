@@ -15,9 +15,14 @@ type EvalFrequency struct {
 	FileRatio float64
 	DamageRate float64
 
+	CorruptedFileList []string
+
 	TotalCorruptedFileCount int
 	TotalRepairedFileCount int
 	TotalUnrepairedFileCount int
+
+	HistoryCorruptedFileCount []int
+	HistoryRepairedFileCount []int
 }
 
 type EvalFrequencyReport struct {
@@ -63,6 +68,7 @@ func (this *EvalFrequencyReport) Run() error {
 
 			i += 1
 			stepSize := this.runCore(i, lines, e)
+			if err != nil { return err }
 			if stepSize < 0 { return fmt.Errorf("Invalid log lines") }
 			this.EvalData = append(this.EvalData, e)
 			i += stepSize
@@ -75,7 +81,48 @@ func (this *EvalFrequencyReport) Run() error {
 func (this *EvalFrequencyReport) runCore(_startIndex int, _lines []string, _e *EvalFrequency) int {
 	lineCount := len(_lines)
 
+	var saveCorruptedFileList []string
+	var saveRepairedFileList []string
+
+	// save := 0
+	for i := _startIndex; i < lineCount; i++ {
+		l := _lines[i]
+		_, message, _ := helper.ParseLog(l)
+		if message == "Start cycle" {
+			stepSize, corruptedFileList, repairedFileList := this.runCycle(i, _lines)
+			if stepSize < 0 {
+				panic(fmt.Errorf("Invalid log lines"))
+			} else {
+				i += stepSize
+			}
+			newCorruptedFileList := helper.SubSlices(corruptedFileList, _e.CorruptedFileList)
+			saveCorruptedFileList = append(saveCorruptedFileList, newCorruptedFileList...)
+			saveRepairedFileList = append(saveRepairedFileList, repairedFileList...)
+			_e.HistoryCorruptedFileCount = append(_e.HistoryCorruptedFileCount, len(saveCorruptedFileList))
+			_e.HistoryRepairedFileCount = append(_e.HistoryRepairedFileCount, len(saveRepairedFileList))
+
+			_e.CorruptedFileList = helper.Uniq(append(_e.CorruptedFileList, corruptedFileList...))
+			_e.CorruptedFileList = helper.SubSlices(_e.CorruptedFileList, repairedFileList)
+
+			// repairedFileCount := len(repairedFileList) + save
+			// _e.HistoryRepairedFileCount = append(_e.HistoryRepairedFileCount, repairedFileCount)
+			// save = repairedFileCount
+		} else if message == "Finish frequency evaluation" {
+			_e.TotalCorruptedFileCount = _e.HistoryCorruptedFileCount[len(_e.HistoryCorruptedFileCount)-1]
+			_e.TotalRepairedFileCount = _e.HistoryRepairedFileCount[len(_e.HistoryRepairedFileCount)-1]
+			_e.TotalUnrepairedFileCount = len(_e.CorruptedFileList)
+			return i - _startIndex
+		}
+	}
+
+	panic(fmt.Errorf("Invalid sequence"))
+}
+
+func (this *EvalFrequencyReport) runCycle(_startIndex int, _lines []string) (int, []string, []string) {
+	lineCount := len(_lines)
+
 	var corruptedFileList []string
+	var repairedFileList []string
 
 	var i int
 	for i = _startIndex; i < lineCount; i++ {
@@ -84,21 +131,17 @@ func (this *EvalFrequencyReport) runCore(_startIndex int, _lines []string, _e *E
 		_, message, detail := helper.ParseLog(l)
 
 		if message == "File corruption" {
-			tmp := len(corruptedFileList)
 			corruptedFileList = append(corruptedFileList, detail["file"])
-			corruptedFileList = helper.Uniq(corruptedFileList)
-			_e.TotalCorruptedFileCount += (len(corruptedFileList) - tmp)
 		} else if message == "Repair" {
-			tmp := len(corruptedFileList)
-			corruptedFileList = helper.Remove(corruptedFileList, detail["file"])
-			_e.TotalRepairedFileCount += (tmp - len(corruptedFileList))
-		} else if message == "Finish frequency evaluation" {
-			_e.TotalUnrepairedFileCount = len(corruptedFileList)
-			return i - _startIndex
+			repairedFileList = append(repairedFileList, detail["file"])
+		} else if message == "Finish cycle" {
+			corruptedFileList = helper.Uniq(corruptedFileList)
+			repairedFileList = helper.Uniq(repairedFileList)
+			return i - _startIndex, corruptedFileList, repairedFileList
 		}
 	}
 
-	return -1 // error
+	panic(fmt.Errorf("Invalid sequence"))
 }
 
 func (this *EvalFrequencyReport) Dump() error {

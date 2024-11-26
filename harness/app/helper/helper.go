@@ -370,3 +370,20 @@ func Float64ToString(_val float64) string {
 func IntToString(_val int) string {
 	return strconv.Itoa(_val)
 }
+
+func SubSlices(_a, _b []string) []string {
+	var arr []string
+	for _, v1 := range _a {
+		found := false
+		for _, v2 := range _b {
+			if v1 == v2 {
+				found = true
+				break
+			}
+		}
+		if !found {
+			arr = append(arr, v1)
+		}
+	}
+	return arr
+}
