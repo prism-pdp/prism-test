@@ -62,6 +62,8 @@ test-gentags-main:
 		rm -f ./harness/app/cache/test.dat; \
 		$(MAKE) aide@testdata FILE_PATH=./cache/test.dat FILE_SIZE=$(X_BLOCK_NUM)M FILE_VAL=$$i; \
 		$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --sim upload su ./cache/test.dat $(X_BLOCK_NUM)"; \
+		rm -f ./harness/app/cache/sp/*.dat; \
+		rm -f ./harness/app/cache/sp/*.dat.tag; \
 	done
 
 test-auditing:
