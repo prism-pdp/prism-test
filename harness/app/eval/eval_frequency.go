@@ -23,7 +23,6 @@ type EvalFrequency struct {
 	TotalUnrepairedFileCount int
 
 	HistoryCorruptedFileCount []int
-	HistoryRepairedFileCount []int
 }
 
 type EvalFrequencyReport struct {
@@ -82,9 +81,6 @@ func (this *EvalFrequencyReport) Run() error {
 func (this *EvalFrequencyReport) runCore(_startIndex int, _lines []string, _e *EvalFrequency) int {
 	lineCount := len(_lines)
 
-	var saveCorruptedFileList []string
-	var saveRepairedFileList []string
-
 	// save := 0
 	for i := _startIndex; i < lineCount; i++ {
 		l := _lines[i]
@@ -97,20 +93,14 @@ func (this *EvalFrequencyReport) runCore(_startIndex int, _lines []string, _e *E
 				i += stepSize
 			}
 			newCorruptedFileList := helper.SubSlices(corruptedFileList, _e.CorruptedFileList)
-			saveCorruptedFileList = append(saveCorruptedFileList, newCorruptedFileList...)
-			saveRepairedFileList = append(saveRepairedFileList, repairedFileList...)
-			_e.HistoryCorruptedFileCount = append(_e.HistoryCorruptedFileCount, len(saveCorruptedFileList))
-			_e.HistoryRepairedFileCount = append(_e.HistoryRepairedFileCount, len(saveRepairedFileList))
+			_e.TotalCorruptedFileCount += len(newCorruptedFileList)
+			_e.TotalRepairedFileCount += len(repairedFileList)
 
 			_e.CorruptedFileList = helper.Uniq(append(_e.CorruptedFileList, corruptedFileList...))
 			_e.CorruptedFileList = helper.SubSlices(_e.CorruptedFileList, repairedFileList)
+			_e.HistoryCorruptedFileCount = append(_e.HistoryCorruptedFileCount, len(_e.CorruptedFileList))
 
-			// repairedFileCount := len(repairedFileList) + save
-			// _e.HistoryRepairedFileCount = append(_e.HistoryRepairedFileCount, repairedFileCount)
-			// save = repairedFileCount
 		} else if message == "Finish frequency evaluation" {
-			_e.TotalCorruptedFileCount = _e.HistoryCorruptedFileCount[len(_e.HistoryCorruptedFileCount)-1]
-			_e.TotalRepairedFileCount = _e.HistoryRepairedFileCount[len(_e.HistoryRepairedFileCount)-1]
 			_e.TotalUnrepairedFileCount = len(_e.CorruptedFileList)
 			return i - _startIndex
 		}
@@ -187,7 +177,7 @@ func (this *EvalFrequencyReport) DumpCsvHistory(_pathDir string) error {
 	defer writer.Flush()
 
 	header := []string{
-		"Type", "File Ratio", "Block Ratio",
+		"File Ratio", "Block Ratio",
 		 "1",  "2",  "3",  "4",  "5",  "6",  "7",  "8",  "9",  "10",
 		"11", "12", "13", "14", "15", "16", "17", "18", "19",  "20",
 		"21", "22", "23", "24", "25", "26", "27", "28", "29",  "30",
@@ -204,16 +194,11 @@ func (this *EvalFrequencyReport) DumpCsvHistory(_pathDir string) error {
 	for _, v := range this.EvalData {
 		fr := fmt.Sprintf("%.1f", v.FileRatio)
 		dr := fmt.Sprintf("%.1f", v.DataRatio)
-		r1 := []string{ "Corruption", fr, dr }
-		r2 := []string{ "Repair", fr, dr }
+		r := []string{ fr, dr }
 		for _, c := range v.HistoryCorruptedFileCount {
-			r1 = append(r1, strconv.Itoa(c))
+			r = append(r, strconv.Itoa(c))
 		}
-		for _, c := range v.HistoryRepairedFileCount {
-			r2 = append(r2, strconv.Itoa(c))
-		}
-		records = append(records, r1)
-		records = append(records, r2)
+		records = append(records, r)
 	}
 
 	if err := writer.Write(header); err != nil {
