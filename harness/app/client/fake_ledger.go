@@ -106,6 +106,8 @@ func (this *FakeLedger) Dump() {
 
 	_, err = f.Write(s)
 	if err != nil { panic(err) }
+
+	f.Sync()
 }
 
 func makePath() string {
