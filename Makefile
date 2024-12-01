@@ -44,8 +44,69 @@ eval-contract:
 	$(MAKE) aide@eval-contract
 
 eval-frequency:
-	$(MAKE) test-frequency
+	rm -rf ./eval/frequency/logs/*
+	docker compose -f docker-compose-eval-frequency.yaml --profile all up
+	docker compose -f docker-compose-eval-frequency.yaml cp harness01:/opt/dpduado/cache/dpduado.log ./eval/frequency/logs/frequency-0.1.log
+	docker compose -f docker-compose-eval-frequency.yaml cp harness02:/opt/dpduado/cache/dpduado.log ./eval/frequency/logs/frequency-0.2.log
+	docker compose -f docker-compose-eval-frequency.yaml cp harness03:/opt/dpduado/cache/dpduado.log ./eval/frequency/logs/frequency-0.3.log
+	docker compose -f docker-compose-eval-frequency.yaml cp harness04:/opt/dpduado/cache/dpduado.log ./eval/frequency/logs/frequency-0.4.log
+	docker compose -f docker-compose-eval-frequency.yaml cp harness05:/opt/dpduado/cache/dpduado.log ./eval/frequency/logs/frequency-0.5.log
+	docker compose -f docker-compose-eval-frequency.yaml cp harness06:/opt/dpduado/cache/dpduado.log ./eval/frequency/logs/frequency-0.6.log
+	docker compose -f docker-compose-eval-frequency.yaml cp harness07:/opt/dpduado/cache/dpduado.log ./eval/frequency/logs/frequency-0.7.log
+	docker compose -f docker-compose-eval-frequency.yaml cp harness08:/opt/dpduado/cache/dpduado.log ./eval/frequency/logs/frequency-0.8.log
+	docker compose -f docker-compose-eval-frequency.yaml cp harness09:/opt/dpduado/cache/dpduado.log ./eval/frequency/logs/frequency-0.9.log
+	docker compose -f docker-compose-eval-frequency.yaml cp harness10:/opt/dpduado/cache/dpduado.log ./eval/frequency/logs/frequency-1.0.log
 	$(MAKE) aide@eval-frequency
+
+eval-frequency-0.1:
+	rm -rf ./eval/frequency/logs/frequency-0.1.log
+	docker compose -f docker-compose-eval-frequency.yaml --profile 10p up
+	docker compose -f docker-compose-eval-frequency.yaml cp harness01:/opt/dpduado/cache/dpduado.log ./eval/frequency/logs/frequency-0.1.log
+
+eval-frequency-0.2:
+	rm -rf ./eval/frequency/logs/frequency-0.2.log
+	docker compose -f docker-compose-eval-frequency.yaml --profile 20p up
+	docker compose -f docker-compose-eval-frequency.yaml cp harness02:/opt/dpduado/cache/dpduado.log ./eval/frequency/logs/frequency-0.2.log
+
+eval-frequency-0.3:
+	rm -rf ./eval/frequency/logs/frequency-0.3.log
+	docker compose -f docker-compose-eval-frequency.yaml --profile 30p up
+	docker compose -f docker-compose-eval-frequency.yaml cp harness03:/opt/dpduado/cache/dpduado.log ./eval/frequency/logs/frequency-0.3.log
+
+eval-frequency-0.4:
+	rm -rf ./eval/frequency/logs/frequency-0.4.log
+	docker compose -f docker-compose-eval-frequency.yaml --profile 40p up
+	docker compose -f docker-compose-eval-frequency.yaml cp harness04:/opt/dpduado/cache/dpduado.log ./eval/frequency/logs/frequency-0.4.log
+
+eval-frequency-0.5:
+	rm -rf ./eval/frequency/logs/frequency-0.5.log
+	docker compose -f docker-compose-eval-frequency.yaml --profile 50p up
+	docker compose -f docker-compose-eval-frequency.yaml cp harness05:/opt/dpduado/cache/dpduado.log ./eval/frequency/logs/frequency-0.5.log
+
+eval-frequency-0.6:
+	rm -rf ./eval/frequency/logs/frequency-0.6.log
+	docker compose -f docker-compose-eval-frequency.yaml --profile 60p up
+	docker compose -f docker-compose-eval-frequency.yaml cp harness06:/opt/dpduado/cache/dpduado.log ./eval/frequency/logs/frequency-0.6.log
+
+eval-frequency-0.7:
+	rm -rf ./eval/frequency/logs/frequency-0.7.log
+	docker compose -f docker-compose-eval-frequency.yaml --profile 70p up
+	docker compose -f docker-compose-eval-frequency.yaml cp harness07:/opt/dpduado/cache/dpduado.log ./eval/frequency/logs/frequency-0.7.log
+
+eval-frequency-0.8:
+	rm -rf ./eval/frequency/logs/frequency-0.8.log
+	docker compose -f docker-compose-eval-frequency.yaml --profile 80p up
+	docker compose -f docker-compose-eval-frequency.yaml cp harness08:/opt/dpduado/cache/dpduado.log ./eval/frequency/logs/frequency-0.8.log
+
+eval-frequency-0.9:
+	rm -rf ./eval/frequency/logs/frequency-0.9.log
+	docker compose -f docker-compose-eval-frequency.yaml --profile 90p up
+	docker compose -f docker-compose-eval-frequency.yaml cp harness09:/opt/dpduado/cache/dpduado.log ./eval/frequency/logs/frequency-0.9.log
+
+eval-frequency-1.0:
+	rm -rf ./eval/frequency/logs/frequency-1.0.log
+	docker compose -f docker-compose-eval-frequency.yaml --profile 100p up
+	docker compose -f docker-compose-eval-frequency.yaml cp harness10:/opt/dpduado/cache/dpduado.log ./eval/frequency/logs/frequency-1.0.log
 
 test-gentags:
 	rm -f ./harness/app/eval/gentags/logs/*
@@ -125,7 +186,7 @@ test-frequency-setup:
 	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --sim enroll auditor tpa1 $(ADDRESS_2)"
 	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --sim enroll user    su1  $(ADDRESS_4) $(PRIVKEY_4)"
 	@for i in `seq $(X_FILE_NUM)`; do \
-		$(MAKE) aide@testdata FILE_PATH="./cache/test.dat" FILE_SIZE=1M FILE_VAL=$$i; \
+		$(MAKE) aide@testdata FILE_PATH="./cache/test.dat" FILE_SIZE=100K FILE_VAL=$$i; \
 		$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --sim upload su1 ./cache/test.dat $(X_BLOCK_NUM)"; \
 	done
 
@@ -166,8 +227,8 @@ aide@eval-contract:
 	$(MAKE) docker-run SERVICE="harness" CMD="./bin/aide eval-contract ./eval/contract/logs ./eval/contract/results"
 
 aide@eval-frequency:
-	rm -f ./harness/app/eval/frequency/results/*
-	$(MAKE) docker-run SERVICE="harness" CMD="./bin/aide eval-frequency ./eval/frequency/logs ./eval/frequency/results"
+	rm -f ./eval/frequency/results/*
+	@docker compose -f docker-compose-eval.yaml run --rm aide aide eval-frequency /opt/dpduado/eval/frequency/logs /opt/dpduado/eval/frequency/results
 
 aide@corruption:
 	$(MAKE) docker-run SERVICE="harness" CMD="./bin/aide corruption $(X_DIR_TARGET) $(X_DAMAGE_RATE) $(X_PATH_RESULT)"
@@ -231,7 +292,7 @@ harness@simtest:
 	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --sim enroll user    su1  $(ADDRESS_4) $(PRIVKEY_4)"
 	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --sim enroll user    su2  $(ADDRESS_5) $(PRIVKEY_5)"
 	$(MAKE) aide@testdata FILE_PATH=./cache/dummy.data FILE_SIZE=1M FILE_VAL=1
-	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --sim pload su1 cache/dummy.data 100"
+	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --sim upload su1 cache/dummy.data 100"
 	$(MAKE) aide@testdata FILE_PATH=./cache/dummy.data FILE_SIZE=1M FILE_VAL=2
 	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --sim upload su1 cache/dummy.data 100"
 	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --sim upload su2 cache/dummy.data 50"

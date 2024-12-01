@@ -5,6 +5,7 @@ import (
 	"bytes"
     "encoding/binary"
 	"time"
+	"sort"
 	"crypto/sha256"
 	"encoding/hex"
 	"fmt"
@@ -18,6 +19,7 @@ import (
 	"math/rand"
 	"os"
 	"regexp"
+	"runtime/debug"
 	"strconv"
 	"strings"
 
@@ -238,8 +240,9 @@ func AppendFile(_path string, _data []byte) error {
 
 	// ファイルに書き込み
 	_, err = file.Write(_data)
+	if err != nil { return err }
 
-	return err
+	return nil
 }
 
 func Uniq(_array []string) []string {
@@ -385,4 +388,19 @@ func SubSlices(_a, _b []string) []string {
 		}
 	}
 	return arr
+}
+
+func SortedMapKeys[V any](m map[string]V) []string {
+    keys := make([]string, 0, len(m))
+    for k := range m {
+        keys = append(keys, k)
+    }
+	sort.Strings(keys)
+    return keys
+}
+
+func Panic(_e error) {
+	PrintLog("%v", _e)
+	PrintLog("\n%s", debug.Stack())
+	panic(_e)
 }

@@ -72,13 +72,13 @@ func (this *Auditor) VerifyAuditingProof(_hash [32]byte, _setTagData pdp.TagData
 	param := pdp.GenParamFromXZ21Param(&xz21Param)
 
 	fileProp, err := this.client.SearchFile(_hash)
-	if err != nil { panic(err) }
+	if err != nil { helper.Panic(err) }
 
 	auditingReq := _auditingReqData.Import(param)
 	subsetTag := _setTagData.ImportSubset(param, fileProp.SplitNum, auditingReq.Chal)
 
 	account, err := this.client.GetAccount(_owner)
-	if err != nil { panic(err) }
+	if err != nil { helper.Panic(err) }
 
 	var pubKeyData pdp.PublicKeyData
 	pubKeyData.Load(account.PubKey)

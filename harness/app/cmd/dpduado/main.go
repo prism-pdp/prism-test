@@ -139,7 +139,7 @@ func runUploadPhase(_name string, _path string, _chunkNum string) {
 	// --------------------------
 	// Read file
 	data, err := helper.ReadFile(_path)
-	if err != nil { panic(err) }
+	if err != nil { helper.Panic(err) }
 
 	helper.PrintLog("Read file (filesize:%d, path:%s)", len(data), _path)
 
@@ -163,7 +163,7 @@ func runUploadPhase(_name string, _path string, _chunkNum string) {
 
 		// SP verifies the proof.
 		success, err := sp.RegisterOwnerToFile(&su, data, chalData, proofData)
-		if err != nil { panic(err) }
+		if err != nil { helper.Panic(err) }
 
 		if success {
 			helper.PrintLog("Register an owner to a file (owner:%s, file:%s)", su.Name, hex)
@@ -172,7 +172,7 @@ func runUploadPhase(_name string, _path string, _chunkNum string) {
 		}
 	} else {
 		tmp, err := strconv.ParseUint(_chunkNum, 10, 32)
-		if err != nil { panic(err) }
+		if err != nil { helper.Panic(err) }
 		chunkNum = uint32(tmp) // Overwrite chunkNum with user defined value
 
 		// SU uploads the file.
@@ -180,7 +180,7 @@ func runUploadPhase(_name string, _path string, _chunkNum string) {
 
 		// SP accepts the file.
 		err = sp.UploadNewFile(data, &tag, su.Addr, &su.PublicKeyData)
-		if err != nil { panic(err) }
+		if err != nil { helper.Panic(err) }
 
 		helper.PrintLog("Upload new file (owner:%s, file:%s)", su.Name, hex)
 	}
@@ -208,10 +208,10 @@ func runUploadAuditingChal(_name string, _ratioData string, _ratioFile string) {
 	// --------------------------
 	// SU gets the list of his/her files.
 	ratioData, err := strconv.ParseFloat(_ratioData, 64)
-	if err != nil { panic(err) }
+	if err != nil { helper.Panic(err) }
 
 	ratioFile, err := strconv.ParseFloat(_ratioFile, 64)
-	if err != nil { panic(err) }
+	if err != nil { helper.Panic(err) }
 
 	fileList := su.GetFileList()
 	// SU generates challenge and requests to audit each file
@@ -251,8 +251,13 @@ func runUploadAuditingProof() {
 
 	for i, f := range fileList {
 		proofData := sp.GenAuditingProof(f, chalDataList[i])
-		helper.PrintLog("Upload auditing proof (entity:%s, file:%s, index:%d/%d)", sp.Name, helper.Hex(f[:]), i+1, len(fileList))
-		sp.UploadAuditingProof(f, proofData)
+		if len([]byte(proofData)) > 0 {
+			helper.PrintLog("Upload auditing proof (entity:%s, file:%s, index:%d/%d)", sp.Name, helper.Hex(f[:]), i+1, len(fileList))
+			sp.UploadAuditingProof(f, proofData)
+		} else {
+			err := fmt.Errorf("[Failure] Generate auditing proof (entity:%s, file:%s, index:%d/%d)", sp.Name, helper.Hex(f[:]), i+1, len(fileList))
+			helper.Panic(err)
+		}
 	}
 
 	// --------------------------
@@ -285,14 +290,16 @@ func runVerifyAuditingProof(_name string) {
 
 	var resultList []bool
 	for i, f := range fileList {
+		helper.PrintLog("Verify auditing proof (file:%s, index:%d/%d)", helper.Hex(f[:]), i+1, len(fileList))
+
 		// TPA gets M (list of hash of chunks) from SP.
 		owner, setDigest, tagDataSet := sp.PrepareVerificationData(f, reqDataList[i].ChalData)
 
 		// TPA verifies proof.
 		result, err := tpa.VerifyAuditingProof(f, tagDataSet, setDigest, &reqDataList[i], owner)
-		if err != nil { panic(err) }
+		if err != nil { helper.Panic(err) }
 
-		helper.PrintLog("Upload auditing result (file:%s, result:%t)", helper.Hex(f[:]), result)
+		helper.PrintLog("Upload auditing result (file:%s, index:%d/%d, result:%t)", helper.Hex(f[:]), i+1, len(fileList), result)
 		tpa.UploadAuditingResult(f, result)
 
 		resultList = append(resultList, result)

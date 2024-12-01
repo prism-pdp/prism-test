@@ -7,6 +7,7 @@ import (
 	"os"
 	"path/filepath"
 	"strconv"
+	"strings"
 
 	"github.com/dpduado/dpduado-test/harness/helper"
 )
@@ -26,10 +27,10 @@ type EvalFrequency struct {
 }
 
 type EvalFrequencyReport struct {
-	PathLogFile string
+	PathLogDir string
 	PathResultDir string
 
-	EvalData []*EvalFrequency
+	EvalData map[string][]*EvalFrequency
 }
 
 func NewEvalFrequency(_dataRatio, _fileRatio, _damageRate float64) *EvalFrequency {
@@ -43,42 +44,57 @@ func NewEvalFrequency(_dataRatio, _fileRatio, _damageRate float64) *EvalFrequenc
 	return obj
 }
 
-func NewEvalFrequencyReport(_pathLogFile, _pathResultDir string) *EvalFrequencyReport {
+func NewEvalFrequencyReport(_pathLogDir, _pathResultDir string) *EvalFrequencyReport {
 	obj := new(EvalFrequencyReport)
-	obj.PathLogFile = _pathLogFile
+	obj.PathLogDir = _pathLogDir
 	obj.PathResultDir = _pathResultDir
+	obj.EvalData = make(map[string][]*EvalFrequency)
 	return obj
 }
 
 func (this *EvalFrequencyReport) Run() error {
-	lines, err := helper.ReadLines(this.PathLogFile)
-	if err != nil { return err }
 
-	lineCount := len(lines)
+	dirEntries, err := os.ReadDir(this.PathLogDir)
+	if err != nil { panic(err) }
 
-	for i := 0; i < lineCount; i++ {
-		l := lines[i]
+	for _, e := range dirEntries {
+		if strings.HasPrefix(e.Name(), ".") {
+			continue
+		}
 
-		_, message, detail := helper.ParseLog(l)
-		if message == "Start frequency evaluation" {
-			r1 := helper.ToFloat64(detail["DataRatio"])
-			r2 := helper.ToFloat64(detail["FileRatio"])
-			r3 := helper.ToFloat64(detail["DamageRate"])
-			e := NewEvalFrequency(r1, r2, r3)
+		filePath := filepath.Join(this.PathLogDir, e.Name())
 
-			i += 1
-			stepSize := this.runCore(i, lines, e)
-			if err != nil { return err }
-			if stepSize < 0 { return fmt.Errorf("Invalid log lines") }
-			this.EvalData = append(this.EvalData, e)
-			i += stepSize
+		lines, err := helper.ReadLines(filePath)
+		if err != nil { return err }
+
+		lineCount := len(lines)
+
+		for i := 0; i < lineCount; i++ {
+			l := lines[i]
+
+			_, message, detail := helper.ParseLog(l)
+			if message == "Start frequency evaluation" {
+				r1 := helper.ToFloat64(detail["DataRatio"])
+				r2 := helper.ToFloat64(detail["FileRatio"])
+				r3 := helper.ToFloat64(detail["DamageRate"])
+				e := NewEvalFrequency(r1, r2, r3)
+
+				i += 1
+				stepSize := this.runCore(i, lines, e, (detail["DataRatio"] == "0.2" && detail["FileRatio"] == "0.1"))
+				if err != nil { return err }
+				if stepSize < 0 { return fmt.Errorf("Invalid log lines") }
+
+				// this.EvalData = append(this.EvalData, e)
+				this.EvalData[detail["FileRatio"]] = append(this.EvalData[detail["FileRatio"]], e)
+				i += stepSize
+			}
 		}
 	}
 
 	return nil
 }
 
-func (this *EvalFrequencyReport) runCore(_startIndex int, _lines []string, _e *EvalFrequency) int {
+func (this *EvalFrequencyReport) runCore(_startIndex int, _lines []string, _e *EvalFrequency, _debug bool) int {
 	lineCount := len(_lines)
 
 	// save := 0
@@ -142,11 +158,7 @@ func (this *EvalFrequencyReport) Dump() error {
 		return err
 	}
 
-	if err = this.DumpCsvHeatMap(this.PathResultDir); err != nil {
-		return err
-	}
-
-	if err = this.DumpCsvHistory(this.PathResultDir); err != nil {
+	if err = this.DumpCsv(this.PathResultDir); err != nil {
 		return err
 	}
 
@@ -154,8 +166,7 @@ func (this *EvalFrequencyReport) Dump() error {
 }
 
 func (this *EvalFrequencyReport) DumpJson(_pathDir string) error {
-	fileName := filepath.Base(this.PathLogFile)
-	filePath := filepath.Join(_pathDir, fileName + ".json")
+	filePath := filepath.Join(_pathDir, "frequency.json")
 
 	tmp, err := json.MarshalIndent(this, "", "\t")
 	if err != nil { return err }
@@ -165,9 +176,8 @@ func (this *EvalFrequencyReport) DumpJson(_pathDir string) error {
 	return nil
 }
 
-func (this *EvalFrequencyReport) DumpCsvHistory(_pathDir string) error {
-	fileName := filepath.Base(this.PathLogFile)
-	filePath := filepath.Join(_pathDir, fileName + "-history.csv")
+func (this *EvalFrequencyReport) DumpCsv(_pathDir string) error {
+	filePath := filepath.Join(_pathDir, "frequency.csv")
 
 	file, err := os.Create(filePath)
 	if err != nil { panic(err) }
@@ -176,72 +186,23 @@ func (this *EvalFrequencyReport) DumpCsvHistory(_pathDir string) error {
 	writer := csv.NewWriter(file)
 	defer writer.Flush()
 
-	header := []string{
-		"File Ratio", "Block Ratio",
-		 "1",  "2",  "3",  "4",  "5",  "6",  "7",  "8",  "9",  "10",
-		"11", "12", "13", "14", "15", "16", "17", "18", "19",  "20",
-		"21", "22", "23", "24", "25", "26", "27", "28", "29",  "30",
-		"31", "32", "33", "34", "35", "36", "37", "38", "39",  "40",
-		"41", "42", "43", "44", "45", "46", "47", "48", "49",  "50",
-		"51", "52", "53", "54", "55", "56", "57", "58", "59",  "60",
-		"61", "62", "63", "64", "65", "66", "67", "68", "69",  "70",
-		"71", "72", "73", "74", "75", "76", "77", "78", "79",  "80",
-		"81", "82", "83", "84", "85", "86", "87", "88", "89",  "90",
-		"91", "92", "93", "94", "95", "96", "97", "98", "99", "100",
+	header := []string{ "File Ratio", "Block Ratio" }
+	for i, _ := range this.EvalData["0.1"][0].HistoryCorruptedFileCount {
+		header = append(header, strconv.Itoa(i))
 	}
 
 	var records [][]string
-	for _, v := range this.EvalData {
-		fr := fmt.Sprintf("%.1f", v.FileRatio)
-		dr := fmt.Sprintf("%.1f", v.DataRatio)
-		r := []string{ fr, dr }
-		for _, c := range v.HistoryCorruptedFileCount {
-			r = append(r, strconv.Itoa(c))
+	keys := helper.SortedMapKeys(this.EvalData)
+	for _, k := range keys {
+		for _, v := range this.EvalData[k] {
+			fr := fmt.Sprintf("%.1f", v.FileRatio)
+			dr := fmt.Sprintf("%.1f", v.DataRatio)
+			r := []string{ fr, dr }
+			for _, c := range v.HistoryCorruptedFileCount {
+				r = append(r, strconv.Itoa(c))
+			}
+			records = append(records, r)
 		}
-		records = append(records, r)
-	}
-
-	if err := writer.Write(header); err != nil {
-		return err
-	}
-	return writer.WriteAll(records)
-}
-
-func (this *EvalFrequencyReport) DumpCsvHeatMap(_pathDir string) error {
-	fileName := filepath.Base(this.PathLogFile)
-	filePath := filepath.Join(_pathDir, fileName + "-heatmap.csv")
-
-	file, err := os.Create(filePath)
-	if err != nil { panic(err) }
-	defer file.Close()
-
-	writer := csv.NewWriter(file)
-	defer writer.Flush()
-
-	header := []string{
-		"FileRatio",
-		"DataRatio:0.1",
-		"DataRatio:0.2",
-		"DataRatio:0.3",
-		"DataRatio:0.4",
-		"DataRatio:0.5",
-		"DataRatio:0.6",
-		"DataRatio:0.7",
-		"DataRatio:0.8",
-		"DataRatio:0.9",
-		"DataRatio:1.0",
-	}
-
-	records := make([][]string, 10)
-	for i := 0; i < len(records); i++ {
-		records[i] = make([]string, len(header))
-		records[i][0] = fmt.Sprintf("%.1f", float64(i + 1) * 0.1)
-	}
-
-	for _, v := range this.EvalData {
-		dr := int(v.DataRatio * 10 - 1) + 1
-		fr := int(v.FileRatio * 10 - 1)
-		records[fr][dr] = helper.IntToString(v.TotalUnrepairedFileCount)
 	}
 
 	if err := writer.Write(header); err != nil {

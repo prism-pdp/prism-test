@@ -7,7 +7,6 @@ import(
 	"github.com/pborman/getopt/v2"
     "math/rand"
 	"strconv"
-    "strings"
     "os"
     "path/filepath"
     "time"
@@ -183,24 +182,13 @@ func runEvalContract(_pathLogDir string, _pathResultDir string) {
 func runEvalFrequency(_pathLogDir string, _pathResultDir string) {
     var err error
 
-	dirEntries, err := os.ReadDir(_pathLogDir)
-	if err != nil { panic(err) }
+    report := eval.NewEvalFrequencyReport(_pathLogDir, _pathResultDir)
 
+    err = report.Run()
+    if err != nil { panic(err) }
 
-	for _, e := range dirEntries {
-		if strings.HasPrefix(e.Name(), ".") {
-			continue
-		}
-
-		filePath := filepath.Join(_pathLogDir, e.Name())
-        report := eval.NewEvalFrequencyReport(filePath, _pathResultDir)
-
-        err = report.Run()
-        if err != nil { panic(err) }
-
-        err = report.Dump()
-        if err != nil { panic(err) }
-    }
+    err = report.Dump()
+    if err != nil { panic(err) }
 }
 
 func runShowAccount(_addr string) {
