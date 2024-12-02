@@ -31,7 +31,7 @@ done
 
 TRIAL_COUNT=100
 DAMAGE_RATE=0.003
-for block_ratio in `seq 0.1 0.1 1.0`; do
+for block_ratio in `seq 0.2 0.2 1.0`; do
     $AIDE write-log "Start frequency evaluation (DataRatio:$block_ratio, FileRatio:$FILE_RATIO, DamageRate:$DAMAGE_RATE)"
     for i in `seq $TRIAL_COUNT`; do
         $AIDE write-log "Start cycle (cycle:$i)"
@@ -49,3 +49,5 @@ for block_ratio in `seq 0.1 0.1 1.0`; do
     $AIDE write-log "Repair all corrupted files"
     $AIDE repair-batch $PATH_CACHE/corrupted.list
 done
+
+cp $PATH_CACHE/dpduado.log /opt/dpduado/logs/frequency-$FILE_RATIO.log

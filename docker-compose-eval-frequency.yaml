@@ -1,152 +1,82 @@
 services:
-  harness01:
+  harness0.2:
     image: dpduado-test/harness
-    container_name: harness01
+    container_name: harness0.2
     volumes:
+      - harness0.2:/opt/dpduado/cache
       - ./harness/app/bin:/opt/dpduado/bin
-      - ./eval-frequency.sh:/opt/dpduado/eval-frequency.sh
-      - harness01:/opt/dpduado/cache
+      - ./eval/frequency/logs:/opt/dpduado/logs
+      - ./eval/eval-frequency.sh:/opt/dpduado/eval-frequency.sh
     env_file:
       - accounts.env
     profiles:
-      - 10p
-      - all
-    command: /opt/dpduado/eval-frequency.sh 0.1
-
-  harness02:
-    image: dpduado-test/harness
-    container_name: harness02
-    volumes:
-      - ./harness/app/bin:/opt/dpduado/bin
-      - ./eval-frequency.sh:/opt/dpduado/eval-frequency.sh
-      - harness02:/opt/dpduado/cache
-    env_file:
-      - accounts.env
-    profiles:
-      - 20p
+      - "0.2"
       - all
     command: /opt/dpduado/eval-frequency.sh 0.2
 
-  harness03:
+  harness0.4:
     image: dpduado-test/harness
-    container_name: harness03
+    container_name: harness0.4
     volumes:
+      - harness0.4:/opt/dpduado/cache
       - ./harness/app/bin:/opt/dpduado/bin
-      - ./eval-frequency.sh:/opt/dpduado/eval-frequency.sh
-      - harness03:/opt/dpduado/cache
+      - ./eval/frequency/logs:/opt/dpduado/logs
+      - ./eval/eval-frequency.sh:/opt/dpduado/eval-frequency.sh
     env_file:
       - accounts.env
     profiles:
-      - 30p
-      - all
-    command: /opt/dpduado/eval-frequency.sh 0.3
-
-  harness04:
-    image: dpduado-test/harness
-    container_name: harness04
-    volumes:
-      - ./harness/app/bin:/opt/dpduado/bin
-      - ./eval-frequency.sh:/opt/dpduado/eval-frequency.sh
-      - harness04:/opt/dpduado/cache
-    env_file:
-      - accounts.env
-    profiles:
-      - 40p
+      - "0.4"
       - all
     command: /opt/dpduado/eval-frequency.sh 0.4
 
-  harness05:
+  harness0.6:
     image: dpduado-test/harness
-    container_name: harness05
+    container_name: harness0.6
     volumes:
+      - harness0.6:/opt/dpduado/cache
       - ./harness/app/bin:/opt/dpduado/bin
-      - ./eval-frequency.sh:/opt/dpduado/eval-frequency.sh
-      - harness05:/opt/dpduado/cache
+      - ./eval/frequency/logs:/opt/dpduado/logs
+      - ./eval/eval-frequency.sh:/opt/dpduado/eval-frequency.sh
     env_file:
       - accounts.env
     profiles:
-      - 50p
-      - all
-    command: /opt/dpduado/eval-frequency.sh 0.5
-
-  harness06:
-    image: dpduado-test/harness
-    container_name: harness06
-    volumes:
-      - ./harness/app/bin:/opt/dpduado/bin
-      - ./eval-frequency.sh:/opt/dpduado/eval-frequency.sh
-      - harness06:/opt/dpduado/cache
-    env_file:
-      - accounts.env
-    profiles:
-      - 60p
+      - "0.6"
       - all
     command: /opt/dpduado/eval-frequency.sh 0.6
 
-  harness07:
+  harness0.8:
     image: dpduado-test/harness
-    container_name: harness07
+    container_name: harness0.8
     volumes:
+      - harness0.8:/opt/dpduado/cache
       - ./harness/app/bin:/opt/dpduado/bin
-      - ./eval-frequency.sh:/opt/dpduado/eval-frequency.sh
-      - harness07:/opt/dpduado/cache
+      - ./eval/frequency/logs:/opt/dpduado/logs
+      - ./eval/eval-frequency.sh:/opt/dpduado/eval-frequency.sh
     env_file:
       - accounts.env
     profiles:
-      - 70p
-      - all
-    command: /opt/dpduado/eval-frequency.sh 0.7
-
-  harness08:
-    image: dpduado-test/harness
-    container_name: harness08
-    volumes:
-      - ./harness/app/bin:/opt/dpduado/bin
-      - ./eval-frequency.sh:/opt/dpduado/eval-frequency.sh
-      - harness08:/opt/dpduado/cache
-    env_file:
-      - accounts.env
-    profiles:
-      - 80p
+      - "0.8"
       - all
     command: /opt/dpduado/eval-frequency.sh 0.8
 
-  harness09:
+  harness1.0:
     image: dpduado-test/harness
-    container_name: harness09
+    container_name: harness1.0
     volumes:
+      - harness1.0:/opt/dpduado/cache
       - ./harness/app/bin:/opt/dpduado/bin
-      - ./eval-frequency.sh:/opt/dpduado/eval-frequency.sh
-      - harness09:/opt/dpduado/cache
+      - ./eval/frequency/logs:/opt/dpduado/logs
+      - ./eval/eval-frequency.sh:/opt/dpduado/eval-frequency.sh
     env_file:
       - accounts.env
     profiles:
-      - 90p
-      - all
-    command: /opt/dpduado/eval-frequency.sh 0.9
-
-  harness10:
-    image: dpduado-test/harness
-    container_name: harness10
-    volumes:
-      - ./harness/app/bin:/opt/dpduado/bin
-      - ./eval-frequency.sh:/opt/dpduado/eval-frequency.sh
-      - harness10:/opt/dpduado/cache
-    env_file:
-      - accounts.env
-    profiles:
-      - 100p
+      - "1.0"
       - all
     command: /opt/dpduado/eval-frequency.sh 1.0
 
 volumes:
-  harness01:
-  harness02:
-  harness03:
-  harness04:
-  harness05:
-  harness06:
-  harness07:
-  harness08:
-  harness09:
-  harness10:
+  harness0.2:
+  harness0.4:
+  harness0.6:
+  harness0.8:
+  harness1.0:

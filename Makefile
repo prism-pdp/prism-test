@@ -44,69 +44,17 @@ eval-contract:
 	$(MAKE) aide@eval-contract
 
 eval-frequency:
+	$(MAKE) eval-frequency-down
 	rm -rf ./eval/frequency/logs/*
 	docker compose -f docker-compose-eval-frequency.yaml --profile all up
-	docker compose -f docker-compose-eval-frequency.yaml cp harness01:/opt/dpduado/cache/dpduado.log ./eval/frequency/logs/frequency-0.1.log
-	docker compose -f docker-compose-eval-frequency.yaml cp harness02:/opt/dpduado/cache/dpduado.log ./eval/frequency/logs/frequency-0.2.log
-	docker compose -f docker-compose-eval-frequency.yaml cp harness03:/opt/dpduado/cache/dpduado.log ./eval/frequency/logs/frequency-0.3.log
-	docker compose -f docker-compose-eval-frequency.yaml cp harness04:/opt/dpduado/cache/dpduado.log ./eval/frequency/logs/frequency-0.4.log
-	docker compose -f docker-compose-eval-frequency.yaml cp harness05:/opt/dpduado/cache/dpduado.log ./eval/frequency/logs/frequency-0.5.log
-	docker compose -f docker-compose-eval-frequency.yaml cp harness06:/opt/dpduado/cache/dpduado.log ./eval/frequency/logs/frequency-0.6.log
-	docker compose -f docker-compose-eval-frequency.yaml cp harness07:/opt/dpduado/cache/dpduado.log ./eval/frequency/logs/frequency-0.7.log
-	docker compose -f docker-compose-eval-frequency.yaml cp harness08:/opt/dpduado/cache/dpduado.log ./eval/frequency/logs/frequency-0.8.log
-	docker compose -f docker-compose-eval-frequency.yaml cp harness09:/opt/dpduado/cache/dpduado.log ./eval/frequency/logs/frequency-0.9.log
-	docker compose -f docker-compose-eval-frequency.yaml cp harness10:/opt/dpduado/cache/dpduado.log ./eval/frequency/logs/frequency-1.0.log
 	$(MAKE) aide@eval-frequency
 
-eval-frequency-0.1:
-	rm -rf ./eval/frequency/logs/frequency-0.1.log
-	docker compose -f docker-compose-eval-frequency.yaml --profile 10p up
-	docker compose -f docker-compose-eval-frequency.yaml cp harness01:/opt/dpduado/cache/dpduado.log ./eval/frequency/logs/frequency-0.1.log
+eval-frequency-x:
+	rm -rf ./eval/frequency/logs/frequency-$(X_FILE_RATIO).log
+	docker compose -f docker-compose-eval-frequency.yaml --profile $(X_FILE_RATIO) up
 
-eval-frequency-0.2:
-	rm -rf ./eval/frequency/logs/frequency-0.2.log
-	docker compose -f docker-compose-eval-frequency.yaml --profile 20p up
-	docker compose -f docker-compose-eval-frequency.yaml cp harness02:/opt/dpduado/cache/dpduado.log ./eval/frequency/logs/frequency-0.2.log
-
-eval-frequency-0.3:
-	rm -rf ./eval/frequency/logs/frequency-0.3.log
-	docker compose -f docker-compose-eval-frequency.yaml --profile 30p up
-	docker compose -f docker-compose-eval-frequency.yaml cp harness03:/opt/dpduado/cache/dpduado.log ./eval/frequency/logs/frequency-0.3.log
-
-eval-frequency-0.4:
-	rm -rf ./eval/frequency/logs/frequency-0.4.log
-	docker compose -f docker-compose-eval-frequency.yaml --profile 40p up
-	docker compose -f docker-compose-eval-frequency.yaml cp harness04:/opt/dpduado/cache/dpduado.log ./eval/frequency/logs/frequency-0.4.log
-
-eval-frequency-0.5:
-	rm -rf ./eval/frequency/logs/frequency-0.5.log
-	docker compose -f docker-compose-eval-frequency.yaml --profile 50p up
-	docker compose -f docker-compose-eval-frequency.yaml cp harness05:/opt/dpduado/cache/dpduado.log ./eval/frequency/logs/frequency-0.5.log
-
-eval-frequency-0.6:
-	rm -rf ./eval/frequency/logs/frequency-0.6.log
-	docker compose -f docker-compose-eval-frequency.yaml --profile 60p up
-	docker compose -f docker-compose-eval-frequency.yaml cp harness06:/opt/dpduado/cache/dpduado.log ./eval/frequency/logs/frequency-0.6.log
-
-eval-frequency-0.7:
-	rm -rf ./eval/frequency/logs/frequency-0.7.log
-	docker compose -f docker-compose-eval-frequency.yaml --profile 70p up
-	docker compose -f docker-compose-eval-frequency.yaml cp harness07:/opt/dpduado/cache/dpduado.log ./eval/frequency/logs/frequency-0.7.log
-
-eval-frequency-0.8:
-	rm -rf ./eval/frequency/logs/frequency-0.8.log
-	docker compose -f docker-compose-eval-frequency.yaml --profile 80p up
-	docker compose -f docker-compose-eval-frequency.yaml cp harness08:/opt/dpduado/cache/dpduado.log ./eval/frequency/logs/frequency-0.8.log
-
-eval-frequency-0.9:
-	rm -rf ./eval/frequency/logs/frequency-0.9.log
-	docker compose -f docker-compose-eval-frequency.yaml --profile 90p up
-	docker compose -f docker-compose-eval-frequency.yaml cp harness09:/opt/dpduado/cache/dpduado.log ./eval/frequency/logs/frequency-0.9.log
-
-eval-frequency-1.0:
-	rm -rf ./eval/frequency/logs/frequency-1.0.log
-	docker compose -f docker-compose-eval-frequency.yaml --profile 100p up
-	docker compose -f docker-compose-eval-frequency.yaml cp harness10:/opt/dpduado/cache/dpduado.log ./eval/frequency/logs/frequency-1.0.log
+eval-frequency-down:
+	docker compose -f docker-compose-eval-frequency.yaml --profile all down
 
 test-gentags:
 	rm -f ./harness/app/eval/gentags/logs/*
@@ -169,44 +117,6 @@ test-contract-main:
 	@$(MAKE) harness@cmd-proof
 	@$(MAKE) harness@cmd-audit     X_ETHERNET_SENDER_OPTS="$(ETHERNET_SENDER_OPTS_2)" X_AUDITOR_NAME=tpa1
 	$(MAKE) testnet/down
-
-test-frequency:
-	rm -rf ./harness/app/cache/*
-	rm -f ./harness/app/eval/frequency/logs/*
-	$(MAKE) test-frequency-setup X_FILE_NUM=100 X_BLOCK_NUM=100
-	@for fr in `seq 0.1 0.1 1.0`; do \
-		for dr in `seq 0.1 0.1 1.0`; do \
-			$(MAKE) test-frequency-main X_DATA_RATIO=$$dr X_FILE_RATIO=$$fr X_DAMAGE_RATE=0.003 X_TRIAL_COUNT=$(TRIAL_COUNT); \
-		done; \
-	done
-	cp ./harness/app/cache/dpduado.log ./harness/app/eval/frequency/logs/frequency.log
-
-test-frequency-setup:
-	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --sim setup $(ADDRESS_0) $(PRIVKEY_0) $(ADDRESS_1) $(PRIVKEY_1)"
-	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --sim enroll auditor tpa1 $(ADDRESS_2)"
-	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --sim enroll user    su1  $(ADDRESS_4) $(PRIVKEY_4)"
-	@for i in `seq $(X_FILE_NUM)`; do \
-		$(MAKE) aide@testdata FILE_PATH="./cache/test.dat" FILE_SIZE=100K FILE_VAL=$$i; \
-		$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --sim upload su1 ./cache/test.dat $(X_BLOCK_NUM)"; \
-	done
-
-test-frequency-main:
-	@$(MAKE) aide@write-log X_LOG="Start frequency evaluation (DataRatio:$(X_DATA_RATIO), FileRatio:$(X_FILE_RATIO), DamageRate:$(X_DAMAGE_RATE))"
-	@for i in `seq $(X_TRIAL_COUNT)`; do \
-		$(MAKE) aide@write-log X_LOG="Start cycle (cycle:$$i)"; \
-		$(MAKE) test-frequency-core X_DATA_RATIO=$(X_DATA_RATIO) X_FILE_RATIO=$(X_FILE_RATIO) X_DAMAGE_RATE=$(X_DAMAGE_RATE); \
-		$(MAKE) aide@write-log X_LOG="Finish cycle (cycle:$$i)"; \
-	done
-	@$(MAKE) aide@write-log X_LOG="Finish frequency evaluation (DataRatio:$(X_DATA_RATIO), FileRatio:$(X_FILE_RATIO), DamageRate:$(X_DAMAGE_RATE))"
-	@$(MAKE) aide@repair-batch X_PATH_LIST="./cache/corrupted-filepath-list.txt"
-
-test-frequency-core:
-	$(MAKE) aide@corruption X_DIR_TARGET="./cache/sp" X_DAMAGE_RATE=$(X_DAMAGE_RATE) X_PATH_RESULT=./cache/corrupted-filepath-list.txt
-	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --sim challenge su1 $(X_DATA_RATIO) $(X_FILE_RATIO)"
-	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --sim proof"
-	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --sim --detected-list ./cache/detected.list audit tpa1"
-	$(MAKE) aide@repair-batch X_PATH_LIST="./cache/detected.list"
-	rm -f ./harness/app/cache/detected.list
 
 aide@build:
 	$(MAKE) docker-run SERVICE="harness" CMD="go build -o bin/aide ./cmd/aide"
