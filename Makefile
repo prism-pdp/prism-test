@@ -40,8 +40,17 @@ eval-auditing:
 	$(MAKE) aide@eval-auditing
 
 eval-contract:
-	$(MAKE) test-contract
+	$(MAKE) eval-contract-down
+	rm -f ./cache/contract.addr
+	rm -f ./cache/contract-addr.env
+	docker compose -f docker-compose-eval-contract.yaml up -d testnet
+	docker compose -f docker-compose-eval-contract.yaml exec testnet /entrypoint.sh deploy $(CONTRACT) | tee ./cache/contract.addr
+	echo CONTRACT_ADDR=`cat ./cache/contract.addr` > ./cache/contract-addr.env
+	docker compose -f docker-compose-eval-contract.yaml up harness
 	$(MAKE) aide@eval-contract
+
+eval-contract-down:
+	docker compose -f docker-compose-eval-contract.yaml down
 
 eval-frequency:
 	$(MAKE) eval-frequency-down
@@ -94,29 +103,6 @@ test-auditing-main:
 		$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --sim proof"; \
 		$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --sim audit tpa"; \
 	done
-
-test-contract:
-	rm -f ./harness/app/eval/contract/logs/*
-	$(MAKE) test-contract-main X_TRIAL_COUNT=$(TRIAL_COUNT)
-	mv ./harness/app/cache/dpduado.log ./harness/app/eval/contract/logs/contract.log
-
-test-contract-main:
-	rm -rf ./harness/app/cache/*
-	$(MAKE) testnet/down
-	$(MAKE) testnet/up
-	@$(MAKE) harness@cmd-setup
-	@$(MAKE) harness@cmd-enroll-auditor X_NAME=tpa1 X_ADDR=$(ADDRESS_2)
-	@$(MAKE) harness@cmd-enroll-user    X_NAME=su1  X_ADDR=$(ADDRESS_4) X_KEY=$(PRIVKEY_4)
-	@$(MAKE) harness@cmd-enroll-user    X_NAME=su2  X_ADDR=$(ADDRESS_5) X_KEY=$(PRIVKEY_5)
-	@for i in `seq $(X_TRIAL_COUNT)`; do \
-		$(MAKE) aide@testdata FILE_PATH="./cache/test.dat" FILE_SIZE=1M FILE_VAL=$$i; \
-		$(MAKE) harness@cmd-upload X_ETHERNET_SENDER_OPTS="$(ETHERNET_SENDER_OPTS_4)" X_USER_NAME=su1 X_PATH_FILE=./cache/test.dat X_SPLIT_COUNT=10; \
-		$(MAKE) harness@cmd-upload X_ETHERNET_SENDER_OPTS="$(ETHERNET_SENDER_OPTS_5)" X_USER_NAME=su2 X_PATH_FILE=./cache/test.dat X_SPLIT_COUNT=10; \
-	done
-	@$(MAKE) harness@cmd-challenge X_ETHERNET_SENDER_OPTS="$(ETHERNET_SENDER_OPTS_4)" X_USER_NAME=su1 X_DATA_RATIO=0.6 X_FILE_RATIO=1.0
-	@$(MAKE) harness@cmd-proof
-	@$(MAKE) harness@cmd-audit     X_ETHERNET_SENDER_OPTS="$(ETHERNET_SENDER_OPTS_2)" X_AUDITOR_NAME=tpa1
-	$(MAKE) testnet/down
 
 aide@build:
 	$(MAKE) docker-run SERVICE="harness" CMD="go build -o bin/aide ./cmd/aide"

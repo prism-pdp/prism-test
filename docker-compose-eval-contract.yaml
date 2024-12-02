@@ -1,0 +1,31 @@
+services:
+  testnet:
+    image: dpduado-test/testnet
+    container_name: eval_contract_testnet
+    hostname: testnet
+    volumes:
+      - ./testnet/dpduado-sol:/app
+    environment:
+      - BALANCE_FIRST_ACCOUNTS=300
+      - WALLET_MNEMONIC=chaos knee unit sing method banana chicken quote script boat crouch pig
+    env_file:
+      - accounts.env
+    ports:
+      - 8545:8545
+    command: start
+
+  harness:
+    image: dpduado-test/harness
+    container_name: eval_contract_harness
+    volumes:
+      - harness:/opt/dpduado/cache
+      - ./cache/contract-addr.env:/opt/dpduado/contract-addr.env
+      - ./harness/app/bin:/opt/dpduado/bin
+      - ./eval/contract/logs:/opt/dpduado/logs
+      - ./eval/eval-contract.sh:/opt/dpduado/eval-contract.sh
+    env_file:
+      - accounts.env
+    command: /opt/dpduado/eval-contract.sh
+
+volumes:
+  harness:
