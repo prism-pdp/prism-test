@@ -1,0 +1,1615 @@
+[2024/12/02 18:14:19.001] Start setup
+[2024/12/02 18:14:19.014] Register param
+[2024/12/02 18:14:19.027] Finish setup
+[2024/12/02 18:14:19.074] Start enroll auditor
+[2024/12/02 18:14:19.076] enroll auditor (name:tpa1)
+[2024/12/02 18:14:19.085] Finish enroll auditor
+[2024/12/02 18:14:19.123] Start enroll user
+[2024/12/02 18:14:19.126] enroll service user (name:su1)
+[2024/12/02 18:14:19.127] Finish enroll user
+[2024/12/02 18:14:36.499] Start upload
+[2024/12/02 18:14:36.877] Read file (filesize:1048576000, path:/tmp/test.dat)
+[2024/12/02 18:14:44.716] Start generate tags (chunks:1000)
+[2024/12/02 18:14:56.595] Finish generate tags (chunks:1000)
+[2024/12/02 18:15:04.927] Upload new file (owner:su1, file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572)
+[2024/12/02 18:15:04.975] Finish upload
+[2024/12/02 18:15:06.086] Start challenge
+[2024/12/02 18:15:06.086] Upload auditing chal (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:15:06.178] Finish challenge
+[2024/12/02 18:15:06.800] Start proof
+[2024/12/02 18:15:06.801] Download auditing chal (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:15:07.143] Start generating proof (chunks:1000, target:900)
+[2024/12/02 18:15:13.056] Finish generating proof (chunks:1000, target:900)
+[2024/12/02 18:15:13.056] Upload auditing proof (entity:sp, file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:15:13.657] Finish proof
+[2024/12/02 18:15:14.839] Start auditing
+[2024/12/02 18:15:15.028] Download auditing req (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:15:15.028] Verify auditing proof (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:15:19.729] Start verifying proof (splitNum:1000, blockCount:900)
+[2024/12/02 18:15:22.750] Finish verifying proof (splitNum:1000, blockCount:900)
+[2024/12/02 18:15:22.750] Upload auditing result (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1, result:true)
+[2024/12/02 18:15:22.814] Finish auditing
+[2024/12/02 18:15:23.575] Start challenge
+[2024/12/02 18:15:23.576] Upload auditing chal (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:15:23.591] Finish challenge
+[2024/12/02 18:15:23.860] Start proof
+[2024/12/02 18:15:23.860] Download auditing chal (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:15:24.208] Start generating proof (chunks:1000, target:900)
+[2024/12/02 18:15:30.050] Finish generating proof (chunks:1000, target:900)
+[2024/12/02 18:15:30.050] Upload auditing proof (entity:sp, file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:15:30.050] Finish proof
+[2024/12/02 18:15:30.175] Start auditing
+[2024/12/02 18:15:30.175] Download auditing req (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:15:30.175] Verify auditing proof (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:15:34.800] Start verifying proof (splitNum:1000, blockCount:900)
+[2024/12/02 18:15:37.850] Finish verifying proof (splitNum:1000, blockCount:900)
+[2024/12/02 18:15:37.850] Upload auditing result (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1, result:true)
+[2024/12/02 18:15:37.850] Finish auditing
+[2024/12/02 18:15:38.090] Start challenge
+[2024/12/02 18:15:38.092] Upload auditing chal (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:15:38.095] Finish challenge
+[2024/12/02 18:15:38.127] Start proof
+[2024/12/02 18:15:38.128] Download auditing chal (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:15:38.474] Start generating proof (chunks:1000, target:900)
+[2024/12/02 18:15:44.366] Finish generating proof (chunks:1000, target:900)
+[2024/12/02 18:15:44.366] Upload auditing proof (entity:sp, file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:15:44.367] Finish proof
+[2024/12/02 18:15:44.492] Start auditing
+[2024/12/02 18:15:44.492] Download auditing req (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:15:44.492] Verify auditing proof (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:15:49.131] Start verifying proof (splitNum:1000, blockCount:900)
+[2024/12/02 18:15:52.142] Finish verifying proof (splitNum:1000, blockCount:900)
+[2024/12/02 18:15:52.142] Upload auditing result (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1, result:true)
+[2024/12/02 18:15:52.142] Finish auditing
+[2024/12/02 18:15:52.276] Start challenge
+[2024/12/02 18:15:52.276] Upload auditing chal (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:15:52.278] Finish challenge
+[2024/12/02 18:15:52.314] Start proof
+[2024/12/02 18:15:52.314] Download auditing chal (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:15:52.679] Start generating proof (chunks:1000, target:900)
+[2024/12/02 18:15:58.555] Finish generating proof (chunks:1000, target:900)
+[2024/12/02 18:15:58.555] Upload auditing proof (entity:sp, file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:15:58.556] Finish proof
+[2024/12/02 18:15:58.776] Start auditing
+[2024/12/02 18:15:58.776] Download auditing req (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:15:58.776] Verify auditing proof (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:16:03.455] Start verifying proof (splitNum:1000, blockCount:900)
+[2024/12/02 18:16:06.480] Finish verifying proof (splitNum:1000, blockCount:900)
+[2024/12/02 18:16:06.480] Upload auditing result (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1, result:true)
+[2024/12/02 18:16:06.480] Finish auditing
+[2024/12/02 18:16:06.609] Start challenge
+[2024/12/02 18:16:06.609] Upload auditing chal (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:16:06.611] Finish challenge
+[2024/12/02 18:16:06.666] Start proof
+[2024/12/02 18:16:06.666] Download auditing chal (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:16:07.031] Start generating proof (chunks:1000, target:900)
+[2024/12/02 18:16:12.906] Finish generating proof (chunks:1000, target:900)
+[2024/12/02 18:16:12.906] Upload auditing proof (entity:sp, file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:16:13.310] Finish proof
+[2024/12/02 18:16:14.454] Start auditing
+[2024/12/02 18:16:14.455] Download auditing req (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:16:14.455] Verify auditing proof (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:16:19.130] Start verifying proof (splitNum:1000, blockCount:900)
+[2024/12/02 18:16:22.154] Finish verifying proof (splitNum:1000, blockCount:900)
+[2024/12/02 18:16:22.154] Upload auditing result (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1, result:true)
+[2024/12/02 18:16:22.154] Finish auditing
+[2024/12/02 18:16:22.278] Start challenge
+[2024/12/02 18:16:22.278] Upload auditing chal (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:16:22.280] Finish challenge
+[2024/12/02 18:16:22.315] Start proof
+[2024/12/02 18:16:22.315] Download auditing chal (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:16:22.672] Start generating proof (chunks:1000, target:900)
+[2024/12/02 18:16:28.572] Finish generating proof (chunks:1000, target:900)
+[2024/12/02 18:16:28.572] Upload auditing proof (entity:sp, file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:16:28.572] Finish proof
+[2024/12/02 18:16:28.684] Start auditing
+[2024/12/02 18:16:28.684] Download auditing req (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:16:28.684] Verify auditing proof (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:16:33.326] Start verifying proof (splitNum:1000, blockCount:900)
+[2024/12/02 18:16:36.360] Finish verifying proof (splitNum:1000, blockCount:900)
+[2024/12/02 18:16:36.360] Upload auditing result (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1, result:true)
+[2024/12/02 18:16:36.415] Finish auditing
+[2024/12/02 18:16:37.413] Start challenge
+[2024/12/02 18:16:37.413] Upload auditing chal (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:16:37.552] Finish challenge
+[2024/12/02 18:16:38.342] Start proof
+[2024/12/02 18:16:38.343] Download auditing chal (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:16:38.683] Start generating proof (chunks:1000, target:900)
+[2024/12/02 18:16:44.547] Finish generating proof (chunks:1000, target:900)
+[2024/12/02 18:16:44.547] Upload auditing proof (entity:sp, file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:16:44.547] Finish proof
+[2024/12/02 18:16:44.680] Start auditing
+[2024/12/02 18:16:44.682] Download auditing req (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:16:44.682] Verify auditing proof (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:16:49.335] Start verifying proof (splitNum:1000, blockCount:900)
+[2024/12/02 18:16:52.358] Finish verifying proof (splitNum:1000, blockCount:900)
+[2024/12/02 18:16:52.358] Upload auditing result (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1, result:true)
+[2024/12/02 18:16:52.359] Finish auditing
+[2024/12/02 18:16:52.471] Start challenge
+[2024/12/02 18:16:52.471] Upload auditing chal (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:16:52.475] Finish challenge
+[2024/12/02 18:16:52.511] Start proof
+[2024/12/02 18:16:52.511] Download auditing chal (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:16:52.852] Start generating proof (chunks:1000, target:900)
+[2024/12/02 18:16:58.821] Finish generating proof (chunks:1000, target:900)
+[2024/12/02 18:16:58.821] Upload auditing proof (entity:sp, file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:16:58.925] Finish proof
+[2024/12/02 18:16:59.369] Start auditing
+[2024/12/02 18:16:59.370] Download auditing req (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:16:59.370] Verify auditing proof (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:17:04.005] Start verifying proof (splitNum:1000, blockCount:900)
+[2024/12/02 18:17:07.037] Finish verifying proof (splitNum:1000, blockCount:900)
+[2024/12/02 18:17:07.038] Upload auditing result (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1, result:true)
+[2024/12/02 18:17:07.038] Finish auditing
+[2024/12/02 18:17:07.156] Start challenge
+[2024/12/02 18:17:07.156] Upload auditing chal (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:17:07.159] Finish challenge
+[2024/12/02 18:17:07.191] Start proof
+[2024/12/02 18:17:07.191] Download auditing chal (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:17:07.537] Start generating proof (chunks:1000, target:900)
+[2024/12/02 18:17:13.423] Finish generating proof (chunks:1000, target:900)
+[2024/12/02 18:17:13.423] Upload auditing proof (entity:sp, file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:17:13.423] Finish proof
+[2024/12/02 18:17:13.722] Start auditing
+[2024/12/02 18:17:13.722] Download auditing req (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:17:13.722] Verify auditing proof (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:17:18.341] Start verifying proof (splitNum:1000, blockCount:900)
+[2024/12/02 18:17:21.350] Finish verifying proof (splitNum:1000, blockCount:900)
+[2024/12/02 18:17:21.350] Upload auditing result (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1, result:true)
+[2024/12/02 18:17:21.487] Finish auditing
+[2024/12/02 18:17:22.555] Start challenge
+[2024/12/02 18:17:22.555] Upload auditing chal (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:17:22.615] Finish challenge
+[2024/12/02 18:17:22.918] Start proof
+[2024/12/02 18:17:22.919] Download auditing chal (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:17:23.259] Start generating proof (chunks:1000, target:900)
+[2024/12/02 18:17:29.152] Finish generating proof (chunks:1000, target:900)
+[2024/12/02 18:17:29.152] Upload auditing proof (entity:sp, file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:17:29.152] Finish proof
+[2024/12/02 18:17:29.273] Start auditing
+[2024/12/02 18:17:29.273] Download auditing req (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:17:29.273] Verify auditing proof (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:17:33.922] Start verifying proof (splitNum:1000, blockCount:900)
+[2024/12/02 18:17:36.958] Finish verifying proof (splitNum:1000, blockCount:900)
+[2024/12/02 18:17:36.958] Upload auditing result (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1, result:true)
+[2024/12/02 18:17:36.958] Finish auditing
+[2024/12/02 18:17:37.125] Start challenge
+[2024/12/02 18:17:37.125] Upload auditing chal (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:17:37.129] Finish challenge
+[2024/12/02 18:17:37.162] Start proof
+[2024/12/02 18:17:37.163] Download auditing chal (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:17:37.504] Start generating proof (chunks:1000, target:900)
+[2024/12/02 18:17:43.482] Finish generating proof (chunks:1000, target:900)
+[2024/12/02 18:17:43.482] Upload auditing proof (entity:sp, file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:17:43.609] Finish proof
+[2024/12/02 18:17:44.652] Start auditing
+[2024/12/02 18:17:44.652] Download auditing req (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:17:44.652] Verify auditing proof (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:17:49.286] Start verifying proof (splitNum:1000, blockCount:900)
+[2024/12/02 18:17:52.327] Finish verifying proof (splitNum:1000, blockCount:900)
+[2024/12/02 18:17:52.327] Upload auditing result (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1, result:true)
+[2024/12/02 18:17:52.328] Finish auditing
+[2024/12/02 18:17:52.448] Start challenge
+[2024/12/02 18:17:52.449] Upload auditing chal (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:17:52.451] Finish challenge
+[2024/12/02 18:17:52.482] Start proof
+[2024/12/02 18:17:52.483] Download auditing chal (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:17:52.829] Start generating proof (chunks:1000, target:900)
+[2024/12/02 18:17:58.712] Finish generating proof (chunks:1000, target:900)
+[2024/12/02 18:17:58.713] Upload auditing proof (entity:sp, file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:17:58.713] Finish proof
+[2024/12/02 18:17:58.830] Start auditing
+[2024/12/02 18:17:58.830] Download auditing req (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:17:58.831] Verify auditing proof (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:18:03.467] Start verifying proof (splitNum:1000, blockCount:900)
+[2024/12/02 18:18:06.492] Finish verifying proof (splitNum:1000, blockCount:900)
+[2024/12/02 18:18:06.492] Upload auditing result (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1, result:true)
+[2024/12/02 18:18:06.514] Finish auditing
+[2024/12/02 18:18:07.294] Start challenge
+[2024/12/02 18:18:07.294] Upload auditing chal (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:18:07.321] Finish challenge
+[2024/12/02 18:18:07.714] Start proof
+[2024/12/02 18:18:07.714] Download auditing chal (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:18:08.067] Start generating proof (chunks:1000, target:900)
+[2024/12/02 18:18:13.917] Finish generating proof (chunks:1000, target:900)
+[2024/12/02 18:18:13.917] Upload auditing proof (entity:sp, file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:18:13.917] Finish proof
+[2024/12/02 18:18:14.070] Start auditing
+[2024/12/02 18:18:14.070] Download auditing req (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:18:14.070] Verify auditing proof (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:18:18.731] Start verifying proof (splitNum:1000, blockCount:900)
+[2024/12/02 18:18:21.789] Finish verifying proof (splitNum:1000, blockCount:900)
+[2024/12/02 18:18:21.789] Upload auditing result (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1, result:true)
+[2024/12/02 18:18:21.789] Finish auditing
+[2024/12/02 18:18:21.913] Start challenge
+[2024/12/02 18:18:21.913] Upload auditing chal (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:18:21.915] Finish challenge
+[2024/12/02 18:18:21.949] Start proof
+[2024/12/02 18:18:21.949] Download auditing chal (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:18:22.305] Start generating proof (chunks:1000, target:900)
+[2024/12/02 18:18:28.162] Finish generating proof (chunks:1000, target:900)
+[2024/12/02 18:18:28.162] Upload auditing proof (entity:sp, file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:18:28.162] Finish proof
+[2024/12/02 18:18:28.314] Start auditing
+[2024/12/02 18:18:28.315] Download auditing req (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:18:28.315] Verify auditing proof (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:18:32.893] Start verifying proof (splitNum:1000, blockCount:900)
+[2024/12/02 18:18:35.923] Finish verifying proof (splitNum:1000, blockCount:900)
+[2024/12/02 18:18:35.923] Upload auditing result (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1, result:true)
+[2024/12/02 18:18:35.923] Finish auditing
+[2024/12/02 18:18:36.139] Start challenge
+[2024/12/02 18:18:36.139] Upload auditing chal (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:18:36.141] Finish challenge
+[2024/12/02 18:18:36.174] Start proof
+[2024/12/02 18:18:36.175] Download auditing chal (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:18:36.529] Start generating proof (chunks:1000, target:900)
+[2024/12/02 18:18:42.401] Finish generating proof (chunks:1000, target:900)
+[2024/12/02 18:18:42.401] Upload auditing proof (entity:sp, file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:18:42.401] Finish proof
+[2024/12/02 18:18:42.597] Start auditing
+[2024/12/02 18:18:42.598] Download auditing req (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:18:42.598] Verify auditing proof (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:18:47.239] Start verifying proof (splitNum:1000, blockCount:900)
+[2024/12/02 18:18:50.263] Finish verifying proof (splitNum:1000, blockCount:900)
+[2024/12/02 18:18:50.263] Upload auditing result (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1, result:true)
+[2024/12/02 18:18:50.263] Finish auditing
+[2024/12/02 18:18:50.382] Start challenge
+[2024/12/02 18:18:50.383] Upload auditing chal (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:18:50.385] Finish challenge
+[2024/12/02 18:18:50.417] Start proof
+[2024/12/02 18:18:50.417] Download auditing chal (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:18:50.769] Start generating proof (chunks:1000, target:900)
+[2024/12/02 18:18:56.613] Finish generating proof (chunks:1000, target:900)
+[2024/12/02 18:18:56.613] Upload auditing proof (entity:sp, file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:18:56.614] Finish proof
+[2024/12/02 18:18:56.758] Start auditing
+[2024/12/02 18:18:56.759] Download auditing req (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:18:56.759] Verify auditing proof (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:19:01.420] Start verifying proof (splitNum:1000, blockCount:900)
+[2024/12/02 18:19:04.445] Finish verifying proof (splitNum:1000, blockCount:900)
+[2024/12/02 18:19:04.445] Upload auditing result (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1, result:true)
+[2024/12/02 18:19:04.445] Finish auditing
+[2024/12/02 18:19:04.589] Start challenge
+[2024/12/02 18:19:04.589] Upload auditing chal (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:19:04.593] Finish challenge
+[2024/12/02 18:19:04.637] Start proof
+[2024/12/02 18:19:04.637] Download auditing chal (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:19:05.001] Start generating proof (chunks:1000, target:900)
+[2024/12/02 18:19:10.893] Finish generating proof (chunks:1000, target:900)
+[2024/12/02 18:19:10.893] Upload auditing proof (entity:sp, file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:19:10.893] Finish proof
+[2024/12/02 18:19:11.033] Start auditing
+[2024/12/02 18:19:11.033] Download auditing req (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:19:11.033] Verify auditing proof (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:19:15.685] Start verifying proof (splitNum:1000, blockCount:900)
+[2024/12/02 18:19:18.688] Finish verifying proof (splitNum:1000, blockCount:900)
+[2024/12/02 18:19:18.923] Upload auditing result (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1, result:true)
+[2024/12/02 18:19:19.207] Finish auditing
+[2024/12/02 18:19:20.704] Start challenge
+[2024/12/02 18:19:20.705] Upload auditing chal (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:19:20.707] Finish challenge
+[2024/12/02 18:19:20.740] Start proof
+[2024/12/02 18:19:20.740] Download auditing chal (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:19:21.100] Start generating proof (chunks:1000, target:900)
+[2024/12/02 18:19:26.971] Finish generating proof (chunks:1000, target:900)
+[2024/12/02 18:19:26.971] Upload auditing proof (entity:sp, file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:19:26.971] Finish proof
+[2024/12/02 18:19:27.103] Start auditing
+[2024/12/02 18:19:27.104] Download auditing req (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:19:27.104] Verify auditing proof (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:19:31.787] Start verifying proof (splitNum:1000, blockCount:900)
+[2024/12/02 18:19:34.829] Finish verifying proof (splitNum:1000, blockCount:900)
+[2024/12/02 18:19:34.829] Upload auditing result (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1, result:true)
+[2024/12/02 18:19:34.830] Finish auditing
+[2024/12/02 18:19:34.959] Start challenge
+[2024/12/02 18:19:34.960] Upload auditing chal (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:19:34.962] Finish challenge
+[2024/12/02 18:19:35.008] Start proof
+[2024/12/02 18:19:35.009] Download auditing chal (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:19:35.363] Start generating proof (chunks:1000, target:900)
+[2024/12/02 18:19:41.222] Finish generating proof (chunks:1000, target:900)
+[2024/12/02 18:19:41.223] Upload auditing proof (entity:sp, file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:19:41.225] Finish proof
+[2024/12/02 18:19:43.315] Start auditing
+[2024/12/02 18:19:43.315] Download auditing req (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:19:43.315] Verify auditing proof (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:19:47.986] Start verifying proof (splitNum:1000, blockCount:900)
+[2024/12/02 18:19:51.001] Finish verifying proof (splitNum:1000, blockCount:900)
+[2024/12/02 18:19:51.001] Upload auditing result (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1, result:true)
+[2024/12/02 18:19:51.001] Finish auditing
+[2024/12/02 18:19:51.129] Start challenge
+[2024/12/02 18:19:51.130] Upload auditing chal (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:19:51.132] Finish challenge
+[2024/12/02 18:19:51.178] Start proof
+[2024/12/02 18:19:51.179] Download auditing chal (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:19:51.540] Start generating proof (chunks:1000, target:900)
+[2024/12/02 18:19:57.453] Finish generating proof (chunks:1000, target:900)
+[2024/12/02 18:19:57.453] Upload auditing proof (entity:sp, file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:19:57.453] Finish proof
+[2024/12/02 18:19:57.594] Start auditing
+[2024/12/02 18:19:57.594] Download auditing req (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:19:57.594] Verify auditing proof (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:20:02.351] Start verifying proof (splitNum:1000, blockCount:900)
+[2024/12/02 18:20:05.355] Finish verifying proof (splitNum:1000, blockCount:900)
+[2024/12/02 18:20:05.355] Upload auditing result (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1, result:true)
+[2024/12/02 18:20:05.432] Finish auditing
+[2024/12/02 18:20:06.844] Start challenge
+[2024/12/02 18:20:06.844] Upload auditing chal (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:20:06.978] Finish challenge
+[2024/12/02 18:20:07.373] Start proof
+[2024/12/02 18:20:07.373] Download auditing chal (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:20:07.718] Start generating proof (chunks:1000, target:900)
+[2024/12/02 18:20:13.622] Finish generating proof (chunks:1000, target:900)
+[2024/12/02 18:20:13.623] Upload auditing proof (entity:sp, file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:20:13.623] Finish proof
+[2024/12/02 18:20:13.737] Start auditing
+[2024/12/02 18:20:13.738] Download auditing req (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:20:13.738] Verify auditing proof (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:20:18.399] Start verifying proof (splitNum:1000, blockCount:900)
+[2024/12/02 18:20:21.441] Finish verifying proof (splitNum:1000, blockCount:900)
+[2024/12/02 18:20:21.441] Upload auditing result (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1, result:true)
+[2024/12/02 18:20:21.441] Finish auditing
+[2024/12/02 18:20:21.561] Start challenge
+[2024/12/02 18:20:21.561] Upload auditing chal (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:20:21.564] Finish challenge
+[2024/12/02 18:20:21.600] Start proof
+[2024/12/02 18:20:21.600] Download auditing chal (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:20:21.947] Start generating proof (chunks:1000, target:900)
+[2024/12/02 18:20:27.805] Finish generating proof (chunks:1000, target:900)
+[2024/12/02 18:20:27.805] Upload auditing proof (entity:sp, file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:20:28.062] Finish proof
+[2024/12/02 18:20:28.956] Start auditing
+[2024/12/02 18:20:28.956] Download auditing req (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:20:28.956] Verify auditing proof (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:20:33.592] Start verifying proof (splitNum:1000, blockCount:900)
+[2024/12/02 18:20:36.642] Finish verifying proof (splitNum:1000, blockCount:900)
+[2024/12/02 18:20:36.643] Upload auditing result (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1, result:true)
+[2024/12/02 18:20:36.643] Finish auditing
+[2024/12/02 18:20:36.761] Start challenge
+[2024/12/02 18:20:36.761] Upload auditing chal (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:20:36.764] Finish challenge
+[2024/12/02 18:20:36.810] Start proof
+[2024/12/02 18:20:36.811] Download auditing chal (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:20:37.164] Start generating proof (chunks:1000, target:900)
+[2024/12/02 18:20:43.072] Finish generating proof (chunks:1000, target:900)
+[2024/12/02 18:20:43.073] Upload auditing proof (entity:sp, file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:20:43.073] Finish proof
+[2024/12/02 18:20:43.234] Start auditing
+[2024/12/02 18:20:43.234] Download auditing req (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:20:43.234] Verify auditing proof (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:20:47.893] Start verifying proof (splitNum:1000, blockCount:900)
+[2024/12/02 18:20:50.903] Finish verifying proof (splitNum:1000, blockCount:900)
+[2024/12/02 18:20:50.904] Upload auditing result (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1, result:true)
+[2024/12/02 18:20:51.056] Finish auditing
+[2024/12/02 18:20:51.695] Start challenge
+[2024/12/02 18:20:51.695] Upload auditing chal (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:20:51.770] Finish challenge
+[2024/12/02 18:20:52.223] Start proof
+[2024/12/02 18:20:52.223] Download auditing chal (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:20:52.582] Start generating proof (chunks:1000, target:900)
+[2024/12/02 18:20:58.478] Finish generating proof (chunks:1000, target:900)
+[2024/12/02 18:20:58.478] Upload auditing proof (entity:sp, file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:20:58.479] Finish proof
+[2024/12/02 18:20:58.605] Start auditing
+[2024/12/02 18:20:58.606] Download auditing req (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:20:58.606] Verify auditing proof (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:21:03.270] Start verifying proof (splitNum:1000, blockCount:900)
+[2024/12/02 18:21:06.315] Finish verifying proof (splitNum:1000, blockCount:900)
+[2024/12/02 18:21:06.316] Upload auditing result (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1, result:true)
+[2024/12/02 18:21:06.316] Finish auditing
+[2024/12/02 18:21:06.453] Start challenge
+[2024/12/02 18:21:06.454] Upload auditing chal (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:21:06.456] Finish challenge
+[2024/12/02 18:21:06.490] Start proof
+[2024/12/02 18:21:06.490] Download auditing chal (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:21:06.846] Start generating proof (chunks:1000, target:900)
+[2024/12/02 18:21:12.738] Finish generating proof (chunks:1000, target:900)
+[2024/12/02 18:21:12.738] Upload auditing proof (entity:sp, file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:21:12.762] Finish proof
+[2024/12/02 18:21:13.359] Start auditing
+[2024/12/02 18:21:13.359] Download auditing req (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:21:13.360] Verify auditing proof (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:21:18.003] Start verifying proof (splitNum:1000, blockCount:900)
+[2024/12/02 18:21:21.038] Finish verifying proof (splitNum:1000, blockCount:900)
+[2024/12/02 18:21:21.038] Upload auditing result (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1, result:true)
+[2024/12/02 18:21:21.039] Finish auditing
+[2024/12/02 18:21:21.201] Start challenge
+[2024/12/02 18:21:21.201] Upload auditing chal (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:21:21.204] Finish challenge
+[2024/12/02 18:21:21.242] Start proof
+[2024/12/02 18:21:21.243] Download auditing chal (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:21:21.590] Start generating proof (chunks:1000, target:900)
+[2024/12/02 18:21:27.521] Finish generating proof (chunks:1000, target:900)
+[2024/12/02 18:21:27.521] Upload auditing proof (entity:sp, file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:21:27.521] Finish proof
+[2024/12/02 18:21:27.681] Start auditing
+[2024/12/02 18:21:27.682] Download auditing req (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:21:27.682] Verify auditing proof (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:21:32.343] Start verifying proof (splitNum:1000, blockCount:900)
+[2024/12/02 18:21:35.362] Finish verifying proof (splitNum:1000, blockCount:900)
+[2024/12/02 18:21:35.362] Upload auditing result (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1, result:true)
+[2024/12/02 18:21:35.550] Finish auditing
+[2024/12/02 18:21:36.652] Start challenge
+[2024/12/02 18:21:36.652] Upload auditing chal (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:21:36.731] Finish challenge
+[2024/12/02 18:21:37.355] Start proof
+[2024/12/02 18:21:37.355] Download auditing chal (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:21:37.709] Start generating proof (chunks:1000, target:900)
+[2024/12/02 18:21:43.602] Finish generating proof (chunks:1000, target:900)
+[2024/12/02 18:21:43.602] Upload auditing proof (entity:sp, file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:21:43.602] Finish proof
+[2024/12/02 18:21:43.730] Start auditing
+[2024/12/02 18:21:43.731] Download auditing req (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:21:43.731] Verify auditing proof (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:21:48.413] Start verifying proof (splitNum:1000, blockCount:900)
+[2024/12/02 18:21:51.467] Finish verifying proof (splitNum:1000, blockCount:900)
+[2024/12/02 18:21:51.467] Upload auditing result (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1, result:true)
+[2024/12/02 18:21:51.467] Finish auditing
+[2024/12/02 18:21:51.587] Start challenge
+[2024/12/02 18:21:51.587] Upload auditing chal (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:21:51.590] Finish challenge
+[2024/12/02 18:21:51.622] Start proof
+[2024/12/02 18:21:51.622] Download auditing chal (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:21:51.975] Start generating proof (chunks:1000, target:900)
+[2024/12/02 18:21:57.873] Finish generating proof (chunks:1000, target:900)
+[2024/12/02 18:21:57.874] Upload auditing proof (entity:sp, file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:21:57.926] Finish proof
+[2024/12/02 18:21:58.613] Start auditing
+[2024/12/02 18:21:58.614] Download auditing req (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:21:58.614] Verify auditing proof (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:22:03.229] Start verifying proof (splitNum:1000, blockCount:900)
+[2024/12/02 18:22:06.272] Finish verifying proof (splitNum:1000, blockCount:900)
+[2024/12/02 18:22:06.272] Upload auditing result (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1, result:true)
+[2024/12/02 18:22:06.273] Finish auditing
+[2024/12/02 18:22:06.432] Start challenge
+[2024/12/02 18:22:06.433] Upload auditing chal (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:22:06.435] Finish challenge
+[2024/12/02 18:22:06.474] Start proof
+[2024/12/02 18:22:06.475] Download auditing chal (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:22:06.822] Start generating proof (chunks:1000, target:900)
+[2024/12/02 18:22:12.720] Finish generating proof (chunks:1000, target:900)
+[2024/12/02 18:22:12.720] Upload auditing proof (entity:sp, file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:22:12.720] Finish proof
+[2024/12/02 18:22:12.859] Start auditing
+[2024/12/02 18:22:12.859] Download auditing req (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:22:12.859] Verify auditing proof (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:22:17.538] Start verifying proof (splitNum:1000, blockCount:900)
+[2024/12/02 18:22:20.576] Finish verifying proof (splitNum:1000, blockCount:900)
+[2024/12/02 18:22:20.576] Upload auditing result (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1, result:true)
+[2024/12/02 18:22:20.576] Finish auditing
+[2024/12/02 18:22:20.705] Start challenge
+[2024/12/02 18:22:20.706] Upload auditing chal (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:22:20.708] Finish challenge
+[2024/12/02 18:22:20.753] Start proof
+[2024/12/02 18:22:20.753] Download auditing chal (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:22:21.116] Start generating proof (chunks:1000, target:900)
+[2024/12/02 18:22:26.974] Finish generating proof (chunks:1000, target:900)
+[2024/12/02 18:22:26.974] Upload auditing proof (entity:sp, file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:22:26.974] Finish proof
+[2024/12/02 18:22:27.110] Start auditing
+[2024/12/02 18:22:27.110] Download auditing req (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:22:27.110] Verify auditing proof (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:22:31.768] Start verifying proof (splitNum:1000, blockCount:900)
+[2024/12/02 18:22:34.807] Finish verifying proof (splitNum:1000, blockCount:900)
+[2024/12/02 18:22:34.807] Upload auditing result (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1, result:true)
+[2024/12/02 18:22:34.807] Finish auditing
+[2024/12/02 18:22:35.007] Start challenge
+[2024/12/02 18:22:35.008] Upload auditing chal (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:22:35.010] Finish challenge
+[2024/12/02 18:22:35.055] Start proof
+[2024/12/02 18:22:35.056] Download auditing chal (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:22:35.414] Start generating proof (chunks:1000, target:900)
+[2024/12/02 18:22:41.292] Finish generating proof (chunks:1000, target:900)
+[2024/12/02 18:22:41.292] Upload auditing proof (entity:sp, file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:22:41.292] Finish proof
+[2024/12/02 18:22:41.425] Start auditing
+[2024/12/02 18:22:41.425] Download auditing req (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:22:41.425] Verify auditing proof (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:22:46.082] Start verifying proof (splitNum:1000, blockCount:900)
+[2024/12/02 18:22:49.100] Finish verifying proof (splitNum:1000, blockCount:900)
+[2024/12/02 18:22:49.100] Upload auditing result (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1, result:true)
+[2024/12/02 18:22:49.100] Finish auditing
+[2024/12/02 18:22:49.227] Start challenge
+[2024/12/02 18:22:49.227] Upload auditing chal (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:22:49.229] Finish challenge
+[2024/12/02 18:22:49.266] Start proof
+[2024/12/02 18:22:49.267] Download auditing chal (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:22:49.624] Start generating proof (chunks:1000, target:900)
+[2024/12/02 18:22:55.526] Finish generating proof (chunks:1000, target:900)
+[2024/12/02 18:22:55.526] Upload auditing proof (entity:sp, file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:22:55.526] Finish proof
+[2024/12/02 18:22:55.663] Start auditing
+[2024/12/02 18:22:55.663] Download auditing req (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:22:55.663] Verify auditing proof (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:23:00.332] Start verifying proof (splitNum:1000, blockCount:900)
+[2024/12/02 18:23:03.376] Finish verifying proof (splitNum:1000, blockCount:900)
+[2024/12/02 18:23:03.376] Upload auditing result (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1, result:true)
+[2024/12/02 18:23:03.377] Finish auditing
+[2024/12/02 18:23:03.627] Start challenge
+[2024/12/02 18:23:03.628] Upload auditing chal (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:23:03.630] Finish challenge
+[2024/12/02 18:23:03.801] Start proof
+[2024/12/02 18:23:03.801] Download auditing chal (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:23:04.158] Start generating proof (chunks:1000, target:900)
+[2024/12/02 18:23:10.034] Finish generating proof (chunks:1000, target:900)
+[2024/12/02 18:23:10.034] Upload auditing proof (entity:sp, file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:23:10.059] Finish proof
+[2024/12/02 18:23:10.966] Start auditing
+[2024/12/02 18:23:10.966] Download auditing req (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:23:10.966] Verify auditing proof (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:23:15.613] Start verifying proof (splitNum:1000, blockCount:900)
+[2024/12/02 18:23:18.649] Finish verifying proof (splitNum:1000, blockCount:900)
+[2024/12/02 18:23:18.650] Upload auditing result (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1, result:true)
+[2024/12/02 18:23:18.650] Finish auditing
+[2024/12/02 18:23:18.781] Start challenge
+[2024/12/02 18:23:18.781] Upload auditing chal (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:23:18.784] Finish challenge
+[2024/12/02 18:23:18.838] Start proof
+[2024/12/02 18:23:18.838] Download auditing chal (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:23:19.195] Start generating proof (chunks:1000, target:900)
+[2024/12/02 18:23:25.114] Finish generating proof (chunks:1000, target:900)
+[2024/12/02 18:23:25.114] Upload auditing proof (entity:sp, file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:23:25.114] Finish proof
+[2024/12/02 18:23:25.309] Start auditing
+[2024/12/02 18:23:25.312] Download auditing req (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:23:25.312] Verify auditing proof (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:23:29.965] Start verifying proof (splitNum:1000, blockCount:900)
+[2024/12/02 18:23:32.966] Finish verifying proof (splitNum:1000, blockCount:900)
+[2024/12/02 18:23:33.175] Upload auditing result (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1, result:true)
+[2024/12/02 18:23:33.176] Finish auditing
+[2024/12/02 18:23:34.104] Start challenge
+[2024/12/02 18:23:34.104] Upload auditing chal (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:23:34.106] Finish challenge
+[2024/12/02 18:23:34.149] Start proof
+[2024/12/02 18:23:34.149] Download auditing chal (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:23:34.509] Start generating proof (chunks:1000, target:900)
+[2024/12/02 18:23:40.381] Finish generating proof (chunks:1000, target:900)
+[2024/12/02 18:23:40.382] Upload auditing proof (entity:sp, file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:23:40.382] Finish proof
+[2024/12/02 18:23:40.505] Start auditing
+[2024/12/02 18:23:40.505] Download auditing req (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:23:40.505] Verify auditing proof (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:23:45.166] Start verifying proof (splitNum:1000, blockCount:900)
+[2024/12/02 18:23:48.208] Finish verifying proof (splitNum:1000, blockCount:900)
+[2024/12/02 18:23:48.208] Upload auditing result (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1, result:true)
+[2024/12/02 18:23:48.208] Finish auditing
+[2024/12/02 18:23:48.371] Start challenge
+[2024/12/02 18:23:48.371] Upload auditing chal (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:23:48.373] Finish challenge
+[2024/12/02 18:23:48.408] Start proof
+[2024/12/02 18:23:48.408] Download auditing chal (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:23:48.758] Start generating proof (chunks:1000, target:900)
+[2024/12/02 18:23:54.627] Finish generating proof (chunks:1000, target:900)
+[2024/12/02 18:23:54.627] Upload auditing proof (entity:sp, file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:23:54.698] Finish proof
+[2024/12/02 18:23:55.297] Start auditing
+[2024/12/02 18:23:55.297] Download auditing req (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:23:55.297] Verify auditing proof (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:23:59.963] Start verifying proof (splitNum:1000, blockCount:900)
+[2024/12/02 18:24:02.999] Finish verifying proof (splitNum:1000, blockCount:900)
+[2024/12/02 18:24:02.999] Upload auditing result (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1, result:true)
+[2024/12/02 18:24:03.000] Finish auditing
+[2024/12/02 18:24:03.132] Start challenge
+[2024/12/02 18:24:03.132] Upload auditing chal (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:24:03.136] Finish challenge
+[2024/12/02 18:24:03.195] Start proof
+[2024/12/02 18:24:03.195] Download auditing chal (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:24:03.551] Start generating proof (chunks:1000, target:900)
+[2024/12/02 18:24:09.460] Finish generating proof (chunks:1000, target:900)
+[2024/12/02 18:24:09.460] Upload auditing proof (entity:sp, file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:24:09.460] Finish proof
+[2024/12/02 18:24:09.586] Start auditing
+[2024/12/02 18:24:09.587] Download auditing req (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:24:09.587] Verify auditing proof (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:24:14.259] Start verifying proof (splitNum:1000, blockCount:900)
+[2024/12/02 18:24:17.275] Finish verifying proof (splitNum:1000, blockCount:900)
+[2024/12/02 18:24:17.275] Upload auditing result (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1, result:true)
+[2024/12/02 18:24:17.415] Finish auditing
+[2024/12/02 18:24:18.146] Start challenge
+[2024/12/02 18:24:18.147] Upload auditing chal (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:24:18.369] Finish challenge
+[2024/12/02 18:24:18.800] Start proof
+[2024/12/02 18:24:18.800] Download auditing chal (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:24:19.145] Start generating proof (chunks:1000, target:900)
+[2024/12/02 18:24:25.047] Finish generating proof (chunks:1000, target:900)
+[2024/12/02 18:24:25.047] Upload auditing proof (entity:sp, file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:24:25.047] Finish proof
+[2024/12/02 18:24:25.168] Start auditing
+[2024/12/02 18:24:25.169] Download auditing req (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:24:25.169] Verify auditing proof (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:24:29.827] Start verifying proof (splitNum:1000, blockCount:900)
+[2024/12/02 18:24:32.851] Finish verifying proof (splitNum:1000, blockCount:900)
+[2024/12/02 18:24:32.851] Upload auditing result (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1, result:true)
+[2024/12/02 18:24:32.851] Finish auditing
+[2024/12/02 18:24:32.993] Start challenge
+[2024/12/02 18:24:32.994] Upload auditing chal (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:24:32.997] Finish challenge
+[2024/12/02 18:24:33.041] Start proof
+[2024/12/02 18:24:33.042] Download auditing chal (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:24:33.385] Start generating proof (chunks:1000, target:900)
+[2024/12/02 18:24:39.263] Finish generating proof (chunks:1000, target:900)
+[2024/12/02 18:24:39.263] Upload auditing proof (entity:sp, file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:24:39.388] Finish proof
+[2024/12/02 18:24:40.126] Start auditing
+[2024/12/02 18:24:40.126] Download auditing req (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:24:40.126] Verify auditing proof (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:24:44.780] Start verifying proof (splitNum:1000, blockCount:900)
+[2024/12/02 18:24:47.829] Finish verifying proof (splitNum:1000, blockCount:900)
+[2024/12/02 18:24:47.829] Upload auditing result (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1, result:true)
+[2024/12/02 18:24:47.829] Finish auditing
+[2024/12/02 18:24:47.971] Start challenge
+[2024/12/02 18:24:47.971] Upload auditing chal (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:24:47.974] Finish challenge
+[2024/12/02 18:24:48.011] Start proof
+[2024/12/02 18:24:48.011] Download auditing chal (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:24:48.361] Start generating proof (chunks:1000, target:900)
+[2024/12/02 18:24:54.258] Finish generating proof (chunks:1000, target:900)
+[2024/12/02 18:24:54.258] Upload auditing proof (entity:sp, file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:24:54.258] Finish proof
+[2024/12/02 18:24:54.385] Start auditing
+[2024/12/02 18:24:54.386] Download auditing req (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:24:54.387] Verify auditing proof (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:24:59.003] Start verifying proof (splitNum:1000, blockCount:900)
+[2024/12/02 18:25:02.015] Finish verifying proof (splitNum:1000, blockCount:900)
+[2024/12/02 18:25:02.015] Upload auditing result (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1, result:true)
+[2024/12/02 18:25:02.081] Finish auditing
+[2024/12/02 18:25:02.710] Start challenge
+[2024/12/02 18:25:02.710] Upload auditing chal (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:25:02.759] Finish challenge
+[2024/12/02 18:25:03.368] Start proof
+[2024/12/02 18:25:03.368] Download auditing chal (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:25:03.729] Start generating proof (chunks:1000, target:900)
+[2024/12/02 18:25:09.605] Finish generating proof (chunks:1000, target:900)
+[2024/12/02 18:25:09.605] Upload auditing proof (entity:sp, file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:25:09.605] Finish proof
+[2024/12/02 18:25:09.734] Start auditing
+[2024/12/02 18:25:09.735] Download auditing req (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:25:09.735] Verify auditing proof (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:25:14.408] Start verifying proof (splitNum:1000, blockCount:900)
+[2024/12/02 18:25:17.467] Finish verifying proof (splitNum:1000, blockCount:900)
+[2024/12/02 18:25:17.467] Upload auditing result (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1, result:true)
+[2024/12/02 18:25:17.467] Finish auditing
+[2024/12/02 18:25:17.616] Start challenge
+[2024/12/02 18:25:17.616] Upload auditing chal (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:25:17.618] Finish challenge
+[2024/12/02 18:25:17.660] Start proof
+[2024/12/02 18:25:17.660] Download auditing chal (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:25:18.013] Start generating proof (chunks:1000, target:900)
+[2024/12/02 18:25:23.894] Finish generating proof (chunks:1000, target:900)
+[2024/12/02 18:25:23.894] Upload auditing proof (entity:sp, file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:25:24.046] Finish proof
+[2024/12/02 18:25:24.579] Start auditing
+[2024/12/02 18:25:24.579] Download auditing req (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:25:24.579] Verify auditing proof (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:25:29.190] Start verifying proof (splitNum:1000, blockCount:900)
+[2024/12/02 18:25:32.229] Finish verifying proof (splitNum:1000, blockCount:900)
+[2024/12/02 18:25:32.229] Upload auditing result (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1, result:true)
+[2024/12/02 18:25:32.229] Finish auditing
+[2024/12/02 18:25:32.377] Start challenge
+[2024/12/02 18:25:32.378] Upload auditing chal (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:25:32.380] Finish challenge
+[2024/12/02 18:25:32.420] Start proof
+[2024/12/02 18:25:32.421] Download auditing chal (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:25:32.771] Start generating proof (chunks:1000, target:900)
+[2024/12/02 18:25:38.669] Finish generating proof (chunks:1000, target:900)
+[2024/12/02 18:25:38.669] Upload auditing proof (entity:sp, file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:25:38.670] Finish proof
+[2024/12/02 18:25:38.784] Start auditing
+[2024/12/02 18:25:38.785] Download auditing req (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:25:38.785] Verify auditing proof (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:25:43.440] Start verifying proof (splitNum:1000, blockCount:900)
+[2024/12/02 18:25:46.486] Finish verifying proof (splitNum:1000, blockCount:900)
+[2024/12/02 18:25:46.486] Upload auditing result (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1, result:true)
+[2024/12/02 18:25:46.580] Finish auditing
+[2024/12/02 18:25:47.181] Start challenge
+[2024/12/02 18:25:47.181] Upload auditing chal (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:25:47.212] Finish challenge
+[2024/12/02 18:25:47.598] Start proof
+[2024/12/02 18:25:47.599] Download auditing chal (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:25:47.948] Start generating proof (chunks:1000, target:900)
+[2024/12/02 18:25:53.801] Finish generating proof (chunks:1000, target:900)
+[2024/12/02 18:25:53.801] Upload auditing proof (entity:sp, file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:25:53.801] Finish proof
+[2024/12/02 18:25:53.936] Start auditing
+[2024/12/02 18:25:53.937] Download auditing req (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:25:53.937] Verify auditing proof (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:25:58.586] Start verifying proof (splitNum:1000, blockCount:900)
+[2024/12/02 18:26:01.641] Finish verifying proof (splitNum:1000, blockCount:900)
+[2024/12/02 18:26:01.642] Upload auditing result (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1, result:true)
+[2024/12/02 18:26:01.642] Finish auditing
+[2024/12/02 18:26:01.778] Start challenge
+[2024/12/02 18:26:01.778] Upload auditing chal (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:26:01.780] Finish challenge
+[2024/12/02 18:26:01.815] Start proof
+[2024/12/02 18:26:01.816] Download auditing chal (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:26:02.163] Start generating proof (chunks:1000, target:900)
+[2024/12/02 18:26:08.052] Finish generating proof (chunks:1000, target:900)
+[2024/12/02 18:26:08.052] Upload auditing proof (entity:sp, file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:26:08.053] Finish proof
+[2024/12/02 18:26:08.237] Start auditing
+[2024/12/02 18:26:08.237] Download auditing req (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:26:08.237] Verify auditing proof (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:26:12.875] Start verifying proof (splitNum:1000, blockCount:900)
+[2024/12/02 18:26:15.910] Finish verifying proof (splitNum:1000, blockCount:900)
+[2024/12/02 18:26:15.910] Upload auditing result (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1, result:true)
+[2024/12/02 18:26:15.910] Finish auditing
+[2024/12/02 18:26:16.048] Start challenge
+[2024/12/02 18:26:16.048] Upload auditing chal (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:26:16.052] Finish challenge
+[2024/12/02 18:26:16.103] Start proof
+[2024/12/02 18:26:16.103] Download auditing chal (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:26:16.462] Start generating proof (chunks:1000, target:900)
+[2024/12/02 18:26:22.377] Finish generating proof (chunks:1000, target:900)
+[2024/12/02 18:26:22.377] Upload auditing proof (entity:sp, file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:26:22.377] Finish proof
+[2024/12/02 18:26:22.640] Start auditing
+[2024/12/02 18:26:22.640] Download auditing req (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:26:22.640] Verify auditing proof (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:26:27.365] Start verifying proof (splitNum:1000, blockCount:900)
+[2024/12/02 18:26:30.413] Finish verifying proof (splitNum:1000, blockCount:900)
+[2024/12/02 18:26:30.413] Upload auditing result (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1, result:true)
+[2024/12/02 18:26:30.413] Finish auditing
+[2024/12/02 18:26:30.567] Start challenge
+[2024/12/02 18:26:30.568] Upload auditing chal (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:26:30.570] Finish challenge
+[2024/12/02 18:26:30.605] Start proof
+[2024/12/02 18:26:30.605] Download auditing chal (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:26:30.974] Start generating proof (chunks:1000, target:900)
+[2024/12/02 18:26:36.911] Finish generating proof (chunks:1000, target:900)
+[2024/12/02 18:26:36.911] Upload auditing proof (entity:sp, file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:26:36.996] Finish proof
+[2024/12/02 18:26:37.243] Start auditing
+[2024/12/02 18:26:37.244] Download auditing req (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:26:37.245] Verify auditing proof (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:26:41.904] Start verifying proof (splitNum:1000, blockCount:900)
+[2024/12/02 18:26:44.940] Finish verifying proof (splitNum:1000, blockCount:900)
+[2024/12/02 18:26:44.940] Upload auditing result (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1, result:true)
+[2024/12/02 18:26:44.940] Finish auditing
+[2024/12/02 18:26:45.113] Start challenge
+[2024/12/02 18:26:45.113] Upload auditing chal (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:26:45.115] Finish challenge
+[2024/12/02 18:26:45.191] Start proof
+[2024/12/02 18:26:45.191] Download auditing chal (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:26:45.547] Start generating proof (chunks:1000, target:900)
+[2024/12/02 18:26:51.436] Finish generating proof (chunks:1000, target:900)
+[2024/12/02 18:26:51.436] Upload auditing proof (entity:sp, file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:26:51.438] Finish proof
+[2024/12/02 18:26:51.563] Start auditing
+[2024/12/02 18:26:51.564] Download auditing req (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:26:51.564] Verify auditing proof (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:26:56.284] Start verifying proof (splitNum:1000, blockCount:900)
+[2024/12/02 18:26:59.286] Finish verifying proof (splitNum:1000, blockCount:900)
+[2024/12/02 18:26:59.286] Upload auditing result (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1, result:true)
+[2024/12/02 18:26:59.286] Finish auditing
+[2024/12/02 18:27:00.393] Start challenge
+[2024/12/02 18:27:00.394] Upload auditing chal (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:27:00.396] Finish challenge
+[2024/12/02 18:27:00.511] Start proof
+[2024/12/02 18:27:00.512] Download auditing chal (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:27:00.874] Start generating proof (chunks:1000, target:900)
+[2024/12/02 18:27:06.802] Finish generating proof (chunks:1000, target:900)
+[2024/12/02 18:27:06.802] Upload auditing proof (entity:sp, file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:27:06.803] Finish proof
+[2024/12/02 18:27:06.969] Start auditing
+[2024/12/02 18:27:06.969] Download auditing req (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:27:06.969] Verify auditing proof (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:27:11.642] Start verifying proof (splitNum:1000, blockCount:900)
+[2024/12/02 18:27:14.666] Finish verifying proof (splitNum:1000, blockCount:900)
+[2024/12/02 18:27:14.667] Upload auditing result (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1, result:true)
+[2024/12/02 18:27:14.667] Finish auditing
+[2024/12/02 18:27:14.792] Start challenge
+[2024/12/02 18:27:14.792] Upload auditing chal (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:27:14.794] Finish challenge
+[2024/12/02 18:27:14.838] Start proof
+[2024/12/02 18:27:14.838] Download auditing chal (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:27:15.201] Start generating proof (chunks:1000, target:900)
+[2024/12/02 18:27:21.073] Finish generating proof (chunks:1000, target:900)
+[2024/12/02 18:27:21.073] Upload auditing proof (entity:sp, file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:27:21.128] Finish proof
+[2024/12/02 18:27:21.830] Start auditing
+[2024/12/02 18:27:21.831] Download auditing req (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:27:21.831] Verify auditing proof (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:27:26.495] Start verifying proof (splitNum:1000, blockCount:900)
+[2024/12/02 18:27:29.546] Finish verifying proof (splitNum:1000, blockCount:900)
+[2024/12/02 18:27:29.546] Upload auditing result (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1, result:true)
+[2024/12/02 18:27:29.546] Finish auditing
+[2024/12/02 18:27:29.690] Start challenge
+[2024/12/02 18:27:29.690] Upload auditing chal (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:27:29.693] Finish challenge
+[2024/12/02 18:27:29.749] Start proof
+[2024/12/02 18:27:29.750] Download auditing chal (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:27:30.108] Start generating proof (chunks:1000, target:900)
+[2024/12/02 18:27:36.045] Finish generating proof (chunks:1000, target:900)
+[2024/12/02 18:27:36.045] Upload auditing proof (entity:sp, file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:27:36.046] Finish proof
+[2024/12/02 18:27:36.180] Start auditing
+[2024/12/02 18:27:36.180] Download auditing req (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:27:36.181] Verify auditing proof (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:27:40.858] Start verifying proof (splitNum:1000, blockCount:900)
+[2024/12/02 18:27:43.857] Finish verifying proof (splitNum:1000, blockCount:900)
+[2024/12/02 18:27:43.857] Upload auditing result (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1, result:true)
+[2024/12/02 18:27:43.949] Finish auditing
+[2024/12/02 18:27:44.788] Start challenge
+[2024/12/02 18:27:44.788] Upload auditing chal (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:27:44.905] Finish challenge
+[2024/12/02 18:27:45.606] Start proof
+[2024/12/02 18:27:45.606] Download auditing chal (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:27:45.967] Start generating proof (chunks:1000, target:900)
+[2024/12/02 18:27:51.872] Finish generating proof (chunks:1000, target:900)
+[2024/12/02 18:27:51.872] Upload auditing proof (entity:sp, file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:27:51.872] Finish proof
+[2024/12/02 18:27:52.009] Start auditing
+[2024/12/02 18:27:52.009] Download auditing req (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:27:52.009] Verify auditing proof (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:27:56.666] Start verifying proof (splitNum:1000, blockCount:900)
+[2024/12/02 18:27:59.718] Finish verifying proof (splitNum:1000, blockCount:900)
+[2024/12/02 18:27:59.718] Upload auditing result (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1, result:true)
+[2024/12/02 18:27:59.718] Finish auditing
+[2024/12/02 18:27:59.933] Start challenge
+[2024/12/02 18:27:59.933] Upload auditing chal (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:27:59.937] Finish challenge
+[2024/12/02 18:27:59.980] Start proof
+[2024/12/02 18:27:59.981] Download auditing chal (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:28:00.335] Start generating proof (chunks:1000, target:900)
+[2024/12/02 18:28:06.213] Finish generating proof (chunks:1000, target:900)
+[2024/12/02 18:28:06.213] Upload auditing proof (entity:sp, file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:28:06.306] Finish proof
+[2024/12/02 18:28:07.211] Start auditing
+[2024/12/02 18:28:07.212] Download auditing req (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:28:07.212] Verify auditing proof (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:28:11.878] Start verifying proof (splitNum:1000, blockCount:900)
+[2024/12/02 18:28:14.925] Finish verifying proof (splitNum:1000, blockCount:900)
+[2024/12/02 18:28:14.926] Upload auditing result (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1, result:true)
+[2024/12/02 18:28:14.926] Finish auditing
+[2024/12/02 18:28:15.066] Start challenge
+[2024/12/02 18:28:15.066] Upload auditing chal (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:28:15.068] Finish challenge
+[2024/12/02 18:28:15.109] Start proof
+[2024/12/02 18:28:15.110] Download auditing chal (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:28:15.468] Start generating proof (chunks:1000, target:900)
+[2024/12/02 18:28:21.399] Finish generating proof (chunks:1000, target:900)
+[2024/12/02 18:28:21.399] Upload auditing proof (entity:sp, file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:28:21.399] Finish proof
+[2024/12/02 18:28:21.637] Start auditing
+[2024/12/02 18:28:21.638] Download auditing req (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:28:21.638] Verify auditing proof (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:28:26.275] Start verifying proof (splitNum:1000, blockCount:900)
+[2024/12/02 18:28:29.296] Finish verifying proof (splitNum:1000, blockCount:900)
+[2024/12/02 18:28:29.296] Upload auditing result (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1, result:true)
+[2024/12/02 18:28:29.385] Finish auditing
+[2024/12/02 18:28:30.416] Start challenge
+[2024/12/02 18:28:30.416] Upload auditing chal (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:28:30.551] Finish challenge
+[2024/12/02 18:28:31.289] Start proof
+[2024/12/02 18:28:31.290] Download auditing chal (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:28:31.648] Start generating proof (chunks:1000, target:900)
+[2024/12/02 18:28:37.544] Finish generating proof (chunks:1000, target:900)
+[2024/12/02 18:28:37.544] Upload auditing proof (entity:sp, file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:28:37.544] Finish proof
+[2024/12/02 18:28:37.695] Start auditing
+[2024/12/02 18:28:37.695] Download auditing req (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:28:37.695] Verify auditing proof (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:28:42.377] Start verifying proof (splitNum:1000, blockCount:900)
+[2024/12/02 18:28:45.460] Finish verifying proof (splitNum:1000, blockCount:900)
+[2024/12/02 18:28:45.460] Upload auditing result (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1, result:true)
+[2024/12/02 18:28:45.460] Finish auditing
+[2024/12/02 18:28:45.580] Start challenge
+[2024/12/02 18:28:45.580] Upload auditing chal (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:28:45.583] Finish challenge
+[2024/12/02 18:28:45.629] Start proof
+[2024/12/02 18:28:45.629] Download auditing chal (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:28:45.979] Start generating proof (chunks:1000, target:900)
+[2024/12/02 18:28:51.886] Finish generating proof (chunks:1000, target:900)
+[2024/12/02 18:28:51.886] Upload auditing proof (entity:sp, file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:28:51.893] Finish proof
+[2024/12/02 18:28:52.474] Start auditing
+[2024/12/02 18:28:52.474] Download auditing req (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:28:52.474] Verify auditing proof (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:28:57.110] Start verifying proof (splitNum:1000, blockCount:900)
+[2024/12/02 18:29:00.158] Finish verifying proof (splitNum:1000, blockCount:900)
+[2024/12/02 18:29:00.158] Upload auditing result (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1, result:true)
+[2024/12/02 18:29:00.158] Finish auditing
+[2024/12/02 18:29:00.302] Start challenge
+[2024/12/02 18:29:00.302] Upload auditing chal (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:29:00.305] Finish challenge
+[2024/12/02 18:29:00.350] Start proof
+[2024/12/02 18:29:00.350] Download auditing chal (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:29:00.705] Start generating proof (chunks:1000, target:900)
+[2024/12/02 18:29:06.621] Finish generating proof (chunks:1000, target:900)
+[2024/12/02 18:29:06.621] Upload auditing proof (entity:sp, file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:29:06.621] Finish proof
+[2024/12/02 18:29:06.755] Start auditing
+[2024/12/02 18:29:06.756] Download auditing req (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:29:06.756] Verify auditing proof (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:29:11.413] Start verifying proof (splitNum:1000, blockCount:900)
+[2024/12/02 18:29:14.446] Finish verifying proof (splitNum:1000, blockCount:900)
+[2024/12/02 18:29:14.446] Upload auditing result (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1, result:true)
+[2024/12/02 18:29:14.706] Finish auditing
+[2024/12/02 18:29:15.513] Start challenge
+[2024/12/02 18:29:15.513] Upload auditing chal (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:29:15.750] Finish challenge
+[2024/12/02 18:29:16.379] Start proof
+[2024/12/02 18:29:16.380] Download auditing chal (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:29:16.741] Start generating proof (chunks:1000, target:900)
+[2024/12/02 18:29:22.614] Finish generating proof (chunks:1000, target:900)
+[2024/12/02 18:29:22.614] Upload auditing proof (entity:sp, file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:29:22.615] Finish proof
+[2024/12/02 18:29:22.746] Start auditing
+[2024/12/02 18:29:22.748] Download auditing req (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:29:22.748] Verify auditing proof (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:29:27.421] Start verifying proof (splitNum:1000, blockCount:900)
+[2024/12/02 18:29:30.476] Finish verifying proof (splitNum:1000, blockCount:900)
+[2024/12/02 18:29:30.476] Upload auditing result (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1, result:true)
+[2024/12/02 18:29:30.476] Finish auditing
+[2024/12/02 18:29:30.627] Start challenge
+[2024/12/02 18:29:30.627] Upload auditing chal (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:29:30.630] Finish challenge
+[2024/12/02 18:29:30.662] Start proof
+[2024/12/02 18:29:30.662] Download auditing chal (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:29:31.016] Start generating proof (chunks:1000, target:900)
+[2024/12/02 18:29:36.916] Finish generating proof (chunks:1000, target:900)
+[2024/12/02 18:29:36.916] Upload auditing proof (entity:sp, file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:29:36.920] Finish proof
+[2024/12/02 18:29:37.477] Start auditing
+[2024/12/02 18:29:37.478] Download auditing req (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:29:37.478] Verify auditing proof (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:29:42.125] Start verifying proof (splitNum:1000, blockCount:900)
+[2024/12/02 18:29:45.175] Finish verifying proof (splitNum:1000, blockCount:900)
+[2024/12/02 18:29:45.175] Upload auditing result (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1, result:true)
+[2024/12/02 18:29:45.175] Finish auditing
+[2024/12/02 18:29:45.352] Start challenge
+[2024/12/02 18:29:45.352] Upload auditing chal (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:29:45.356] Finish challenge
+[2024/12/02 18:29:45.406] Start proof
+[2024/12/02 18:29:45.406] Download auditing chal (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:29:45.762] Start generating proof (chunks:1000, target:900)
+[2024/12/02 18:29:51.677] Finish generating proof (chunks:1000, target:900)
+[2024/12/02 18:29:51.677] Upload auditing proof (entity:sp, file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:29:51.677] Finish proof
+[2024/12/02 18:29:51.798] Start auditing
+[2024/12/02 18:29:51.800] Download auditing req (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:29:51.800] Verify auditing proof (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:29:56.468] Start verifying proof (splitNum:1000, blockCount:900)
+[2024/12/02 18:29:59.502] Finish verifying proof (splitNum:1000, blockCount:900)
+[2024/12/02 18:29:59.502] Upload auditing result (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1, result:true)
+[2024/12/02 18:29:59.536] Finish auditing
+[2024/12/02 18:30:00.204] Start challenge
+[2024/12/02 18:30:00.205] Upload auditing chal (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:30:00.278] Finish challenge
+[2024/12/02 18:30:01.277] Start proof
+[2024/12/02 18:30:01.278] Download auditing chal (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:30:01.634] Start generating proof (chunks:1000, target:900)
+[2024/12/02 18:30:07.518] Finish generating proof (chunks:1000, target:900)
+[2024/12/02 18:30:07.519] Upload auditing proof (entity:sp, file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:30:07.519] Finish proof
+[2024/12/02 18:30:07.652] Start auditing
+[2024/12/02 18:30:07.653] Download auditing req (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:30:07.653] Verify auditing proof (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:30:12.324] Start verifying proof (splitNum:1000, blockCount:900)
+[2024/12/02 18:30:15.387] Finish verifying proof (splitNum:1000, blockCount:900)
+[2024/12/02 18:30:15.388] Upload auditing result (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1, result:true)
+[2024/12/02 18:30:15.388] Finish auditing
+[2024/12/02 18:30:15.521] Start challenge
+[2024/12/02 18:30:15.521] Upload auditing chal (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:30:15.524] Finish challenge
+[2024/12/02 18:30:15.553] Start proof
+[2024/12/02 18:30:15.553] Download auditing chal (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:30:15.906] Start generating proof (chunks:1000, target:900)
+[2024/12/02 18:30:21.787] Finish generating proof (chunks:1000, target:900)
+[2024/12/02 18:30:21.787] Upload auditing proof (entity:sp, file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:30:21.787] Finish proof
+[2024/12/02 18:30:21.917] Start auditing
+[2024/12/02 18:30:21.918] Download auditing req (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:30:21.918] Verify auditing proof (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:30:26.527] Start verifying proof (splitNum:1000, blockCount:900)
+[2024/12/02 18:30:29.573] Finish verifying proof (splitNum:1000, blockCount:900)
+[2024/12/02 18:30:29.574] Upload auditing result (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1, result:true)
+[2024/12/02 18:30:29.574] Finish auditing
+[2024/12/02 18:30:29.692] Start challenge
+[2024/12/02 18:30:29.692] Upload auditing chal (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:30:29.695] Finish challenge
+[2024/12/02 18:30:29.773] Start proof
+[2024/12/02 18:30:29.773] Download auditing chal (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:30:30.123] Start generating proof (chunks:1000, target:900)
+[2024/12/02 18:30:36.021] Finish generating proof (chunks:1000, target:900)
+[2024/12/02 18:30:36.021] Upload auditing proof (entity:sp, file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:30:36.022] Finish proof
+[2024/12/02 18:30:36.158] Start auditing
+[2024/12/02 18:30:36.160] Download auditing req (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:30:36.160] Verify auditing proof (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:30:40.826] Start verifying proof (splitNum:1000, blockCount:900)
+[2024/12/02 18:30:43.879] Finish verifying proof (splitNum:1000, blockCount:900)
+[2024/12/02 18:30:43.879] Upload auditing result (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1, result:true)
+[2024/12/02 18:30:43.879] Finish auditing
+[2024/12/02 18:30:44.010] Start challenge
+[2024/12/02 18:30:44.010] Upload auditing chal (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:30:44.014] Finish challenge
+[2024/12/02 18:30:44.066] Start proof
+[2024/12/02 18:30:44.067] Download auditing chal (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:30:44.420] Start generating proof (chunks:1000, target:900)
+[2024/12/02 18:30:50.279] Finish generating proof (chunks:1000, target:900)
+[2024/12/02 18:30:50.279] Upload auditing proof (entity:sp, file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:30:50.674] Finish proof
+[2024/12/02 18:30:51.694] Start auditing
+[2024/12/02 18:30:51.695] Download auditing req (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:30:51.695] Verify auditing proof (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:30:56.368] Start verifying proof (splitNum:1000, blockCount:900)
+[2024/12/02 18:30:59.411] Finish verifying proof (splitNum:1000, blockCount:900)
+[2024/12/02 18:30:59.411] Upload auditing result (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1, result:true)
+[2024/12/02 18:30:59.411] Finish auditing
+[2024/12/02 18:30:59.542] Start challenge
+[2024/12/02 18:30:59.543] Upload auditing chal (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:30:59.545] Finish challenge
+[2024/12/02 18:30:59.603] Start proof
+[2024/12/02 18:30:59.603] Download auditing chal (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:30:59.965] Start generating proof (chunks:1000, target:900)
+[2024/12/02 18:31:05.902] Finish generating proof (chunks:1000, target:900)
+[2024/12/02 18:31:05.902] Upload auditing proof (entity:sp, file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:31:05.902] Finish proof
+[2024/12/02 18:31:06.037] Start auditing
+[2024/12/02 18:31:06.037] Download auditing req (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:31:06.037] Verify auditing proof (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:31:10.702] Start verifying proof (splitNum:1000, blockCount:900)
+[2024/12/02 18:31:13.718] Finish verifying proof (splitNum:1000, blockCount:900)
+[2024/12/02 18:31:13.718] Upload auditing result (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1, result:true)
+[2024/12/02 18:31:14.062] Finish auditing
+[2024/12/02 18:31:15.149] Start challenge
+[2024/12/02 18:31:15.149] Upload auditing chal (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:31:15.151] Finish challenge
+[2024/12/02 18:31:15.205] Start proof
+[2024/12/02 18:31:15.206] Download auditing chal (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:31:15.564] Start generating proof (chunks:1000, target:900)
+[2024/12/02 18:31:21.462] Finish generating proof (chunks:1000, target:900)
+[2024/12/02 18:31:21.462] Upload auditing proof (entity:sp, file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:31:21.462] Finish proof
+[2024/12/02 18:31:21.590] Start auditing
+[2024/12/02 18:31:21.590] Download auditing req (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:31:21.590] Verify auditing proof (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:31:26.284] Start verifying proof (splitNum:1000, blockCount:900)
+[2024/12/02 18:31:29.331] Finish verifying proof (splitNum:1000, blockCount:900)
+[2024/12/02 18:31:29.331] Upload auditing result (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1, result:true)
+[2024/12/02 18:31:29.332] Finish auditing
+[2024/12/02 18:31:29.478] Start challenge
+[2024/12/02 18:31:29.478] Upload auditing chal (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:31:29.482] Finish challenge
+[2024/12/02 18:31:29.524] Start proof
+[2024/12/02 18:31:29.524] Download auditing chal (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:31:29.880] Start generating proof (chunks:1000, target:900)
+[2024/12/02 18:31:35.761] Finish generating proof (chunks:1000, target:900)
+[2024/12/02 18:31:35.761] Upload auditing proof (entity:sp, file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:31:35.818] Finish proof
+[2024/12/02 18:31:37.064] Start auditing
+[2024/12/02 18:31:37.064] Download auditing req (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:31:37.064] Verify auditing proof (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:31:41.744] Start verifying proof (splitNum:1000, blockCount:900)
+[2024/12/02 18:31:44.784] Finish verifying proof (splitNum:1000, blockCount:900)
+[2024/12/02 18:31:44.784] Upload auditing result (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1, result:true)
+[2024/12/02 18:31:44.784] Finish auditing
+[2024/12/02 18:31:44.912] Start challenge
+[2024/12/02 18:31:44.912] Upload auditing chal (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:31:44.914] Finish challenge
+[2024/12/02 18:31:44.952] Start proof
+[2024/12/02 18:31:44.952] Download auditing chal (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:31:45.309] Start generating proof (chunks:1000, target:900)
+[2024/12/02 18:31:51.224] Finish generating proof (chunks:1000, target:900)
+[2024/12/02 18:31:51.224] Upload auditing proof (entity:sp, file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:31:51.224] Finish proof
+[2024/12/02 18:31:51.342] Start auditing
+[2024/12/02 18:31:51.342] Download auditing req (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:31:51.342] Verify auditing proof (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:31:56.003] Start verifying proof (splitNum:1000, blockCount:900)
+[2024/12/02 18:31:59.002] Finish verifying proof (splitNum:1000, blockCount:900)
+[2024/12/02 18:31:59.002] Upload auditing result (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1, result:true)
+[2024/12/02 18:31:59.157] Finish auditing
+[2024/12/02 18:32:00.411] Start challenge
+[2024/12/02 18:32:00.411] Upload auditing chal (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:32:00.618] Finish challenge
+[2024/12/02 18:32:01.608] Start proof
+[2024/12/02 18:32:01.608] Download auditing chal (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:32:01.978] Start generating proof (chunks:1000, target:900)
+[2024/12/02 18:32:07.897] Finish generating proof (chunks:1000, target:900)
+[2024/12/02 18:32:07.897] Upload auditing proof (entity:sp, file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:32:07.897] Finish proof
+[2024/12/02 18:32:08.048] Start auditing
+[2024/12/02 18:32:08.048] Download auditing req (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:32:08.048] Verify auditing proof (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:32:12.735] Start verifying proof (splitNum:1000, blockCount:900)
+[2024/12/02 18:32:15.788] Finish verifying proof (splitNum:1000, blockCount:900)
+[2024/12/02 18:32:15.788] Upload auditing result (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1, result:true)
+[2024/12/02 18:32:15.788] Finish auditing
+[2024/12/02 18:32:15.922] Start challenge
+[2024/12/02 18:32:15.923] Upload auditing chal (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:32:15.926] Finish challenge
+[2024/12/02 18:32:15.973] Start proof
+[2024/12/02 18:32:15.973] Download auditing chal (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:32:16.333] Start generating proof (chunks:1000, target:900)
+[2024/12/02 18:32:22.230] Finish generating proof (chunks:1000, target:900)
+[2024/12/02 18:32:22.230] Upload auditing proof (entity:sp, file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:32:22.230] Finish proof
+[2024/12/02 18:32:22.360] Start auditing
+[2024/12/02 18:32:22.360] Download auditing req (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:32:22.360] Verify auditing proof (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:32:27.062] Start verifying proof (splitNum:1000, blockCount:900)
+[2024/12/02 18:32:30.050] Finish verifying proof (splitNum:1000, blockCount:900)
+[2024/12/02 18:32:30.050] Upload auditing result (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1, result:true)
+[2024/12/02 18:32:30.393] Finish auditing
+[2024/12/02 18:32:30.670] Start challenge
+[2024/12/02 18:32:30.670] Upload auditing chal (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:32:30.673] Finish challenge
+[2024/12/02 18:32:30.719] Start proof
+[2024/12/02 18:32:30.719] Download auditing chal (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:32:31.074] Start generating proof (chunks:1000, target:900)
+[2024/12/02 18:32:36.986] Finish generating proof (chunks:1000, target:900)
+[2024/12/02 18:32:36.986] Upload auditing proof (entity:sp, file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:32:36.987] Finish proof
+[2024/12/02 18:32:37.116] Start auditing
+[2024/12/02 18:32:37.117] Download auditing req (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:32:37.117] Verify auditing proof (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:32:41.801] Start verifying proof (splitNum:1000, blockCount:900)
+[2024/12/02 18:32:44.868] Finish verifying proof (splitNum:1000, blockCount:900)
+[2024/12/02 18:32:44.868] Upload auditing result (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1, result:true)
+[2024/12/02 18:32:44.869] Finish auditing
+[2024/12/02 18:32:45.090] Start challenge
+[2024/12/02 18:32:45.090] Upload auditing chal (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:32:45.093] Finish challenge
+[2024/12/02 18:32:45.145] Start proof
+[2024/12/02 18:32:45.146] Download auditing chal (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:32:45.504] Start generating proof (chunks:1000, target:900)
+[2024/12/02 18:32:51.429] Finish generating proof (chunks:1000, target:900)
+[2024/12/02 18:32:51.429] Upload auditing proof (entity:sp, file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:32:51.429] Finish proof
+[2024/12/02 18:32:51.895] Start auditing
+[2024/12/02 18:32:51.896] Download auditing req (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:32:51.896] Verify auditing proof (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:32:56.528] Start verifying proof (splitNum:1000, blockCount:900)
+[2024/12/02 18:32:59.569] Finish verifying proof (splitNum:1000, blockCount:900)
+[2024/12/02 18:32:59.569] Upload auditing result (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1, result:true)
+[2024/12/02 18:32:59.570] Finish auditing
+[2024/12/02 18:32:59.760] Start challenge
+[2024/12/02 18:32:59.760] Upload auditing chal (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:32:59.763] Finish challenge
+[2024/12/02 18:32:59.799] Start proof
+[2024/12/02 18:32:59.799] Download auditing chal (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:33:00.155] Start generating proof (chunks:1000, target:900)
+[2024/12/02 18:33:06.045] Finish generating proof (chunks:1000, target:900)
+[2024/12/02 18:33:06.045] Upload auditing proof (entity:sp, file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:33:06.045] Finish proof
+[2024/12/02 18:33:06.178] Start auditing
+[2024/12/02 18:33:06.179] Download auditing req (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:33:06.179] Verify auditing proof (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:33:10.869] Start verifying proof (splitNum:1000, blockCount:900)
+[2024/12/02 18:33:13.911] Finish verifying proof (splitNum:1000, blockCount:900)
+[2024/12/02 18:33:13.911] Upload auditing result (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1, result:true)
+[2024/12/02 18:33:13.912] Finish auditing
+[2024/12/02 18:33:14.091] Start challenge
+[2024/12/02 18:33:14.091] Upload auditing chal (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:33:14.093] Finish challenge
+[2024/12/02 18:33:14.134] Start proof
+[2024/12/02 18:33:14.135] Download auditing chal (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:33:14.490] Start generating proof (chunks:1000, target:900)
+[2024/12/02 18:33:20.387] Finish generating proof (chunks:1000, target:900)
+[2024/12/02 18:33:20.387] Upload auditing proof (entity:sp, file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:33:20.419] Finish proof
+[2024/12/02 18:33:21.611] Start auditing
+[2024/12/02 18:33:21.612] Download auditing req (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:33:21.612] Verify auditing proof (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:33:26.232] Start verifying proof (splitNum:1000, blockCount:900)
+[2024/12/02 18:33:29.272] Finish verifying proof (splitNum:1000, blockCount:900)
+[2024/12/02 18:33:29.272] Upload auditing result (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1, result:true)
+[2024/12/02 18:33:29.273] Finish auditing
+[2024/12/02 18:33:29.403] Start challenge
+[2024/12/02 18:33:29.403] Upload auditing chal (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:33:29.406] Finish challenge
+[2024/12/02 18:33:29.436] Start proof
+[2024/12/02 18:33:29.437] Download auditing chal (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:33:29.791] Start generating proof (chunks:1000, target:900)
+[2024/12/02 18:33:35.706] Finish generating proof (chunks:1000, target:900)
+[2024/12/02 18:33:35.706] Upload auditing proof (entity:sp, file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:33:35.706] Finish proof
+[2024/12/02 18:33:35.847] Start auditing
+[2024/12/02 18:33:35.848] Download auditing req (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:33:35.848] Verify auditing proof (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:33:40.510] Start verifying proof (splitNum:1000, blockCount:900)
+[2024/12/02 18:33:43.559] Finish verifying proof (splitNum:1000, blockCount:900)
+[2024/12/02 18:33:43.559] Upload auditing result (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1, result:true)
+[2024/12/02 18:33:43.559] Finish auditing
+[2024/12/02 18:33:43.706] Start challenge
+[2024/12/02 18:33:43.706] Upload auditing chal (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:33:43.709] Finish challenge
+[2024/12/02 18:33:43.755] Start proof
+[2024/12/02 18:33:43.755] Download auditing chal (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:33:44.111] Start generating proof (chunks:1000, target:900)
+[2024/12/02 18:33:50.116] Finish generating proof (chunks:1000, target:900)
+[2024/12/02 18:33:50.116] Upload auditing proof (entity:sp, file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:33:50.265] Finish proof
+[2024/12/02 18:33:51.119] Start auditing
+[2024/12/02 18:33:51.119] Download auditing req (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:33:51.120] Verify auditing proof (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:33:55.777] Start verifying proof (splitNum:1000, blockCount:900)
+[2024/12/02 18:33:58.819] Finish verifying proof (splitNum:1000, blockCount:900)
+[2024/12/02 18:33:58.819] Upload auditing result (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1, result:true)
+[2024/12/02 18:33:58.820] Finish auditing
+[2024/12/02 18:33:58.953] Start challenge
+[2024/12/02 18:33:58.953] Upload auditing chal (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:33:58.956] Finish challenge
+[2024/12/02 18:33:59.007] Start proof
+[2024/12/02 18:33:59.008] Download auditing chal (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:33:59.358] Start generating proof (chunks:1000, target:900)
+[2024/12/02 18:34:05.284] Finish generating proof (chunks:1000, target:900)
+[2024/12/02 18:34:05.285] Upload auditing proof (entity:sp, file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:34:05.285] Finish proof
+[2024/12/02 18:34:05.513] Start auditing
+[2024/12/02 18:34:05.513] Download auditing req (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:34:05.513] Verify auditing proof (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:34:10.161] Start verifying proof (splitNum:1000, blockCount:900)
+[2024/12/02 18:34:13.202] Finish verifying proof (splitNum:1000, blockCount:900)
+[2024/12/02 18:34:13.202] Upload auditing result (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1, result:true)
+[2024/12/02 18:34:13.203] Finish auditing
+[2024/12/02 18:34:13.333] Start challenge
+[2024/12/02 18:34:13.333] Upload auditing chal (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:34:13.336] Finish challenge
+[2024/12/02 18:34:13.377] Start proof
+[2024/12/02 18:34:13.378] Download auditing chal (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:34:13.757] Start generating proof (chunks:1000, target:900)
+[2024/12/02 18:34:19.582] Finish generating proof (chunks:1000, target:900)
+[2024/12/02 18:34:19.582] Upload auditing proof (entity:sp, file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:34:20.042] Finish proof
+[2024/12/02 18:34:20.444] Start auditing
+[2024/12/02 18:34:20.446] Download auditing req (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:34:20.446] Verify auditing proof (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:34:25.127] Start verifying proof (splitNum:1000, blockCount:900)
+[2024/12/02 18:34:28.178] Finish verifying proof (splitNum:1000, blockCount:900)
+[2024/12/02 18:34:28.179] Upload auditing result (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1, result:true)
+[2024/12/02 18:34:28.179] Finish auditing
+[2024/12/02 18:34:28.429] Start challenge
+[2024/12/02 18:34:28.429] Upload auditing chal (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:34:28.432] Finish challenge
+[2024/12/02 18:34:28.481] Start proof
+[2024/12/02 18:34:28.481] Download auditing chal (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:34:28.849] Start generating proof (chunks:1000, target:900)
+[2024/12/02 18:34:34.785] Finish generating proof (chunks:1000, target:900)
+[2024/12/02 18:34:34.785] Upload auditing proof (entity:sp, file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:34:34.785] Finish proof
+[2024/12/02 18:34:34.916] Start auditing
+[2024/12/02 18:34:34.916] Download auditing req (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:34:34.916] Verify auditing proof (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:34:39.568] Start verifying proof (splitNum:1000, blockCount:900)
+[2024/12/02 18:34:42.592] Finish verifying proof (splitNum:1000, blockCount:900)
+[2024/12/02 18:34:42.592] Upload auditing result (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1, result:true)
+[2024/12/02 18:34:42.642] Finish auditing
+[2024/12/02 18:34:43.373] Start challenge
+[2024/12/02 18:34:43.373] Upload auditing chal (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:34:43.532] Finish challenge
+[2024/12/02 18:34:44.620] Start proof
+[2024/12/02 18:34:44.622] Download auditing chal (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:34:44.996] Start generating proof (chunks:1000, target:900)
+[2024/12/02 18:34:50.855] Finish generating proof (chunks:1000, target:900)
+[2024/12/02 18:34:50.855] Upload auditing proof (entity:sp, file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:34:50.855] Finish proof
+[2024/12/02 18:34:50.990] Start auditing
+[2024/12/02 18:34:50.991] Download auditing req (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:34:50.991] Verify auditing proof (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:34:55.671] Start verifying proof (splitNum:1000, blockCount:900)
+[2024/12/02 18:34:58.745] Finish verifying proof (splitNum:1000, blockCount:900)
+[2024/12/02 18:34:58.745] Upload auditing result (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1, result:true)
+[2024/12/02 18:34:58.746] Finish auditing
+[2024/12/02 18:34:58.899] Start challenge
+[2024/12/02 18:34:58.899] Upload auditing chal (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:34:58.903] Finish challenge
+[2024/12/02 18:34:58.951] Start proof
+[2024/12/02 18:34:58.951] Download auditing chal (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:34:59.316] Start generating proof (chunks:1000, target:900)
+[2024/12/02 18:35:05.234] Finish generating proof (chunks:1000, target:900)
+[2024/12/02 18:35:05.234] Upload auditing proof (entity:sp, file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:35:05.234] Finish proof
+[2024/12/02 18:35:05.383] Start auditing
+[2024/12/02 18:35:05.384] Download auditing req (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:35:05.384] Verify auditing proof (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:35:10.057] Start verifying proof (splitNum:1000, blockCount:900)
+[2024/12/02 18:35:13.071] Finish verifying proof (splitNum:1000, blockCount:900)
+[2024/12/02 18:35:13.071] Upload auditing result (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1, result:true)
+[2024/12/02 18:35:13.283] Finish auditing
+[2024/12/02 18:35:14.562] Start challenge
+[2024/12/02 18:35:14.562] Upload auditing chal (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:35:14.600] Finish challenge
+[2024/12/02 18:35:15.322] Start proof
+[2024/12/02 18:35:15.323] Download auditing chal (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:35:15.688] Start generating proof (chunks:1000, target:900)
+[2024/12/02 18:35:21.560] Finish generating proof (chunks:1000, target:900)
+[2024/12/02 18:35:21.560] Upload auditing proof (entity:sp, file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:35:21.560] Finish proof
+[2024/12/02 18:35:21.720] Start auditing
+[2024/12/02 18:35:21.720] Download auditing req (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:35:21.720] Verify auditing proof (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:35:26.394] Start verifying proof (splitNum:1000, blockCount:900)
+[2024/12/02 18:35:29.459] Finish verifying proof (splitNum:1000, blockCount:900)
+[2024/12/02 18:35:29.459] Upload auditing result (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1, result:true)
+[2024/12/02 18:35:29.459] Finish auditing
+[2024/12/02 18:35:29.751] Start challenge
+[2024/12/02 18:35:29.752] Upload auditing chal (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:35:29.754] Finish challenge
+[2024/12/02 18:35:29.798] Start proof
+[2024/12/02 18:35:29.799] Download auditing chal (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:35:30.151] Start generating proof (chunks:1000, target:900)
+[2024/12/02 18:35:36.058] Finish generating proof (chunks:1000, target:900)
+[2024/12/02 18:35:36.058] Upload auditing proof (entity:sp, file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:35:36.059] Finish proof
+[2024/12/02 18:35:36.182] Start auditing
+[2024/12/02 18:35:36.183] Download auditing req (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:35:36.183] Verify auditing proof (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:35:40.775] Start verifying proof (splitNum:1000, blockCount:900)
+[2024/12/02 18:35:43.800] Finish verifying proof (splitNum:1000, blockCount:900)
+[2024/12/02 18:35:43.800] Upload auditing result (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1, result:true)
+[2024/12/02 18:35:43.801] Finish auditing
+[2024/12/02 18:35:44.004] Start challenge
+[2024/12/02 18:35:44.004] Upload auditing chal (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:35:44.007] Finish challenge
+[2024/12/02 18:35:44.051] Start proof
+[2024/12/02 18:35:44.051] Download auditing chal (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:35:44.409] Start generating proof (chunks:1000, target:900)
+[2024/12/02 18:35:50.299] Finish generating proof (chunks:1000, target:900)
+[2024/12/02 18:35:50.300] Upload auditing proof (entity:sp, file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:35:50.300] Finish proof
+[2024/12/02 18:35:50.456] Start auditing
+[2024/12/02 18:35:50.457] Download auditing req (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:35:50.457] Verify auditing proof (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:35:55.129] Start verifying proof (splitNum:1000, blockCount:900)
+[2024/12/02 18:35:58.172] Finish verifying proof (splitNum:1000, blockCount:900)
+[2024/12/02 18:35:58.172] Upload auditing result (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1, result:true)
+[2024/12/02 18:35:58.172] Finish auditing
+[2024/12/02 18:35:58.418] Start challenge
+[2024/12/02 18:35:58.419] Upload auditing chal (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:35:58.421] Finish challenge
+[2024/12/02 18:35:58.477] Start proof
+[2024/12/02 18:35:58.478] Download auditing chal (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:35:58.837] Start generating proof (chunks:1000, target:900)
+[2024/12/02 18:36:04.731] Finish generating proof (chunks:1000, target:900)
+[2024/12/02 18:36:04.731] Upload auditing proof (entity:sp, file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:36:04.930] Finish proof
+[2024/12/02 18:36:05.526] Start auditing
+[2024/12/02 18:36:05.527] Download auditing req (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:36:05.527] Verify auditing proof (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:36:10.147] Start verifying proof (splitNum:1000, blockCount:900)
+[2024/12/02 18:36:13.195] Finish verifying proof (splitNum:1000, blockCount:900)
+[2024/12/02 18:36:13.195] Upload auditing result (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1, result:true)
+[2024/12/02 18:36:13.195] Finish auditing
+[2024/12/02 18:36:13.334] Start challenge
+[2024/12/02 18:36:13.334] Upload auditing chal (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:36:13.337] Finish challenge
+[2024/12/02 18:36:13.390] Start proof
+[2024/12/02 18:36:13.391] Download auditing chal (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:36:13.752] Start generating proof (chunks:1000, target:900)
+[2024/12/02 18:36:19.702] Finish generating proof (chunks:1000, target:900)
+[2024/12/02 18:36:19.702] Upload auditing proof (entity:sp, file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:36:19.702] Finish proof
+[2024/12/02 18:36:19.846] Start auditing
+[2024/12/02 18:36:19.846] Download auditing req (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:36:19.846] Verify auditing proof (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:36:24.545] Start verifying proof (splitNum:1000, blockCount:900)
+[2024/12/02 18:36:27.580] Finish verifying proof (splitNum:1000, blockCount:900)
+[2024/12/02 18:36:27.580] Upload auditing result (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1, result:true)
+[2024/12/02 18:36:27.581] Finish auditing
+[2024/12/02 18:36:27.763] Start challenge
+[2024/12/02 18:36:27.763] Upload auditing chal (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:36:27.766] Finish challenge
+[2024/12/02 18:36:27.809] Start proof
+[2024/12/02 18:36:27.810] Download auditing chal (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:36:28.176] Start generating proof (chunks:1000, target:900)
+[2024/12/02 18:36:34.073] Finish generating proof (chunks:1000, target:900)
+[2024/12/02 18:36:34.073] Upload auditing proof (entity:sp, file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:36:34.240] Finish proof
+[2024/12/02 18:36:34.991] Start auditing
+[2024/12/02 18:36:34.992] Download auditing req (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:36:34.992] Verify auditing proof (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:36:39.680] Start verifying proof (splitNum:1000, blockCount:900)
+[2024/12/02 18:36:42.736] Finish verifying proof (splitNum:1000, blockCount:900)
+[2024/12/02 18:36:42.736] Upload auditing result (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1, result:true)
+[2024/12/02 18:36:42.736] Finish auditing
+[2024/12/02 18:36:42.891] Start challenge
+[2024/12/02 18:36:42.891] Upload auditing chal (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:36:42.893] Finish challenge
+[2024/12/02 18:36:42.946] Start proof
+[2024/12/02 18:36:42.946] Download auditing chal (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:36:43.306] Start generating proof (chunks:1000, target:900)
+[2024/12/02 18:36:49.247] Finish generating proof (chunks:1000, target:900)
+[2024/12/02 18:36:49.247] Upload auditing proof (entity:sp, file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:36:49.248] Finish proof
+[2024/12/02 18:36:49.422] Start auditing
+[2024/12/02 18:36:49.423] Download auditing req (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:36:49.423] Verify auditing proof (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:36:54.101] Start verifying proof (splitNum:1000, blockCount:900)
+[2024/12/02 18:36:57.153] Finish verifying proof (splitNum:1000, blockCount:900)
+[2024/12/02 18:36:57.153] Upload auditing result (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1, result:true)
+[2024/12/02 18:36:57.465] Finish auditing
+[2024/12/02 18:36:58.611] Start challenge
+[2024/12/02 18:36:58.611] Upload auditing chal (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:36:58.928] Finish challenge
+[2024/12/02 18:36:59.801] Start proof
+[2024/12/02 18:36:59.802] Download auditing chal (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:37:00.170] Start generating proof (chunks:1000, target:900)
+[2024/12/02 18:37:06.019] Finish generating proof (chunks:1000, target:900)
+[2024/12/02 18:37:06.019] Upload auditing proof (entity:sp, file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:37:06.019] Finish proof
+[2024/12/02 18:37:06.159] Start auditing
+[2024/12/02 18:37:06.160] Download auditing req (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:37:06.160] Verify auditing proof (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:37:10.815] Start verifying proof (splitNum:1000, blockCount:900)
+[2024/12/02 18:37:13.861] Finish verifying proof (splitNum:1000, blockCount:900)
+[2024/12/02 18:37:13.861] Upload auditing result (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1, result:true)
+[2024/12/02 18:37:13.862] Finish auditing
+[2024/12/02 18:37:14.002] Start challenge
+[2024/12/02 18:37:14.003] Upload auditing chal (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:37:14.005] Finish challenge
+[2024/12/02 18:37:14.043] Start proof
+[2024/12/02 18:37:14.044] Download auditing chal (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:37:14.400] Start generating proof (chunks:1000, target:900)
+[2024/12/02 18:37:20.325] Finish generating proof (chunks:1000, target:900)
+[2024/12/02 18:37:20.326] Upload auditing proof (entity:sp, file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:37:20.326] Finish proof
+[2024/12/02 18:37:20.462] Start auditing
+[2024/12/02 18:37:20.463] Download auditing req (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:37:20.463] Verify auditing proof (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:37:25.143] Start verifying proof (splitNum:1000, blockCount:900)
+[2024/12/02 18:37:28.159] Finish verifying proof (splitNum:1000, blockCount:900)
+[2024/12/02 18:37:28.159] Upload auditing result (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1, result:true)
+[2024/12/02 18:37:28.277] Finish auditing
+[2024/12/02 18:37:29.274] Start challenge
+[2024/12/02 18:37:29.274] Upload auditing chal (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:37:29.597] Finish challenge
+[2024/12/02 18:37:30.323] Start proof
+[2024/12/02 18:37:30.323] Download auditing chal (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:37:30.687] Start generating proof (chunks:1000, target:900)
+[2024/12/02 18:37:36.620] Finish generating proof (chunks:1000, target:900)
+[2024/12/02 18:37:36.620] Upload auditing proof (entity:sp, file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:37:36.620] Finish proof
+[2024/12/02 18:37:36.775] Start auditing
+[2024/12/02 18:37:36.775] Download auditing req (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:37:36.775] Verify auditing proof (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:37:41.495] Start verifying proof (splitNum:1000, blockCount:900)
+[2024/12/02 18:37:44.575] Finish verifying proof (splitNum:1000, blockCount:900)
+[2024/12/02 18:37:44.575] Upload auditing result (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1, result:true)
+[2024/12/02 18:37:44.575] Finish auditing
+[2024/12/02 18:37:44.700] Start challenge
+[2024/12/02 18:37:44.700] Upload auditing chal (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:37:44.703] Finish challenge
+[2024/12/02 18:37:44.749] Start proof
+[2024/12/02 18:37:44.749] Download auditing chal (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:37:45.107] Start generating proof (chunks:1000, target:900)
+[2024/12/02 18:37:51.042] Finish generating proof (chunks:1000, target:900)
+[2024/12/02 18:37:51.042] Upload auditing proof (entity:sp, file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:37:51.042] Finish proof
+[2024/12/02 18:37:51.188] Start auditing
+[2024/12/02 18:37:51.188] Download auditing req (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:37:51.188] Verify auditing proof (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:37:55.863] Start verifying proof (splitNum:1000, blockCount:900)
+[2024/12/02 18:37:58.872] Finish verifying proof (splitNum:1000, blockCount:900)
+[2024/12/02 18:37:58.872] Upload auditing result (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1, result:true)
+[2024/12/02 18:37:58.873] Finish auditing
+[2024/12/02 18:37:59.185] Start challenge
+[2024/12/02 18:37:59.185] Upload auditing chal (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:37:59.188] Finish challenge
+[2024/12/02 18:37:59.219] Start proof
+[2024/12/02 18:37:59.219] Download auditing chal (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:37:59.593] Start generating proof (chunks:1000, target:900)
+[2024/12/02 18:38:05.509] Finish generating proof (chunks:1000, target:900)
+[2024/12/02 18:38:05.509] Upload auditing proof (entity:sp, file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:38:05.509] Finish proof
+[2024/12/02 18:38:05.651] Start auditing
+[2024/12/02 18:38:05.653] Download auditing req (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:38:05.653] Verify auditing proof (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:38:10.368] Start verifying proof (splitNum:1000, blockCount:900)
+[2024/12/02 18:38:13.449] Finish verifying proof (splitNum:1000, blockCount:900)
+[2024/12/02 18:38:13.449] Upload auditing result (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1, result:true)
+[2024/12/02 18:38:13.450] Finish auditing
+[2024/12/02 18:38:13.598] Start challenge
+[2024/12/02 18:38:13.599] Upload auditing chal (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:38:13.601] Finish challenge
+[2024/12/02 18:38:13.647] Start proof
+[2024/12/02 18:38:13.647] Download auditing chal (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:38:14.017] Start generating proof (chunks:1000, target:900)
+[2024/12/02 18:38:19.952] Finish generating proof (chunks:1000, target:900)
+[2024/12/02 18:38:19.952] Upload auditing proof (entity:sp, file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:38:20.261] Finish proof
+[2024/12/02 18:38:21.050] Start auditing
+[2024/12/02 18:38:21.051] Download auditing req (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:38:21.051] Verify auditing proof (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:38:25.680] Start verifying proof (splitNum:1000, blockCount:900)
+[2024/12/02 18:38:28.710] Finish verifying proof (splitNum:1000, blockCount:900)
+[2024/12/02 18:38:28.710] Upload auditing result (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1, result:true)
+[2024/12/02 18:38:28.711] Finish auditing
+[2024/12/02 18:38:28.860] Start challenge
+[2024/12/02 18:38:28.860] Upload auditing chal (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:38:28.863] Finish challenge
+[2024/12/02 18:38:28.910] Start proof
+[2024/12/02 18:38:28.910] Download auditing chal (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:38:29.280] Start generating proof (chunks:1000, target:900)
+[2024/12/02 18:38:35.182] Finish generating proof (chunks:1000, target:900)
+[2024/12/02 18:38:35.182] Upload auditing proof (entity:sp, file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:38:35.183] Finish proof
+[2024/12/02 18:38:35.337] Start auditing
+[2024/12/02 18:38:35.338] Download auditing req (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:38:35.338] Verify auditing proof (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:38:40.038] Start verifying proof (splitNum:1000, blockCount:900)
+[2024/12/02 18:38:43.083] Finish verifying proof (splitNum:1000, blockCount:900)
+[2024/12/02 18:38:43.083] Upload auditing result (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1, result:true)
+[2024/12/02 18:38:43.083] Finish auditing
+[2024/12/02 18:38:43.232] Start challenge
+[2024/12/02 18:38:43.232] Upload auditing chal (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:38:43.234] Finish challenge
+[2024/12/02 18:38:43.284] Start proof
+[2024/12/02 18:38:43.284] Download auditing chal (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:38:43.646] Start generating proof (chunks:1000, target:900)
+[2024/12/02 18:38:49.542] Finish generating proof (chunks:1000, target:900)
+[2024/12/02 18:38:49.542] Upload auditing proof (entity:sp, file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:38:49.900] Finish proof
+[2024/12/02 18:38:51.239] Start auditing
+[2024/12/02 18:38:51.240] Download auditing req (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:38:51.240] Verify auditing proof (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:38:55.871] Start verifying proof (splitNum:1000, blockCount:900)
+[2024/12/02 18:38:58.916] Finish verifying proof (splitNum:1000, blockCount:900)
+[2024/12/02 18:38:58.917] Upload auditing result (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1, result:true)
+[2024/12/02 18:38:58.917] Finish auditing
+[2024/12/02 18:38:59.130] Start challenge
+[2024/12/02 18:38:59.132] Upload auditing chal (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:38:59.134] Finish challenge
+[2024/12/02 18:38:59.188] Start proof
+[2024/12/02 18:38:59.188] Download auditing chal (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:38:59.559] Start generating proof (chunks:1000, target:900)
+[2024/12/02 18:39:05.498] Finish generating proof (chunks:1000, target:900)
+[2024/12/02 18:39:05.498] Upload auditing proof (entity:sp, file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:39:05.498] Finish proof
+[2024/12/02 18:39:05.647] Start auditing
+[2024/12/02 18:39:05.648] Download auditing req (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:39:05.648] Verify auditing proof (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:39:10.345] Start verifying proof (splitNum:1000, blockCount:900)
+[2024/12/02 18:39:13.377] Finish verifying proof (splitNum:1000, blockCount:900)
+[2024/12/02 18:39:13.377] Upload auditing result (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1, result:true)
+[2024/12/02 18:39:13.378] Finish auditing
+[2024/12/02 18:39:13.540] Start challenge
+[2024/12/02 18:39:13.541] Upload auditing chal (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:39:13.545] Finish challenge
+[2024/12/02 18:39:13.590] Start proof
+[2024/12/02 18:39:13.590] Download auditing chal (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:39:13.958] Start generating proof (chunks:1000, target:900)
+[2024/12/02 18:39:19.858] Finish generating proof (chunks:1000, target:900)
+[2024/12/02 18:39:19.858] Upload auditing proof (entity:sp, file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:39:19.999] Finish proof
+[2024/12/02 18:39:21.044] Start auditing
+[2024/12/02 18:39:21.044] Download auditing req (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:39:21.044] Verify auditing proof (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:39:25.735] Start verifying proof (splitNum:1000, blockCount:900)
+[2024/12/02 18:39:28.780] Finish verifying proof (splitNum:1000, blockCount:900)
+[2024/12/02 18:39:28.780] Upload auditing result (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1, result:true)
+[2024/12/02 18:39:28.780] Finish auditing
+[2024/12/02 18:39:29.015] Start challenge
+[2024/12/02 18:39:29.017] Upload auditing chal (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:39:29.020] Finish challenge
+[2024/12/02 18:39:29.060] Start proof
+[2024/12/02 18:39:29.060] Download auditing chal (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:39:29.424] Start generating proof (chunks:1000, target:900)
+[2024/12/02 18:39:35.369] Finish generating proof (chunks:1000, target:900)
+[2024/12/02 18:39:35.369] Upload auditing proof (entity:sp, file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:39:35.370] Finish proof
+[2024/12/02 18:39:35.581] Start auditing
+[2024/12/02 18:39:35.583] Download auditing req (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:39:35.583] Verify auditing proof (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:39:40.275] Start verifying proof (splitNum:1000, blockCount:900)
+[2024/12/02 18:39:43.318] Finish verifying proof (splitNum:1000, blockCount:900)
+[2024/12/02 18:39:43.318] Upload auditing result (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1, result:true)
+[2024/12/02 18:39:43.349] Finish auditing
+[2024/12/02 18:39:44.308] Start challenge
+[2024/12/02 18:39:44.308] Upload auditing chal (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:39:44.421] Finish challenge
+[2024/12/02 18:39:45.329] Start proof
+[2024/12/02 18:39:45.329] Download auditing chal (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:39:45.700] Start generating proof (chunks:1000, target:900)
+[2024/12/02 18:39:51.574] Finish generating proof (chunks:1000, target:900)
+[2024/12/02 18:39:51.574] Upload auditing proof (entity:sp, file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:39:51.574] Finish proof
+[2024/12/02 18:39:51.721] Start auditing
+[2024/12/02 18:39:51.721] Download auditing req (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:39:51.722] Verify auditing proof (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1)
+[2024/12/02 18:39:56.400] Start verifying proof (splitNum:1000, blockCount:900)
+[2024/12/02 18:39:59.451] Finish verifying proof (splitNum:1000, blockCount:900)
+[2024/12/02 18:39:59.451] Upload auditing result (file:0x89c87b6da4f612927397faca5edcf3cfc7cef12921b70c4b5858afaced38d572, index:1/1, result:true)
+[2024/12/02 18:39:59.452] Finish auditing
