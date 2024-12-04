@@ -21,88 +21,51 @@ ETHERNET_SENDER_OPTS_5 = --sender-addr $(ADDRESS_5) --sender-key $(PRIVKEY_5)
 shell:
 	docker compose run $(SERVICE) bash
 
-eval-all:
+test-all:
 # build programs
 	$(MAKE) harness@build
 	$(MAKE) aide@build
 # perform evaluation
+	$(MAKE) test-proctime
+	$(MAKE) test-contract
+	$(MAKE) test-frequency
+
+test-proctime:
+	$(MAKE) test-proctime-down
+	rm -rf ./eval/gentags/logs/*
+	rm -rf ./eval/auditing/logs/*
+	docker compose -f docker-compose-eval-proctime.yaml up
 	$(MAKE) eval-gentags
 	$(MAKE) eval-auditing
-	$(MAKE) eval-contract
-	$(MAKE) eval-frequency
 
-eval-gentags:
-	$(MAKE) test-gentags
-	$(MAKE) aide@eval-gentags
-
-eval-auditing:
-	$(MAKE) test-auditing
-	$(MAKE) aide@eval-auditing
-
-eval-contract:
-	$(MAKE) eval-contract-down
+test-contract:
+	$(MAKE) test-contract-down
 	rm -f ./cache/contract.addr
 	rm -f ./cache/contract-addr.env
 	docker compose -f docker-compose-eval-contract.yaml up -d testnet
 	docker compose -f docker-compose-eval-contract.yaml exec testnet /entrypoint.sh deploy $(CONTRACT) | tee ./cache/contract.addr
 	echo CONTRACT_ADDR=`cat ./cache/contract.addr` > ./cache/contract-addr.env
 	docker compose -f docker-compose-eval-contract.yaml up harness
-	$(MAKE) aide@eval-contract
+	$(MAKE) eval-contract
 
-eval-contract-down:
+test-proctime-down:
+	docker compose -f docker-compose-eval-proctime.yaml down
+
+test-contract-down:
 	docker compose -f docker-compose-eval-contract.yaml down
 
-eval-frequency:
-	$(MAKE) eval-frequency-down
+test-frequency:
+	$(MAKE) test-frequency-down
 	rm -rf ./eval/frequency/logs/*
 	docker compose -f docker-compose-eval-frequency.yaml --profile all up
-	$(MAKE) aide@eval-frequency
+	$(MAKE) eval-frequency
 
-eval-frequency-x:
+test-frequency-x:
 	rm -rf ./eval/frequency/logs/frequency-$(X_FILE_RATIO).log
 	docker compose -f docker-compose-eval-frequency.yaml --profile $(X_FILE_RATIO) up
 
-eval-frequency-down:
+test-frequency-down:
 	docker compose -f docker-compose-eval-frequency.yaml --profile all down
-
-test-gentags:
-	rm -f ./harness/app/eval/gentags/logs/*
-	@for block_num in `seq 100 100 1000`; do \
-		$(MAKE) test-gentags-main X_TRIAL_COUNT=$(TRIAL_COUNT) X_BLOCK_NUM=$$block_num; \
-		mv ./harness/app/cache/dpduado.log ./harness/app/eval/gentags/logs/gentags-$$block_num.log; \
-	done
-
-test-gentags-main:
-	rm -rf ./harness/app/cache/*
-	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --sim setup $(ADDRESS_0) $(PRIVKEY_0) $(ADDRESS_1) $(PRIVKEY_1)"
-	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --sim enroll user su $(ADDRESS_4) $(PRIVKEY_4)"
-	@for i in `seq $(X_TRIAL_COUNT)`; do \
-		rm -f ./harness/app/cache/test.dat; \
-		$(MAKE) aide@testdata FILE_PATH=./cache/test.dat FILE_SIZE=$(X_BLOCK_NUM)M FILE_VAL=$$i; \
-		$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --sim upload su ./cache/test.dat $(X_BLOCK_NUM)"; \
-		rm -f ./harness/app/cache/sp/*.dat; \
-		rm -f ./harness/app/cache/sp/*.dat.tag; \
-	done
-
-test-auditing:
-	rm -f ./harness/app/eval/auditing/logs/*
-	@for ratio in `seq 0.1 0.1 1.0`; do \
-		$(MAKE) test-auditing-main X_TRIAL_COUNT=$(TRIAL_COUNT) X_BLOCK_RATIO=$$ratio; \
-		mv ./harness/app/cache/dpduado.log ./harness/app/eval/auditing/logs/auditing-$$ratio.log; \
-	done
-
-test-auditing-main:
-	rm -rf ./harness/app/cache/*
-	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --sim setup $(ADDRESS_0) $(PRIVKEY_0) $(ADDRESS_1) $(PRIVKEY_1)"
-	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --sim enroll auditor tpa $(ADDRESS_2)"
-	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --sim enroll user su $(ADDRESS_3) $(PRIVKEY_3)"
-	$(MAKE) aide@testdata FILE_PATH="./cache/test.dat" FILE_SIZE=1000M FILE_VAL=255
-	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --sim upload su ./cache/test.dat 1000"
-	@for i in `seq $(X_TRIAL_COUNT)`; do \
-		$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --sim challenge su $(X_BLOCK_RATIO) 1.0"; \
-		$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --sim proof"; \
-		$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --sim audit tpa"; \
-	done
 
 aide@build:
 	$(MAKE) docker-run SERVICE="harness" CMD="go build -o bin/aide ./cmd/aide"
@@ -110,21 +73,21 @@ aide@build:
 aide@testdata:
 	$(MAKE) docker-run SERVICE="harness" CMD="./bin/aide testdata $(FILE_PATH) $(FILE_SIZE) $(FILE_VAL)"
 
-aide@eval-gentags:
-	rm -f ./harness/app/eval/gentags/results/*
-	$(MAKE) docker-run SERVICE="harness" CMD="./bin/aide eval-gentags ./eval/gentags/logs ./eval/gentags/results"
+eval-gentags:
+	rm -f ./eval/gentags/results/*
+	$(MAKE) docker-run-eval MODE="eval-gentags" TYPE="gentags"
 
-aide@eval-auditing:
-	rm -f ./harness/app/eval/auditing/results/*
-	$(MAKE) docker-run SERVICE="harness" CMD="./bin/aide eval-auditing ./eval/auditing/logs ./eval/auditing/results"
+eval-auditing:
+	rm -f ./eval/auditing/results/*
+	$(MAKE) docker-run-eval MODE="eval-auditing" TYPE="auditing"
 
-aide@eval-contract:
+eval-contract:
 	rm -f ./harness/app/eval/contract/results/*
-	$(MAKE) docker-run SERVICE="harness" CMD="./bin/aide eval-contract ./eval/contract/logs ./eval/contract/results"
+	$(MAKE) docker-run-eval MODE="eval-contract" TYPE="contract"
 
-aide@eval-frequency:
+eval-frequency:
 	rm -f ./eval/frequency/results/*
-	@docker compose -f docker-compose-eval.yaml run --rm aide aide eval-frequency /opt/dpduado/eval/frequency/logs /opt/dpduado/eval/frequency/results
+	$(MAKE) docker-run-eval MODE="eval-frequency" TYPE="frequency"
 
 aide@corruption:
 	$(MAKE) docker-run SERVICE="harness" CMD="./bin/aide corruption $(X_DIR_TARGET) $(X_DAMAGE_RATE) $(X_PATH_RESULT)"
@@ -261,3 +224,7 @@ docker-exec:
 
 docker-log:
 	@docker compose logs -f
+
+docker-run-eval:
+	@docker compose -f docker-compose-eval.yaml run --rm aide aide $(MODE) /opt/dpduado/eval/$(TYPE)/logs /opt/dpduado/eval/$(TYPE)/results
+
