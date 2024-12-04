@@ -113,6 +113,7 @@ func (this *User) GetFileList() [][32]byte {
 }
 
 func (this *User) AppendAuditingFile(_hash [32]byte) {
+	helper.PrintLog("Append auditing file (file:%s)", helper.Hex(_hash[:]))
 	this.AuditingFileList = append(this.AuditingFileList, _hash)
 }
 
@@ -122,7 +123,9 @@ func (this *User) RemoveAuditingFile(_hash [32]byte) {
     for _, v := range this.AuditingFileList {
         if v != _hash { // 条件に一致しない要素だけを新しいスライスに追加
             newSlice = append(newSlice, v)
-        }
+        } else {
+			helper.PrintLog("Remove auditing file (file:%s)", helper.Hex(_hash[:]))
+		}
     }
 	this.AuditingFileList = newSlice
 }
