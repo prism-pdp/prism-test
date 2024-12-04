@@ -19,6 +19,8 @@ type User struct {
 	PublicKeyData pdp.PublicKeyData `json:'publicKey'`
 	PrivateKeyData pdp.PrivateKeyData `json:'privateKey'`
 
+	AuditingFileList [][32]byte
+
 	client client.BaseClient
 }
 
@@ -108,6 +110,29 @@ func (this *User) GetFileList() [][32]byte {
 	fileList, err := this.client.GetFileList(this.Addr)
 	if err != nil { panic(err) }
 	return fileList
+}
+
+func (this *User) AppendAuditingFile(_hash [32]byte) {
+	this.AuditingFileList = append(this.AuditingFileList, _hash)
+}
+
+func (this *User) RemoveAuditingFile(_hash [32]byte) {
+	this.AuditingFileList = append(this.AuditingFileList, _hash)
+	newSlice := [][32]byte{}
+    for _, v := range this.AuditingFileList {
+        if v != _hash { // 条件に一致しない要素だけを新しいスライスに追加
+            newSlice = append(newSlice, v)
+        }
+    }
+	this.AuditingFileList = newSlice
+}
+
+func (this *User) GetAuditingFileList() [][32]byte {
+	list := make([][32]byte, len(this.AuditingFileList))
+	for i, v := range this.AuditingFileList {
+		list[i] = v
+	}
+	return list
 }
 
 func (this *User) GetName() string {

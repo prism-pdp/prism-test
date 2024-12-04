@@ -150,14 +150,14 @@ harness@simtest:
 	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --sim enroll auditor tpa2 $(ADDRESS_3)"
 	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --sim enroll user    su1  $(ADDRESS_4) $(PRIVKEY_4)"
 	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --sim enroll user    su2  $(ADDRESS_5) $(PRIVKEY_5)"
-	$(MAKE) aide@testdata FILE_PATH=./cache/dummy.data FILE_SIZE=1M FILE_VAL=1
+	$(MAKE) aide@testdata FILE_PATH=./cache/dummy.data FILE_SIZE=100K FILE_VAL=1
 	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --sim upload su1 cache/dummy.data 100"
-	$(MAKE) aide@testdata FILE_PATH=./cache/dummy.data FILE_SIZE=1M FILE_VAL=2
+	$(MAKE) aide@testdata FILE_PATH=./cache/dummy.data FILE_SIZE=100K FILE_VAL=2
 	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --sim upload su1 cache/dummy.data 100"
 	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --sim upload su2 cache/dummy.data 50"
 	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --sim challenge su1 0.55 1.0"
-	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --sim proof"
-	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --sim --detected-list ./cache/detected.list audit tpa1"
+	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --sim proof su1"
+	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --sim --detected-list ./cache/detected.list audit tpa1 su1"
 
 harness@ethtest:
 	$(MAKE) harness@ethtest-setup
@@ -176,11 +176,11 @@ harness@ethtest-main:
 	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness $(ETHERNET_OPTS) $(ETHERNET_SENDER_OPTS_0) enroll auditor tpa2 $(ADDRESS_3)"
 	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness $(ETHERNET_OPTS) $(ETHERNET_SENDER_OPTS_0) enroll user    su1  $(ADDRESS_4) $(PRIVKEY_4)"
 	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness $(ETHERNET_OPTS) $(ETHERNET_SENDER_OPTS_0) enroll user    su2  $(ADDRESS_5) $(PRIVKEY_5)"
-	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness $(ETHERNET_OPTS) $(ETHERNET_SENDER_OPTS_4) upload su1 cache/dummy.data 100"
-	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness $(ETHERNET_OPTS) $(ETHERNET_SENDER_OPTS_5) upload su2 cache/dummy.data 50"
+	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness $(ETHERNET_OPTS) $(ETHERNET_SENDER_OPTS_1) upload su1 cache/dummy.data 100"
+	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness $(ETHERNET_OPTS) $(ETHERNET_SENDER_OPTS_1) upload su2 cache/dummy.data 50"
 	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness $(ETHERNET_OPTS) $(ETHERNET_SENDER_OPTS_4) challenge su1 0.55 1.0"
-	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness $(ETHERNET_OPTS) $(ETHERNET_SENDER_OPTS_1) proof"
-	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness $(ETHERNET_OPTS) $(ETHERNET_SENDER_OPTS_2) audit tpa1"
+	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness $(ETHERNET_OPTS) $(ETHERNET_SENDER_OPTS_1) proof su1"
+	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness $(ETHERNET_OPTS) $(ETHERNET_SENDER_OPTS_2) audit tpa1 su1"
 
 harness@cmd-setup:
 	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness $(ETHERNET_OPTS) $(ETHERNET_SENDER_OPTS_0) setup $(ADDRESS_0) $(PRIVKEY_0) $(ADDRESS_1) $(PRIVKEY_1)"

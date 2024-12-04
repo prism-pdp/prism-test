@@ -80,7 +80,8 @@ func (this *Provider) NewFile(_addr common.Address, _hash [32]byte, _data []byte
 	pathTagFile := helper.MakeDumpFilePath(this.Name, file.TagFilename)
 	helper.WriteFile(pathTagFile, b)
 
-	this.client.RegisterFile(_hash, _tagSet.Size(), _addr)
+	err = this.client.RegisterFile(_hash, _tagSet.Size(), _addr)
+	if err != nil { return err }
 
 	return nil
 }
@@ -102,7 +103,8 @@ func (this *Provider) UploadNewFile(_data []byte, _tagSet *pdp.TagSet, _addrSU c
 	if isUploaded {
 		return fmt.Errorf("File is already uploaded. (hash:%s)", helper.Hex(hash[:]))
 	} else {
-		this.NewFile(_addrSU, hash, _data, _tagSet, _pubKeySU)
+		err := this.NewFile(_addrSU, hash, _data, _tagSet, _pubKeySU)
+		if err != nil { return err }
 	}
 
 	return nil
@@ -177,18 +179,20 @@ func (this *Provider) GenDedupChal(_data []byte, _addrSU common.Address) *pdp.Ch
 	return chalData
 }
 
-func (this *Provider) DownloadAuditingChal() ([][32]byte, []*pdp.ChalData) {
-	hashList, reqList, err := this.client.GetAuditingReqList()
-	if err != nil { panic(err) }
-	chalDataList := make([]*pdp.ChalData, 0)
-	for _, v := range reqList {
-		if len(v.Proof) == 0 {
-			chalData, err := pdp.DecodeToChalData(v.Chal)
+func (this *Provider) DownloadAuditingChal(_fileList [][32]byte) ([]*pdp.ChalData) {
+	chalDataList := make([]*pdp.ChalData, len(_fileList))
+
+	for i, v := range _fileList {
+		req, err := this.client.GetAuditingReq(v)
+		if err != nil { panic(err) }
+
+		if len(req.Proof) == 0 {
+			chalData, err := pdp.DecodeToChalData(req.Chal)
 			if err != nil { panic(err) }
-			chalDataList = append(chalDataList, chalData)
+			chalDataList[i] = chalData
 		}
 	}
-	return hashList, chalDataList
+	return chalDataList
 }
 
 func (this *Provider) GenAuditingProof(_hash [32]byte, _chal *pdp.ChalData) pdp.ProofData {

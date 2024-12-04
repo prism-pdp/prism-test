@@ -220,6 +220,7 @@ func runUploadAuditingChal(_name string, _ratioData string, _ratioFile string) {
 			helper.PrintLog("Upload auditing chal (file:%s, index:%d/%d)", helper.Hex(f[:]), i+1, len(fileList))
 			chalData := su.GenAuditingChal(f, ratioData)
 			su.UploadAuditingChal(f, chalData)
+			su.AppendAuditingFile(f)
 		}
 	}
 
@@ -231,31 +232,33 @@ func runUploadAuditingChal(_name string, _ratioData string, _ratioFile string) {
 	helper.PrintLog("Finish challenge")
 }
 
-func runUploadAuditingProof() {
+func runUploadAuditingProof(_nameSU string) {
 	helper.PrintLog("Start proof")
 
 	// --------------------------
 	// Prepare entities
 	// --------------------------
 	var sp entity.Provider
+	var su entity.User
 	helper.LoadEntity(nameSP, &sp)
+	helper.LoadEntity(_nameSU, &su)
 
 	// --------------------------
 	// Main processing
 	// --------------------------
-	// SP gets challenge from blockchain.
-	fileList, chalDataList := sp.DownloadAuditingChal()
-	for i, h := range fileList {
-		helper.PrintLog("Download auditing chal (file:%s, index:%d/%d)", helper.Hex(h[:]), i+1, len(fileList))
-	}
+	// SP gets the file list for auditing from SU.
+	auditingFileList := su.GetAuditingFileList()
 
-	for i, f := range fileList {
+	// SP gets challenge from blockchain.
+	chalDataList := sp.DownloadAuditingChal(auditingFileList)
+
+	for i, f := range auditingFileList {
 		proofData := sp.GenAuditingProof(f, chalDataList[i])
 		if len([]byte(proofData)) > 0 {
-			helper.PrintLog("Upload auditing proof (entity:%s, file:%s, index:%d/%d)", sp.Name, helper.Hex(f[:]), i+1, len(fileList))
+			helper.PrintLog("Upload auditing proof (entity:%s, file:%s, index:%d/%d)", sp.Name, helper.Hex(f[:]), i+1, len(auditingFileList))
 			sp.UploadAuditingProof(f, proofData)
 		} else {
-			err := fmt.Errorf("[Failure] Generate auditing proof (entity:%s, file:%s, index:%d/%d)", sp.Name, helper.Hex(f[:]), i+1, len(fileList))
+			err := fmt.Errorf("[Failure] Generate auditing proof (entity:%s, file:%s, index:%d/%d)", sp.Name, helper.Hex(f[:]), i+1, len(auditingFileList))
 			helper.Panic(err)
 		}
 	}
@@ -268,7 +271,7 @@ func runUploadAuditingProof() {
 	helper.PrintLog("Finish proof")
 }
 
-func runVerifyAuditingProof(_name string) {
+func runVerifyAuditingProof(_nameTPA string, _nameSU string) {
 	helper.PrintLog("Start auditing")
 
 	// --------------------------
@@ -276,30 +279,34 @@ func runVerifyAuditingProof(_name string) {
 	// --------------------------
 	var sp entity.Provider
 	var tpa entity.Auditor
+	var su entity.User
 	helper.LoadEntity(nameSP, &sp)
-	helper.LoadEntity(_name, &tpa)
+	helper.LoadEntity(_nameTPA, &tpa)
+	helper.LoadEntity(_nameSU, &su)
 
 	// --------------------------
 	// Main processing
 	// --------------------------
-	// TPA gets challenge and proof from blockchain.
-	fileList, reqDataList := tpa.GetAuditingReqList()
-	for i, f := range fileList {
-		helper.PrintLog("Download auditing req (file:%s, index:%d/%d)", helper.Hex(f[:]), i+1, len(fileList))
+	// TPA gets the file list for auditing from SU.
+	auditingFileList := su.GetAuditingFileList()
+	//
+	reqDataList := tpa.GetAuditingReqList(auditingFileList)
+	for i, f := range auditingFileList {
+		helper.PrintLog("Download auditing req (file:%s, index:%d/%d)", helper.Hex(f[:]), i+1, len(auditingFileList))
 	}
 
 	var resultList []bool
-	for i, f := range fileList {
-		helper.PrintLog("Verify auditing proof (file:%s, index:%d/%d)", helper.Hex(f[:]), i+1, len(fileList))
+	for i, f := range auditingFileList {
+		helper.PrintLog("Verify auditing proof (file:%s, index:%d/%d)", helper.Hex(f[:]), i+1, len(auditingFileList))
 
 		// TPA gets M (list of hash of chunks) from SP.
 		owner, setDigest, tagDataSet := sp.PrepareVerificationData(f, reqDataList[i].ChalData)
 
 		// TPA verifies proof.
-		result, err := tpa.VerifyAuditingProof(f, tagDataSet, setDigest, &reqDataList[i], owner)
+		result, err := tpa.VerifyAuditingProof(f, tagDataSet, setDigest, reqDataList[i], owner)
 		if err != nil { helper.Panic(err) }
 
-		helper.PrintLog("Upload auditing result (file:%s, index:%d/%d, result:%t)", helper.Hex(f[:]), i+1, len(fileList), result)
+		helper.PrintLog("Upload auditing result (file:%s, index:%d/%d, result:%t)", helper.Hex(f[:]), i+1, len(auditingFileList), result)
 		tpa.UploadAuditingResult(f, result)
 
 		resultList = append(resultList, result)
@@ -313,13 +320,19 @@ func runVerifyAuditingProof(_name string) {
 		}
 	}
 
-	tpa.SaveSummary(fileList, resultList)
+	tpa.SaveSummary(auditingFileList, resultList)
+
+	// Update auditing req list of SU
+	for _, v := range auditingFileList {
+		su.RemoveAuditingFile(v)
+	}
 
 	// --------------------------
 	// Save entities
 	// --------------------------
 	helper.DumpEntity(&sp)
 	helper.DumpEntity(&tpa)
+	helper.DumpEntity(&su)
 
 	helper.PrintLog("Finish auditing")
 }
@@ -352,9 +365,9 @@ func main() {
 	case "challenge":
 		runUploadAuditingChal(args[1], args[2], args[3])
 	case "proof":
-		runUploadAuditingProof()
+		runUploadAuditingProof(args[1])
 	case "audit":
-		runVerifyAuditingProof(args[1])
+		runVerifyAuditingProof(args[1], args[2])
 	default:
 		getopt.Usage()
 		os.Exit(1)

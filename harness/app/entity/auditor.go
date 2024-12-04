@@ -52,17 +52,21 @@ func (this *Auditor) SetupEthClient() {
 	this.client = client.NewEthClient(helper.Server, helper.ContractAddr, helper.SenderPrivKey, helper.SenderAddr)
 }
 
-func (this *Auditor) GetAuditingReqList() ([][32]byte, []pdp.AuditingReqData) {
-	hashList, xz21ReqList, err := this.client.GetAuditingReqList()
-	if err != nil { panic(err) }
+func (this *Auditor) GetAuditingReqList(_fileList [][32]byte) ([]*pdp.AuditingReqData) {
+	reqDataList := make([]*pdp.AuditingReqData, len(_fileList))
 
-	var reqDataList []pdp.AuditingReqData
-	for _, v := range xz21ReqList {
-		var reqData pdp.AuditingReqData
-		reqData.LoadFromXZ21(&v)
-		reqDataList = append(reqDataList, reqData)
+	for i, v := range _fileList {
+		req, err := this.client.GetAuditingReq(v)
+		if err != nil { panic(err) }
+
+		if len(req.Chal) > 0 && len(req.Proof) > 0 {
+			reqData := new(pdp.AuditingReqData)
+			reqData.LoadFromXZ21(req)
+			reqDataList[i] = reqData
+		}
 	}
-	return hashList, reqDataList
+
+	return reqDataList
 }
 
 func (this *Auditor) VerifyAuditingProof(_hash [32]byte, _setTagData pdp.TagDataSet, _setDigest pdp.DigestSet, _auditingReqData *pdp.AuditingReqData, _owner common.Address) (bool, error) {

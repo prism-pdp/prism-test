@@ -115,16 +115,14 @@ func (this *SimClient) SetAuditingResult(_hash [32]byte, _result bool) error {
 	return nil
 }
 
-func (this *SimClient) GetAuditingReqList() ([][32]byte, []pdp.XZ21AuditingReq, error) {
-	var fileList [][32]byte
-	var reqList []pdp.XZ21AuditingReq
-	for hashHex, req := range this.Ledger.Reqs {
-		hash, err := helper.DecodeHex(hashHex)
-		if err != nil { panic(err) }
-		fileList = append(fileList, [32]byte(hash))
-		reqList = append(reqList, *req)
+func (this *SimClient) GetAuditingReq(_hash [32]byte) (*pdp.XZ21AuditingReq, error) {
+	hashHex := helper.Hex(_hash[:])
+
+	if v, ok := this.Ledger.Reqs[hashHex]; ok {
+		return v, nil
 	}
-	return fileList, reqList, nil
+
+	return nil, nil
 }
 
 func (this *SimClient) GetAuditingLogs(_hash [32]byte) ([]pdp.XZ21AuditingLog, error) {
