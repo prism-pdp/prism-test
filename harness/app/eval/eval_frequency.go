@@ -187,8 +187,11 @@ func (this *EvalFrequencyReport) DumpCsv(_pathDir string) error {
 	defer writer.Flush()
 
 	header := []string{ "File Ratio", "Block Ratio" }
-	for i, _ := range this.EvalData["0.1"][0].HistoryCorruptedFileCount {
-		header = append(header, strconv.Itoa(i))
+	for _, v := range this.EvalData {
+		for i, _ := range v[0].HistoryCorruptedFileCount {
+			header = append(header, strconv.Itoa(i))
+		}
+		break
 	}
 
 	var records [][]string
