@@ -1,7 +1,7 @@
 services:
   testnet:
     image: dpduado-test/testnet
-    container_name: eval_contract_testnet
+    container_name: contract_testnet
     hostname: testnet
     volumes:
       - ./testnet/dpduado-sol:/app
@@ -16,7 +16,7 @@ services:
 
   harness:
     image: dpduado-test/harness
-    container_name: eval_contract_harness
+    container_name: contract_harness
     volumes:
       - harness:/opt/dpduado/cache
       - ./cache/contract-addr.env:/opt/dpduado/contract-addr.env
