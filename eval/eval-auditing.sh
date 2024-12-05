@@ -28,8 +28,8 @@ for ratio in `seq 0.1 0.1 1.0`; do
 
     for i in `seq $TRIAL_COUNT`; do
         $HARNESS challenge su1 $ratio 1.0
-        $HARNESS proof
-        $HARNESS audit tpa1
+        $HARNESS proof su1
+        $HARNESS audit tpa1 su1
     done
 
     mv $PATH_LOG /opt/dpduado/logs/auditing-${ratio}.log

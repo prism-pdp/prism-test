@@ -39,7 +39,7 @@ for i in `seq $TRIAL_COUNT`; do
 done
 
 $HARNESS $SENDER_OPTS_SU1 challenge su1 0.6 1.0
-$HARNESS $SENDER_OPTS_SP proof
-$HARNESS $SENDER_OPTS_TPA audit tpa1
+$HARNESS $SENDER_OPTS_SP proof su1
+$HARNESS $SENDER_OPTS_TPA audit tpa1 su1
 
 cp $PATH_LOG /opt/dpduado/logs/contract.log

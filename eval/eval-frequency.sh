@@ -38,8 +38,8 @@ for block_ratio in `seq 0.1 0.2 1.0`; do
         # ========================================================================
         $AIDE corruption $PATH_CACHE/sp $DAMAGE_RATE $PATH_CACHE/corrupted.list
         $HARNESS challenge su1 $block_ratio $FILE_RATIO
-        $HARNESS proof
-        $HARNESS --detected-list $PATH_CACHE/detected.list audit tpa1
+        $HARNESS proof su1
+        $HARNESS --detected-list $PATH_CACHE/detected.list audit tpa1 su1
         $AIDE repair-batch $PATH_CACHE/detected.list
         rm -f $PATH_CACHE/detected.list
         # ========================================================================
