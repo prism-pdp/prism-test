@@ -18,25 +18,31 @@ ETHERNET_SENDER_OPTS_3 = --sender-addr $(ADDRESS_3) --sender-key $(PRIVKEY_3)
 ETHERNET_SENDER_OPTS_4 = --sender-addr $(ADDRESS_4) --sender-key $(PRIVKEY_4)
 ETHERNET_SENDER_OPTS_5 = --sender-addr $(ADDRESS_5) --sender-key $(PRIVKEY_5)
 
+.PHONY: eval
+
 shell:
 	docker compose run $(SERVICE) bash
 
-test-all:
+eval:
 # build programs
 	$(MAKE) harness@build
 	$(MAKE) aide@build
-# perform evaluation
+# perform evaluation: proctime
 	$(MAKE) test-proctime
+	$(MAKE) eval-gentags
+	$(MAKE) eval-auditing
+# perform evaluation: contract
 	$(MAKE) test-contract
+	$(MAKE) eval-contract
+# perform evaluation: frequency
 	$(MAKE) test-frequency
+	$(MAKE) eval-frequency
 
 test-proctime:
 	$(MAKE) test-proctime-down
 	rm -rf ./eval/gentags/logs/*
 	rm -rf ./eval/auditing/logs/*
 	docker compose -f docker-compose-eval-proctime.yaml up
-	$(MAKE) eval-gentags
-	$(MAKE) eval-auditing
 
 test-contract:
 	$(MAKE) test-contract-down
@@ -46,7 +52,6 @@ test-contract:
 	docker compose -f docker-compose-eval-contract.yaml exec testnet /entrypoint.sh deploy $(CONTRACT) | tee ./cache/contract.addr
 	echo CONTRACT_ADDR=`cat ./cache/contract.addr` > ./cache/contract-addr.env
 	docker compose -f docker-compose-eval-contract.yaml up harness
-	$(MAKE) eval-contract
 
 test-proctime-down:
 	docker compose -f docker-compose-eval-proctime.yaml down
@@ -58,7 +63,6 @@ test-frequency:
 	$(MAKE) test-frequency-down
 	rm -rf ./eval/frequency/logs/*
 	docker compose -f docker-compose-eval-frequency.yaml --profile all up
-	$(MAKE) eval-frequency
 
 test-frequency-x:
 	rm -rf ./eval/frequency/logs/frequency-$(X_FILE_RATIO).log
