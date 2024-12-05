@@ -171,8 +171,8 @@ func (this *EthClient) SetProof(_hash [32]byte, _proofBytes []byte) error {
 	return err
 }
 
-func (this *EthClient) GetAuditingReq(_hash [32]byte) (*pdp.XZ21AuditingReq, error) {
-	req, err := this.Session.GetAuditingReq(_hash)
+func (this *EthClient) GetLatestAuditingLog(_hash [32]byte) (*pdp.XZ21AuditingLog, error) {
+	req, err := this.Session.GetLatestAuditingLog(_hash)
 	return &req, err
 }
 

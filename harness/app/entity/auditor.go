@@ -52,24 +52,24 @@ func (this *Auditor) SetupEthClient() {
 	this.client = client.NewEthClient(helper.Server, helper.ContractAddr, helper.SenderPrivKey, helper.SenderAddr)
 }
 
-func (this *Auditor) GetAuditingReqList(_fileList [][32]byte) ([]*pdp.AuditingReqData) {
-	reqDataList := make([]*pdp.AuditingReqData, len(_fileList))
+func (this *Auditor) GetWaitingResultList(_fileList [][32]byte) ([]*pdp.AuditingLogData) {
+	logDataList := make([]*pdp.AuditingLogData, len(_fileList))
 
 	for i, v := range _fileList {
-		req, err := this.client.GetAuditingReq(v)
+		log, err := this.client.GetLatestAuditingLog(v)
 		if err != nil { panic(err) }
 
-		if len(req.Chal) > 0 && len(req.Proof) > 0 {
-			reqData := new(pdp.AuditingReqData)
-			reqData.LoadFromXZ21(req)
-			reqDataList[i] = reqData
+		if log.Stage == pdp.WaitingResult {
+			logData := new(pdp.AuditingLogData)
+			logData.LoadFromXZ21(log)
+			logDataList[i] = logData
 		}
 	}
 
-	return reqDataList
+	return logDataList
 }
 
-func (this *Auditor) VerifyAuditingProof(_hash [32]byte, _setTagData pdp.TagDataSet, _setDigest pdp.DigestSet, _auditingReqData *pdp.AuditingReqData, _owner common.Address) (bool, error) {
+func (this *Auditor) VerifyAuditingProof(_hash [32]byte, _setTagData pdp.TagDataSet, _setDigest pdp.DigestSet, _auditingLogData *pdp.AuditingLogData, _owner common.Address) (bool, error) {
 	xz21Param, err := this.client.GetParam()
 	if err != nil { return false, err }
 
@@ -78,8 +78,8 @@ func (this *Auditor) VerifyAuditingProof(_hash [32]byte, _setTagData pdp.TagData
 	fileProp, err := this.client.SearchFile(_hash)
 	if err != nil { helper.Panic(err) }
 
-	auditingReq := _auditingReqData.Import(param)
-	subsetTag := _setTagData.ImportSubset(param, fileProp.SplitNum, auditingReq.Chal)
+	auditingLog := _auditingLogData.Import(param)
+	subsetTag := _setTagData.ImportSubset(param, fileProp.SplitNum, auditingLog.Chal)
 
 	account, err := this.client.GetAccount(_owner)
 	if err != nil { helper.Panic(err) }
@@ -88,10 +88,10 @@ func (this *Auditor) VerifyAuditingProof(_hash [32]byte, _setTagData pdp.TagData
 	pubKeyData.Load(account.PubKey)
 	pubKey := pubKeyData.Import(param)
 
-	helper.PrintLog("Start verifying proof (splitNum:%d, blockCount:%d)", fileProp.SplitNum, auditingReq.Chal.GetTargetBlockCount())
-	result, err := pdp.VerifyProof(param, fileProp.SplitNum, subsetTag, _setDigest, auditingReq.Chal, auditingReq.Proof, pubKey)
+	helper.PrintLog("Start verifying proof (splitNum:%d, blockCount:%d)", fileProp.SplitNum, auditingLog.Chal.GetTargetBlockCount())
+	result, err := pdp.VerifyProof(param, fileProp.SplitNum, subsetTag, _setDigest, auditingLog.Chal, auditingLog.Proof, pubKey)
 	if err != nil { return false, err }
-	helper.PrintLog("Finish verifying proof (splitNum:%d, blockCount:%d)", fileProp.SplitNum, auditingReq.Chal.GetTargetBlockCount())
+	helper.PrintLog("Finish verifying proof (splitNum:%d, blockCount:%d)", fileProp.SplitNum, auditingLog.Chal.GetTargetBlockCount())
 
 	return result, nil
 }

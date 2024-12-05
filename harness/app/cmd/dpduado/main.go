@@ -290,7 +290,7 @@ func runVerifyAuditingProof(_nameTPA string, _nameSU string) {
 	// TPA gets the file list for auditing from SU.
 	auditingFileList := su.GetAuditingFileList()
 	//
-	reqDataList := tpa.GetAuditingReqList(auditingFileList)
+	waitingResultList := tpa.GetWaitingResultList(auditingFileList)
 	for i, f := range auditingFileList {
 		helper.PrintLog("Download auditing req (file:%s, index:%d/%d)", helper.Hex(f[:]), i+1, len(auditingFileList))
 	}
@@ -300,10 +300,10 @@ func runVerifyAuditingProof(_nameTPA string, _nameSU string) {
 		helper.PrintLog("Verify auditing proof (file:%s, index:%d/%d)", helper.Hex(f[:]), i+1, len(auditingFileList))
 
 		// TPA gets M (list of hash of chunks) from SP.
-		owner, setDigest, tagDataSet := sp.PrepareVerificationData(f, reqDataList[i].ChalData)
+		owner, setDigest, tagDataSet := sp.PrepareVerificationData(f, waitingResultList[i].ChalData)
 
 		// TPA verifies proof.
-		result, err := tpa.VerifyAuditingProof(f, tagDataSet, setDigest, reqDataList[i], owner)
+		result, err := tpa.VerifyAuditingProof(f, tagDataSet, setDigest, waitingResultList[i], owner)
 		if err != nil { helper.Panic(err) }
 
 		helper.PrintLog("Upload auditing result (file:%s, index:%d/%d, result:%t)", helper.Hex(f[:]), i+1, len(auditingFileList), result)

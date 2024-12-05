@@ -2,6 +2,8 @@ package client
 
 import (
 	"fmt"
+	"math/big"
+	"time"
 	"github.com/ethereum/go-ethereum/common"
 
 	pdp "github.com/dpduado/dpduado-go/xz21"
@@ -77,49 +79,60 @@ func (this *SimClient) AppendOwner(_hash [32]byte, _addr common.Address) error {
 
 func (this *SimClient) SetChal(_hash [32]byte, _chalBytes []byte) error {
 	hashHex := helper.Hex(_hash[:])
-	if _, ok := this.Ledger.Reqs[hashHex]; ok {
-		return nil
+	size := len(this.Ledger.Logs[hashHex])
+	if size > 0 {
+		pos := size - 1
+		if this.Ledger.Logs[hashHex][pos].Stage != pdp.DoneAuditing {
+			return fmt.Errorf("Not WaitingChal")
+		}
 	}
 
-	var req pdp.XZ21AuditingReq
-	req.Chal = _chalBytes
-	this.Ledger.Reqs[hashHex] = &req
+	var log pdp.XZ21AuditingLog
+	log.Chal = _chalBytes
+	log.Stage = pdp.WaitingProof
+	this.Ledger.Logs[hashHex] = append(this.Ledger.Logs[hashHex], &log)
 
 	return nil
 }
 
 func (this *SimClient) SetProof(_hash [32]byte, _proofBytes []byte) error {
-	this.Ledger.Reqs[helper.Hex(_hash[:])].Proof = _proofBytes
+	hashHex := helper.Hex(_hash[:])
+	size := len(this.Ledger.Logs[hashHex])
+	if size == 0 { return fmt.Errorf("Missing challenge") }
+	pos := size - 1
+	if this.Ledger.Logs[hashHex][pos].Stage != pdp.WaitingProof {
+		return fmt.Errorf("Not WaitingProof")
+	}
+
+	this.Ledger.Logs[hashHex][pos].Proof = _proofBytes
+	this.Ledger.Logs[hashHex][pos].Stage = pdp.WaitingResult
+
 	return nil
 }
 
 func (this *SimClient) SetAuditingResult(_hash [32]byte, _result bool) error {
 	hashHex := helper.Hex(_hash[:])
-
-	req, ok := this.Ledger.Reqs[hashHex]
-	if ok == false {
-		return fmt.Errorf("Invalid request")
+	size := len(this.Ledger.Logs[hashHex])
+	if size == 0 { return fmt.Errorf("Missing proof") }
+	pos := size - 1
+	if this.Ledger.Logs[hashHex][pos].Stage != pdp.WaitingResult {
+		return fmt.Errorf("Not WaitingResult")
 	}
 
-	if len(req.Chal) <= 0 && len(req.Proof) <= 0 {
-		return fmt.Errorf("Invalid status")
-	}
+	log := this.Ledger.Logs[hashHex][pos]
 
-	var log pdp.XZ21AuditingLog
-	log.Req = *req
 	log.Result = _result
-	this.Ledger.Logs[hashHex] = append(this.Ledger.Logs[hashHex], &log)
-
-	delete(this.Ledger.Reqs, hashHex)
+	log.Date = big.NewInt(time.Now().Unix())
+	log.Stage = pdp.DoneAuditing
 
 	return nil
 }
 
-func (this *SimClient) GetAuditingReq(_hash [32]byte) (*pdp.XZ21AuditingReq, error) {
+func (this *SimClient) GetLatestAuditingLog(_hash [32]byte) (*pdp.XZ21AuditingLog, error) {
 	hashHex := helper.Hex(_hash[:])
-
-	if v, ok := this.Ledger.Reqs[hashHex]; ok {
-		return v, nil
+	size := len(this.Ledger.Logs[hashHex])
+	if size > 0 {
+		return this.Ledger.Logs[hashHex][size - 1], nil
 	}
 
 	return nil, nil

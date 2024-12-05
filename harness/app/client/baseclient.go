@@ -20,7 +20,7 @@ type BaseClient interface {
 	AppendOwner(_hash [32]byte, _owner common.Address) error // F
 	SetChal(_hash [32]byte, _chalBytes []byte) error // G
 	SetProof(_hash [32]byte, _proofBytes []byte) error // I
-	GetAuditingReq(_hash [32]byte) (*pdp.XZ21AuditingReq, error) // J
+	GetLatestAuditingLog(_hash [32]byte) (*pdp.XZ21AuditingLog, error) // J
 	SetAuditingResult(_hash [32]byte, _result bool) error // K
 	GetAuditingLogs(_hash [32]byte) ([]pdp.XZ21AuditingLog, error)
 }

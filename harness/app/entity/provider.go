@@ -183,11 +183,11 @@ func (this *Provider) DownloadAuditingChal(_fileList [][32]byte) ([]*pdp.ChalDat
 	chalDataList := make([]*pdp.ChalData, len(_fileList))
 
 	for i, v := range _fileList {
-		req, err := this.client.GetAuditingReq(v)
+		log, err := this.client.GetLatestAuditingLog(v)
 		if err != nil { panic(err) }
 
-		if len(req.Proof) == 0 {
-			chalData, err := pdp.DecodeToChalData(req.Chal)
+		if log.Stage == pdp.WaitingProof {
+			chalData, err := pdp.DecodeToChalData(log.Chal)
 			if err != nil { panic(err) }
 			chalDataList[i] = chalData
 		}

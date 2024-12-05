@@ -17,7 +17,6 @@ type FakeLedger struct {
 	FileProperties map[string]*pdp.XZ21FileProperty `json:'fileProperties'`
 	UserAccountTable map[common.Address]*pdp.XZ21Account `json:'accounts'`
 	AuditorAddrList []common.Address `json:'addrListTPA'`
-	Reqs map[string]*pdp.XZ21AuditingReq `json:'auditReqs'`
 	Logs map[string][]*pdp.XZ21AuditingLog `json:'auditLogs'`
 }
 
@@ -30,7 +29,6 @@ func GetFakeLedger() *FakeLedger {
 func GenFakeLedger() {
 	ledger.FileProperties = make(map[string]*pdp.XZ21FileProperty)
 	ledger.UserAccountTable = make(map[common.Address]*pdp.XZ21Account)
-	ledger.Reqs = make(map[string]*pdp.XZ21AuditingReq)
 	ledger.Logs = make(map[string][]*pdp.XZ21AuditingLog)
 }
 
