@@ -23,13 +23,19 @@ ETHERNET_SENDER_OPTS_5 = --sender-addr $(ADDRESS_5) --sender-key $(PRIVKEY_5)
 shell:
 	docker compose run $(SERVICE) bash
 
+upgrade:
+	$(MAKE) harness@upgrade
+	$(MAKE) testnet@upgrade
+
 eval:
 # build programs
 	$(MAKE) harness@build
 	$(MAKE) aide@build
-# perform evaluation: proctime
-	$(MAKE) test-proctime
+# perform evaluation: gentags
+	$(MAKE) test-gentags
 	$(MAKE) eval-gentags
+# perform evaluation: auditing
+	$(MAKE) test-auditing
 	$(MAKE) eval-auditing
 # perform evaluation: contract
 	$(MAKE) test-contract
@@ -38,11 +44,15 @@ eval:
 	$(MAKE) test-frequency
 	$(MAKE) eval-frequency
 
-test-proctime:
-	$(MAKE) test-proctime-down
+test-gentags:
+	$(MAKE) test-gentags-down
 	rm -rf ./eval/gentags/logs/*
+	docker compose -f docker-compose-eval-gentags.yaml up
+
+test-auditing:
+	$(MAKE) test-auditing-down
 	rm -rf ./eval/auditing/logs/*
-	docker compose -f docker-compose-eval-proctime.yaml up
+	docker compose -f docker-compose-eval-auditing.yaml up
 
 test-contract:
 	$(MAKE) test-contract-down
@@ -53,8 +63,11 @@ test-contract:
 	echo CONTRACT_ADDR=`cat ./cache/contract.addr` > ./cache/contract-addr.env
 	docker compose -f docker-compose-eval-contract.yaml up harness
 
-test-proctime-down:
-	docker compose -f docker-compose-eval-proctime.yaml down
+test-gentags-down:
+	docker compose -f docker-compose-eval-gentags.yaml down
+
+test-auditing-down:
+	docker compose -f docker-compose-eval-auditing.yaml down
 
 test-contract-down:
 	docker compose -f docker-compose-eval-contract.yaml down
@@ -131,6 +144,9 @@ testnet/shell:
 
 testnet/login:
 	$(MAKE) docker-exec SERVICE="testnet" CMD="sh"
+
+testnet@upgrade:
+	cd ./testnet/dpduado-sol; git pull
 
 harness/shell:
 	$(MAKE) docker-run SERVICE="harness" CMD="bash"

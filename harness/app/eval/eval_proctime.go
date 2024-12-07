@@ -8,6 +8,7 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
+	"sort"
 	"strconv"
 	"strings"
 	"time"
@@ -28,15 +29,17 @@ type EvalProcTime struct {
 type EvalProcTimeReport struct {
 	ReportName string
 	TargetMsg string
+	RangeMsg string
 	PathLogDir string
 	PathResultDir string
     ProcTime []*EvalProcTime
 }
 
-func NewEvalProcTimeReport(_reportName, _targetMsg, _pathLogDir, _pathResultDir string) *EvalProcTimeReport {
+func NewEvalProcTimeReport(_reportName, _targetMsg, _rangeMsg, _pathLogDir, _pathResultDir string) *EvalProcTimeReport {
 	obj := new(EvalProcTimeReport)
 	obj.ReportName = _reportName
 	obj.TargetMsg = _targetMsg
+	obj.RangeMsg = _rangeMsg
 	obj.PathLogDir = _pathLogDir
 	obj.PathResultDir = _pathResultDir
 	return obj
@@ -64,10 +67,27 @@ func (this *EvalProcTimeReport) Run() {
 		evalProcTime.BlockNum, err = getBlockNum(e.Name())
 		if err != nil { panic(err) }
 
+		inRange := false
+		checkRange := len(this.RangeMsg) > 0
 		scanner := bufio.NewScanner(f)
 		for scanner.Scan() {
 			line := scanner.Text()
-			evalProcTime.CalcDuration(this.TargetMsg, line)
+			datetime, msg, _ := helper.ParseLog(line)
+
+			if checkRange {
+				match, start := checkMsg(this.RangeMsg, msg)
+				if match {
+					inRange = start
+				}
+			} else {
+				inRange = true
+			}
+
+			if !inRange {
+				continue
+			}
+
+			evalProcTime.CalcDuration(this.TargetMsg, datetime, msg)
 		}
 
 		if err := scanner.Err(); err != nil {
@@ -80,6 +100,10 @@ func (this *EvalProcTimeReport) Run() {
 
 		this.ProcTime = append(this.ProcTime, evalProcTime)
 	}
+
+	sort.Slice(this.ProcTime, func(i, j int) bool {
+		return this.ProcTime[i].BlockNum < this.ProcTime[j].BlockNum
+	})
 }
 
 func (this *EvalProcTimeReport) Dump() error {
@@ -140,12 +164,11 @@ func (this *EvalProcTimeReport) DumpCsv(_pathDir string) error {
 	return writer.WriteAll(records)
 }
 
-func (this *EvalProcTime) CalcDuration(_targetMsg string, _log string) {
-	datetime, msg, _ := helper.ParseLog(_log)
+func (this *EvalProcTime) CalcDuration(_targetMsg string, _datetime time.Time, _msg string) {
 
-	match, start := checkMsg(_targetMsg, msg)
+	match, start := checkMsg(_targetMsg, _msg)
 	if match {
-		err := this.update(start, datetime)
+		err := this.update(start, _datetime)
 		if err != nil { panic(err) }
 	}
 }
@@ -185,14 +208,7 @@ func checkMsg(_expected string, _actual string) (bool, bool) {
 }
 
 func getBlockNum(_filename string) (int, error) {
-	if strings.HasPrefix(_filename, "gentags") {
-		re := regexp.MustCompile(`gentags-(\d+)\.log`)
-		matches := re.FindStringSubmatch(_filename)
-		return strconv.Atoi(matches[1])
-	} else if strings.HasPrefix(_filename, "auditing") {
-		val, err := strconv.ParseFloat(_filename[9:12], 32)
-		if err != nil { return 0, err }
-		return int(val * 1000.0), nil
-	}
-	return 0, fmt.Errorf("Invalid filename (%s)", _filename)
+	re := regexp.MustCompile(`.*-(\d+)\.log`)
+	matches := re.FindStringSubmatch(_filename)
+	return strconv.Atoi(matches[1])
 }

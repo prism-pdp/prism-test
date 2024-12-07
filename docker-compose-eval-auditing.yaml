@@ -1,16 +1,4 @@
 services:
-  gentags_harness:
-    image: dpduado-test/harness
-    container_name: gentags_harness
-    volumes:
-      - gentags_harness:/opt/dpduado/cache
-      - ./harness/app/bin:/opt/dpduado/bin
-      - ./eval/gentags/logs:/opt/dpduado/logs
-      - ./eval/eval-gentags.sh:/opt/dpduado/eval-gentags.sh
-    env_file:
-      - accounts.env
-    command: /opt/dpduado/eval-gentags.sh
-
   auditing_harness:
     image: dpduado-test/harness
     container_name: auditing_harness
@@ -24,5 +12,4 @@ services:
     command: /opt/dpduado/eval-auditing.sh
 
 volumes:
-  gentags_harness:
   auditing_harness:

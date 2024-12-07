@@ -7,6 +7,8 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/pborman/getopt/v2"
 
+	pdp "github.com/dpduado/dpduado-go/xz21"
+
 	"github.com/dpduado/dpduado-test/harness/client"
 	"github.com/dpduado/dpduado-test/harness/entity"
 	"github.com/dpduado/dpduado-test/harness/helper"
@@ -171,12 +173,7 @@ func runUploadPhase(_name string, _path string, _chunkNum string) {
 			helper.PrintLog("Failure registering an owner to a file (owner:%s, file:%s)", su.Name, hex)
 		}
 	} else {
-		tmp, err := strconv.ParseUint(_chunkNum, 10, 32)
-		if err != nil { helper.Panic(err) }
-		chunkNum = uint32(tmp) // Overwrite chunkNum with user defined value
-
-		// SU uploads the file.
-		tag := su.PrepareUpload(data, chunkNum)
+		tag := gentags(&su, data, _chunkNum)
 
 		// SP accepts the file.
 		err = sp.UploadNewFile(data, &tag, su.Addr, &su.PublicKeyData)
@@ -193,6 +190,7 @@ func runUploadPhase(_name string, _path string, _chunkNum string) {
 
 	helper.PrintLog("Finish upload")
 }
+
 
 func runUploadAuditingChal(_name string, _ratioData string, _ratioFile string) {
 	helper.PrintLog("Start challenge")
@@ -337,6 +335,14 @@ func runVerifyAuditingProof(_nameTPA string, _nameSU string) {
 	helper.PrintLog("Finish auditing")
 }
 
+func gentags(_su *entity.User, _data []byte, _chunkNum string) pdp.TagSet {
+	tmp, err := strconv.ParseUint(_chunkNum, 10, 32)
+	if err != nil { helper.Panic(err) }
+	chunkNum := uint32(tmp) // Overwrite chunkNum with user defined value
+
+	return _su.PrepareUpload(_data, chunkNum)
+}
+
 func main() {
 
 	helper.SetupOpt()
@@ -368,6 +374,12 @@ func main() {
 		runUploadAuditingProof(args[1])
 	case "audit":
 		runVerifyAuditingProof(args[1], args[2])
+	case "test-gentags":
+		var su entity.User
+		helper.LoadEntity(args[1], &su)
+		data, err := helper.ReadFile(args[2])
+		if err != nil { helper.Panic(err) }
+		gentags(&su, data, args[3])
 	default:
 		getopt.Usage()
 		os.Exit(1)

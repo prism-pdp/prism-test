@@ -144,7 +144,7 @@ func runWriteLog(_log string) {
 }
 
 func runEvalGenTag(_pathLogDir string, _pathResultDir string) {
-    evalReport := eval.NewEvalProcTimeReport("gentags", "generate tags", _pathLogDir, _pathResultDir)
+    evalReport := eval.NewEvalProcTimeReport("gentags", "generate tags", "", _pathLogDir, _pathResultDir)
 
     evalReport.Run()
 
@@ -155,17 +155,20 @@ func runEvalGenTag(_pathLogDir string, _pathResultDir string) {
 func runEvalAuditing(_pathLogDir string, _pathResultDir string) {
     var err error
 
-    evalGenProofReport := eval.NewEvalProcTimeReport("genproof", "generating proof", _pathLogDir, _pathResultDir)
-    evalVerProofReport := eval.NewEvalProcTimeReport("verifyproof", "verifying proof", _pathLogDir, _pathResultDir)
+    evalGenProofReport_FBN := eval.NewEvalProcTimeReport("genproof_fixed-block-num", "generating proof", "fixed block num", _pathLogDir, _pathResultDir)
+    evalVerProofReport_FBN := eval.NewEvalProcTimeReport("verifyproof_fixed-block-num", "verifying proof", "fixed block num", _pathLogDir, _pathResultDir)
+    evalGenProofReport_FBR := eval.NewEvalProcTimeReport("genproof_fixed-block-ratio", "generating proof", "fixed block ratio", _pathLogDir, _pathResultDir)
+    evalVerProofReport_FBR := eval.NewEvalProcTimeReport("verifyproof_fixed-block-ratio", "verifying proof", "fixed block ratio", _pathLogDir, _pathResultDir)
 
-    evalGenProofReport.Run()
-    evalVerProofReport.Run()
+    evalGenProofReport_FBN.Run()
+    evalVerProofReport_FBN.Run()
+    evalGenProofReport_FBR.Run()
+    evalVerProofReport_FBR.Run()
 
-    err = evalGenProofReport.Dump()
-    if err != nil { panic(err) }
-
-    err = evalVerProofReport.Dump()
-    if err != nil { panic(err) }
+    err = evalGenProofReport_FBN.Dump(); if err != nil { panic(err) }
+    err = evalVerProofReport_FBN.Dump(); if err != nil { panic(err) }
+    err = evalGenProofReport_FBR.Dump(); if err != nil { panic(err) }
+    err = evalVerProofReport_FBR.Dump(); if err != nil { panic(err) }
 }
 
 func runEvalContract(_pathLogDir string, _pathResultDir string) {
