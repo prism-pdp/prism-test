@@ -22,7 +22,6 @@ RUN apt -y install \
 ARG GITHUB_TOKEN
 ENV GITHUB_TOKEN ${GITHUB_TOKEN}
 ENV WALLET_MNEMONIC test test test test test test test test test test test junk
-ENV GOPRIVATE github.com/prism-pdp/prism-go
 
 WORKDIR /app
 
