@@ -46,7 +46,9 @@ func (this *EthClient) RegisterParam(_params string, _g []byte, _u []byte) error
 		return err
 	}
 
-	helper.PrintLog("Completed smart contract (name:RegisterParam, caller:%s, gasUsed:%d, gasPrice:%d)", this.Addr, receipt.GasUsed, receipt.EffectiveGasPrice)
+	size := len(_params) + len(_g) + len(_u)
+
+	helper.PrintLog("Completed smart contract (name:RegisterParam, caller:%s, size:%d, gasUsed:%d, gasPrice:%d)", this.Addr, size, receipt.GasUsed, receipt.EffectiveGasPrice)
 
 	return err
 }
@@ -64,7 +66,9 @@ func (this *EthClient) RegisterFile(_hash [32]byte, _splitNum uint32, _owner com
 		return err
 	}
 
-	helper.PrintLog("Completed smart contract (name:RegisterFile, caller:%s, gasUsed:%d, gasPrice:%d, owner:%s, file:%s)", this.Addr, receipt.GasUsed, receipt.EffectiveGasPrice, _owner, helper.Hex(_hash[:]))
+	size := len(_hash) + 4 /* _splitNum */ + len(_owner)
+
+	helper.PrintLog("Completed smart contract (name:RegisterFile, caller:%s, size:%d, gasUsed:%d, gasPrice:%d, owner:%s, file:%s)", this.Addr, size, receipt.GasUsed, receipt.EffectiveGasPrice, _owner, helper.Hex(_hash[:]))
 
 	return err
 }
@@ -105,8 +109,10 @@ func (this *EthClient) enroll(_type int, _addr common.Address, _pubKey pdp.Publi
 		helper.PrintLog("Failed to complete EnrollAccount contract (caller:%s, type:%d, addr:%s, key:%s)", this.Addr, _type, _addr, helper.Hex(_pubKey.Base()))
 		return err
 	}
+
+	size := 8 /* t */ + len(_addr) + len(_pubKey.Base())
 	
-	helper.PrintLog("Completed smart contract (name:EnrollAccount, caller:%s, gasUsed:%d, gasPrice:%d, type:%d, addr:%s, key:%s)", this.Addr, receipt.GasUsed, receipt.EffectiveGasPrice, _type, _addr, helper.Hex(_pubKey.Base()))
+	helper.PrintLog("Completed smart contract (name:EnrollAccount, caller:%s, size:%d, gasUsed:%d, gasPrice:%d, type:%d, addr:%s, key:%s)", this.Addr, size, receipt.GasUsed, receipt.EffectiveGasPrice, _type, _addr, helper.Hex(_pubKey.Base()))
 
 	return err
 }
@@ -124,7 +130,9 @@ func (this *EthClient) AppendOwner(_hash [32]byte, _owner common.Address) error 
 		return err
 	}
 
-	helper.PrintLog("Completed smart contract (name:AppendOwner, caller:%s, gasUsed:%d, gasPrice:%d, owner:%s, file:%s)", this.Addr, receipt.GasUsed, receipt.EffectiveGasPrice, _owner, helper.Hex(_hash[:]))
+	size := len(_hash) + len(_owner)
+
+	helper.PrintLog("Completed smart contract (name:AppendOwner, caller:%s, size:%d, gasUsed:%d, gasPrice:%d, owner:%s, file:%s)", this.Addr, size, receipt.GasUsed, receipt.EffectiveGasPrice, _owner, helper.Hex(_hash[:]))
 
 	return err
 }
@@ -148,7 +156,9 @@ func (this *EthClient) SetChal(_hash [32]byte, _chalBytes []byte) error {
 		return err
 	}
 
-	helper.PrintLog("Completed smart contract (name:SetChal, caller:%s, gasUsed:%d, gasPrice:%d, file:%s)", this.Addr, receipt.GasUsed, receipt.EffectiveGasPrice, helper.Hex(_hash[:]))
+	size := len(_hash) + len(_chalBytes)
+
+	helper.PrintLog("Completed smart contract (name:SetChal, caller:%s, size:%d, gasUsed:%d, gasPrice:%d, file:%s)", this.Addr, size, receipt.GasUsed, receipt.EffectiveGasPrice, helper.Hex(_hash[:]))
 
 	return nil
 }
@@ -166,7 +176,9 @@ func (this *EthClient) SetProof(_hash [32]byte, _proofBytes []byte) error {
 		return err
 	}
 
-	helper.PrintLog("Completed smart contract (name:SetProof, caller:%s, gasUsed:%d, gasPrice:%d, file:%s)", this.Addr, receipt.GasUsed, receipt.EffectiveGasPrice, helper.Hex(_hash[:]))
+	size := len(_hash) + len(_proofBytes)
+
+	helper.PrintLog("Completed smart contract (name:SetProof, caller:%s, size:%d, gasUsed:%d, gasPrice:%d, file:%s)", this.Addr, size, receipt.GasUsed, receipt.EffectiveGasPrice, helper.Hex(_hash[:]))
 
 	return err
 }
@@ -189,7 +201,9 @@ func (this *EthClient) SetAuditingResult(_hash [32]byte, _result bool) error {
 		return err
 	}
 
-	helper.PrintLog("Completed smart contract (name:SetAuditingResult, caller:%s, gasUsed:%d, gasPrice:%d, file:%s, result:%t)", this.Addr, receipt.GasUsed, receipt.EffectiveGasPrice, helper.Hex(_hash[:]), _result)
+	size := len(_hash) + 1 /* _result */
+
+	helper.PrintLog("Completed smart contract (name:SetAuditingResult, caller:%s, size:%d, gasUsed:%d, gasPrice:%d, file:%s, result:%t)", this.Addr, size, receipt.GasUsed, receipt.EffectiveGasPrice, helper.Hex(_hash[:]), _result)
 
 	return err
 }
