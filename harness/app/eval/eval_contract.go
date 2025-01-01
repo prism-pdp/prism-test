@@ -9,7 +9,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/dpduado/dpduado-test/harness/helper"
+	"github.com/prism-pdp/prism-test/harness/helper"
 )
 
 type EvalContract struct {

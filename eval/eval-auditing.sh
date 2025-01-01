@@ -2,16 +2,16 @@
 
 set -e
 
-PATH_CACHE=/opt/dpduado/cache
-PATH_LOG=$PATH_CACHE/dpduado.log
+PATH_CACHE=/opt/prism/cache
+PATH_LOG=$PATH_CACHE/prism.log
 PATH_TESTDATA=/tmp/test.dat
 TRIAL_COUNT=100
 
 HARNESS_OPTS="--sim --log $PATH_LOG --cache $PATH_CACHE"
-HARNESS="/opt/dpduado/bin/harness $HARNESS_OPTS"
+HARNESS="/opt/prism/bin/harness $HARNESS_OPTS"
 
 AIDE_OPTS="--log $PATH_LOG"
-AIDE="/opt/dpduado/bin/aide $AIDE_OPTS"
+AIDE="/opt/prism/bin/aide $AIDE_OPTS"
 
 for block_num in `seq 100 100 1000`; do
     rm -rf $PATH_CACHE/*
@@ -47,7 +47,7 @@ for block_num in `seq 100 100 1000`; do
 
     $AIDE write-log "Finish eval auditing (block_num:${block_num})"
 
-    mv $PATH_LOG /opt/dpduado/logs/auditing-${block_num}.log
+    mv $PATH_LOG /opt/prism/logs/auditing-${block_num}.log
 done
 
 
@@ -69,5 +69,5 @@ for ratio in `seq 0.1 0.1 1.0`; do
         $HARNESS audit tpa1 su1
     done
 
-    mv $PATH_LOG /opt/dpduado/logs/auditing-${ratio}.log
+    mv $PATH_LOG /opt/prism/logs/auditing-${ratio}.log
 done

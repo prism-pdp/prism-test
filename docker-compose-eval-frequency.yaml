@@ -1,78 +1,78 @@
 services:
   frequency_harness0.1:
-    image: dpduado-test/harness
+    image: prism-test/harness
     container_name: frequency_harness0.1
     volumes:
-      - harness0.1:/opt/dpduado/cache
-      - ./harness/app/bin:/opt/dpduado/bin
-      - ./eval/frequency/logs:/opt/dpduado/logs
-      - ./eval/eval-frequency.sh:/opt/dpduado/eval-frequency.sh
+      - harness0.1:/opt/prism/cache
+      - ./harness/app/bin:/opt/prism/bin
+      - ./eval/frequency/logs:/opt/prism/logs
+      - ./eval/eval-frequency.sh:/opt/prism/eval-frequency.sh
     env_file:
       - accounts.env
     profiles:
       - "0.1"
       - all
-    command: /opt/dpduado/eval-frequency.sh 0.1
+    command: /opt/prism/eval-frequency.sh 0.1
 
   frequency_harness0.3:
-    image: dpduado-test/harness
+    image: prism-test/harness
     container_name: frequency_harness0.3
     volumes:
-      - harness0.3:/opt/dpduado/cache
-      - ./harness/app/bin:/opt/dpduado/bin
-      - ./eval/frequency/logs:/opt/dpduado/logs
-      - ./eval/eval-frequency.sh:/opt/dpduado/eval-frequency.sh
+      - harness0.3:/opt/prism/cache
+      - ./harness/app/bin:/opt/prism/bin
+      - ./eval/frequency/logs:/opt/prism/logs
+      - ./eval/eval-frequency.sh:/opt/prism/eval-frequency.sh
     env_file:
       - accounts.env
     profiles:
       - "0.3"
       - all
-    command: /opt/dpduado/eval-frequency.sh 0.3
+    command: /opt/prism/eval-frequency.sh 0.3
 
   frequency_harness0.5:
-    image: dpduado-test/harness
+    image: prism-test/harness
     container_name: frequency_harness0.5
     volumes:
-      - harness0.5:/opt/dpduado/cache
-      - ./harness/app/bin:/opt/dpduado/bin
-      - ./eval/frequency/logs:/opt/dpduado/logs
-      - ./eval/eval-frequency.sh:/opt/dpduado/eval-frequency.sh
+      - harness0.5:/opt/prism/cache
+      - ./harness/app/bin:/opt/prism/bin
+      - ./eval/frequency/logs:/opt/prism/logs
+      - ./eval/eval-frequency.sh:/opt/prism/eval-frequency.sh
     env_file:
       - accounts.env
     profiles:
       - "0.5"
       - all
-    command: /opt/dpduado/eval-frequency.sh 0.5
+    command: /opt/prism/eval-frequency.sh 0.5
 
   frequency_harness0.7:
-    image: dpduado-test/harness
+    image: prism-test/harness
     container_name: frequency_harness0.7
     volumes:
-      - harness0.7:/opt/dpduado/cache
-      - ./harness/app/bin:/opt/dpduado/bin
-      - ./eval/frequency/logs:/opt/dpduado/logs
-      - ./eval/eval-frequency.sh:/opt/dpduado/eval-frequency.sh
+      - harness0.7:/opt/prism/cache
+      - ./harness/app/bin:/opt/prism/bin
+      - ./eval/frequency/logs:/opt/prism/logs
+      - ./eval/eval-frequency.sh:/opt/prism/eval-frequency.sh
     env_file:
       - accounts.env
     profiles:
       - "0.7"
       - all
-    command: /opt/dpduado/eval-frequency.sh 0.7
+    command: /opt/prism/eval-frequency.sh 0.7
 
   frequency_harness0.9:
-    image: dpduado-test/harness
+    image: prism-test/harness
     container_name: frequency_harness0.9
     volumes:
-      - harness0.9:/opt/dpduado/cache
-      - ./harness/app/bin:/opt/dpduado/bin
-      - ./eval/frequency/logs:/opt/dpduado/logs
-      - ./eval/eval-frequency.sh:/opt/dpduado/eval-frequency.sh
+      - harness0.9:/opt/prism/cache
+      - ./harness/app/bin:/opt/prism/bin
+      - ./eval/frequency/logs:/opt/prism/logs
+      - ./eval/eval-frequency.sh:/opt/prism/eval-frequency.sh
     env_file:
       - accounts.env
     profiles:
       - "0.9"
       - all
-    command: /opt/dpduado/eval-frequency.sh 0.9
+    command: /opt/prism/eval-frequency.sh 0.9
 
 volumes:
   harness0.1:

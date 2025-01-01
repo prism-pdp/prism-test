@@ -11,10 +11,10 @@ import(
     "path/filepath"
     "time"
 
-	"github.com/dpduado/dpduado-test/harness/client"
-	"github.com/dpduado/dpduado-test/harness/entity"
-	"github.com/dpduado/dpduado-test/harness/eval"
-	"github.com/dpduado/dpduado-test/harness/helper"
+	"github.com/prism-pdp/prism-test/harness/client"
+	"github.com/prism-pdp/prism-test/harness/entity"
+	"github.com/prism-pdp/prism-test/harness/eval"
+	"github.com/prism-pdp/prism-test/harness/helper"
 )
 
 var baseclient client.BaseClient

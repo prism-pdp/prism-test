@@ -1,6 +1,6 @@
 {
-	"PathLogDir": "/opt/dpduado/eval/frequency/logs",
-	"PathResultDir": "/opt/dpduado/eval/frequency/results",
+	"PathLogDir": "/opt/prism/eval/frequency/logs",
+	"PathResultDir": "/opt/prism/eval/frequency/results",
 	"EvalData": {
 		"0.1": [
 			{

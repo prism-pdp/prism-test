@@ -2,15 +2,15 @@
 
 set -e
 
-PATH_CACHE=/opt/dpduado/cache
+PATH_CACHE=/opt/prism/cache
 
 FILE_RATIO=$1
 
-HARNESS_OPTS="--sim --log $PATH_CACHE/dpduado.log --cache $PATH_CACHE"
-HARNESS="/opt/dpduado/bin/harness $HARNESS_OPTS"
+HARNESS_OPTS="--sim --log $PATH_CACHE/prism.log --cache $PATH_CACHE"
+HARNESS="/opt/prism/bin/harness $HARNESS_OPTS"
 
-AIDE_OPTS="--log $PATH_CACHE/dpduado.log"
-AIDE="/opt/dpduado/bin/aide $AIDE_OPTS"
+AIDE_OPTS="--log $PATH_CACHE/prism.log"
+AIDE="/opt/prism/bin/aide $AIDE_OPTS"
 
 rm -rf $PATH_CACHE/*
 
@@ -50,4 +50,4 @@ for block_ratio in `seq 0.1 0.2 1.0`; do
     $AIDE repair-batch $PATH_CACHE/corrupted.list
 done
 
-cp $PATH_CACHE/dpduado.log /opt/dpduado/logs/frequency-$FILE_RATIO.log
+cp $PATH_CACHE/prism.log /opt/prism/logs/frequency-$FILE_RATIO.log

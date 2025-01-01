@@ -22,7 +22,7 @@ RUN apt -y install \
 ARG GITHUB_TOKEN
 ENV GITHUB_TOKEN ${GITHUB_TOKEN}
 ENV WALLET_MNEMONIC test test test test test test test test test test test junk
-ENV GOPRIVATE github.com/dpduado/dpduado-go
+ENV GOPRIVATE github.com/prism-pdp/prism-go
 
 WORKDIR /app
 
@@ -34,7 +34,7 @@ COPY ./app/go.sum /app/go.sum
 RUN go mod download
 
 COPY --chmod=755 ./build/entrypoint.sh /entrypoint.sh
-COPY ./build/config.json.template /etc/dpduado/harness/config.json.template
+COPY ./build/config.json.template /etc/prism/harness/config.json.template
 
 ENTRYPOINT ["/entrypoint.sh"]
 

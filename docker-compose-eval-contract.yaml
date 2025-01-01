@@ -1,10 +1,10 @@
 services:
   testnet:
-    image: dpduado-test/testnet
+    image: prism-test/testnet
     container_name: contract_testnet
     hostname: testnet
     volumes:
-      - ./testnet/dpduado-sol:/app
+      - ./testnet/prism-sol:/app
     environment:
       - BALANCE_FIRST_ACCOUNTS=300
       - WALLET_MNEMONIC=chaos knee unit sing method banana chicken quote script boat crouch pig
@@ -15,17 +15,17 @@ services:
     command: start
 
   harness:
-    image: dpduado-test/harness
+    image: prism-test/harness
     container_name: contract_harness
     volumes:
-      - harness:/opt/dpduado/cache
-      - ./cache/contract-addr.env:/opt/dpduado/contract-addr.env
-      - ./harness/app/bin:/opt/dpduado/bin
-      - ./eval/contract/logs:/opt/dpduado/logs
-      - ./eval/eval-contract.sh:/opt/dpduado/eval-contract.sh
+      - harness:/opt/prism/cache
+      - ./cache/contract-addr.env:/opt/prism/contract-addr.env
+      - ./harness/app/bin:/opt/prism/bin
+      - ./eval/contract/logs:/opt/prism/logs
+      - ./eval/eval-contract.sh:/opt/prism/eval-contract.sh
     env_file:
       - accounts.env
-    command: /opt/dpduado/eval-contract.sh
+    command: /opt/prism/eval-contract.sh
 
 volumes:
   harness:

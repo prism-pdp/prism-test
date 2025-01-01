@@ -1,17 +1,17 @@
-# dpduado-test
+# prism-test
 
-# Update dpduado-go
+# Update prism-go
 
 1. Run docker container of harness
 ```
 make harness/shell
 ```
 
-2. Remove github.com/dpduado/dpduado-go from go.mod and go.sum
+2. Remove github.com/prism/prism-go from go.mod and go.sum
 
-3. Download new dpduado-go
+3. Download new prism-go
 ```
-go get github.com/dpduado/dpduado-go
+go get github.com/prism/prism-go
 ```
 
 4. Exit from the container
@@ -21,11 +21,11 @@ go get github.com/dpduado/dpduado-go
 make build-img
 ```
 
-# Update dpduado-sol
+# Update prism-sol
 
-1. Move to dpduado-sol directory
+1. Move to prism-sol directory
 ```
-cd testnet/dpduado-sol
+cd testnet/prism-sol
 ```
 
 2. Update source codes with git pull command

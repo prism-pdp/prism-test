@@ -2,8 +2,8 @@
 	"ReportName": "gentags",
 	"TargetMsg": "generate tags",
 	"RangeMsg": "",
-	"PathLogDir": "/opt/dpduado/eval/gentags/logs",
-	"PathResultDir": "/opt/dpduado/eval/gentags/results",
+	"PathLogDir": "/opt/prism/eval/gentags/logs",
+	"PathResultDir": "/opt/prism/eval/gentags/results",
 	"ProcTime": [
 		{
 			"Name": "gentags-100.log",

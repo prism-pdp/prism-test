@@ -2,8 +2,8 @@
 	"ReportName": "genproof_fixed-block-num",
 	"TargetMsg": "generating proof",
 	"RangeMsg": "fixed block num",
-	"PathLogDir": "/opt/dpduado/eval/auditing/logs",
-	"PathResultDir": "/opt/dpduado/eval/auditing/results",
+	"PathLogDir": "/opt/prism/eval/auditing/logs",
+	"PathResultDir": "/opt/prism/eval/auditing/results",
 	"ProcTime": [
 		{
 			"Name": "auditing-100.log",

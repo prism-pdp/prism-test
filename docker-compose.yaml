@@ -1,10 +1,10 @@
 services:
   testnet:
-    image: dpduado-test/testnet
+    image: prism-test/testnet
     build: ./testnet/build
     hostname: testnet
     volumes:
-      - ./testnet/dpduado-sol:/app
+      - ./testnet/prism-sol:/app
     environment:
       - BALANCE_FIRST_ACCOUNTS=300
       - WALLET_MNEMONIC=chaos knee unit sing method banana chicken quote script boat crouch pig
@@ -15,7 +15,7 @@ services:
     command: start
 
   harness:
-    image: dpduado-test/harness
+    image: prism-test/harness
     build:
       context: ./harness
       args:

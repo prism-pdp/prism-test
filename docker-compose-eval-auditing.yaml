@@ -1,15 +1,15 @@
 services:
   auditing_harness:
-    image: dpduado-test/harness
+    image: prism-test/harness
     container_name: auditing_harness
     volumes:
-      - auditing_harness:/opt/dpduado/cache
-      - ./harness/app/bin:/opt/dpduado/bin
-      - ./eval/auditing/logs:/opt/dpduado/logs
-      - ./eval/eval-auditing.sh:/opt/dpduado/eval-auditing.sh
+      - auditing_harness:/opt/prism/cache
+      - ./harness/app/bin:/opt/prism/bin
+      - ./eval/auditing/logs:/opt/prism/logs
+      - ./eval/eval-auditing.sh:/opt/prism/eval-auditing.sh
     env_file:
       - accounts.env
-    command: /opt/dpduado/eval-auditing.sh
+    command: /opt/prism/eval-auditing.sh
 
 volumes:
   auditing_harness:

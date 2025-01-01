@@ -2,16 +2,16 @@
 
 set -e
 
-. /opt/dpduado/contract-addr.env
+. /opt/prism/contract-addr.env
 
-PATH_CACHE=/opt/dpduado/cache
-PATH_LOG=$PATH_CACHE/dpduado.log
+PATH_CACHE=/opt/prism/cache
+PATH_LOG=$PATH_CACHE/prism.log
 
 HARNESS_OPTS="--server ws://testnet:8545 --contract $CONTRACT_ADDR --log $PATH_LOG --cache $PATH_CACHE"
-HARNESS="/opt/dpduado/bin/harness $HARNESS_OPTS"
+HARNESS="/opt/prism/bin/harness $HARNESS_OPTS"
 
 AIDE_OPTS="--log $PATH_LOG"
-AIDE="/opt/dpduado/bin/aide $AIDE_OPTS"
+AIDE="/opt/prism/bin/aide $AIDE_OPTS"
 
 SENDER_OPTS_SM="--sender-addr $ADDRESS_0 --sender-key $PRIVKEY_0"
 SENDER_OPTS_SP="--sender-addr $ADDRESS_1 --sender-key $PRIVKEY_1"
@@ -42,4 +42,4 @@ $HARNESS $SENDER_OPTS_SU1 challenge su1 0.6 1.0
 $HARNESS $SENDER_OPTS_SP proof su1
 $HARNESS $SENDER_OPTS_TPA audit tpa1 su1
 
-cp $PATH_LOG /opt/dpduado/logs/contract.log
+cp $PATH_LOG /opt/prism/logs/contract.log

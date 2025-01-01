@@ -7,11 +7,11 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/pborman/getopt/v2"
 
-	pdp "github.com/dpduado/dpduado-go/xz21"
+	pdp "github.com/prism-pdp/prism-go/xz21"
 
-	"github.com/dpduado/dpduado-test/harness/client"
-	"github.com/dpduado/dpduado-test/harness/entity"
-	"github.com/dpduado/dpduado-test/harness/helper"
+	"github.com/prism-pdp/prism-test/harness/client"
+	"github.com/prism-pdp/prism-test/harness/entity"
+	"github.com/prism-pdp/prism-test/harness/helper"
 )
 
 var command string

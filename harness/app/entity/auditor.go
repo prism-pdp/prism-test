@@ -4,10 +4,10 @@ import (
 	"encoding/json"
 	"github.com/ethereum/go-ethereum/common"
 
-	pdp "github.com/dpduado/dpduado-go/xz21"
+	pdp "github.com/prism-pdp/prism-go/xz21"
 
-	"github.com/dpduado/dpduado-test/harness/client"
-	"github.com/dpduado/dpduado-test/harness/helper"
+	"github.com/prism-pdp/prism-test/harness/client"
+	"github.com/prism-pdp/prism-test/harness/helper"
 )
 
 type AuditingSummary struct {

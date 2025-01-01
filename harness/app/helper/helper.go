@@ -23,7 +23,7 @@ import (
 	"strconv"
 	"strings"
 
-	pdp "github.com/dpduado/dpduado-go/xz21"
+	pdp "github.com/prism-pdp/prism-go/xz21"
 )
 
 const escape = "\x1b"

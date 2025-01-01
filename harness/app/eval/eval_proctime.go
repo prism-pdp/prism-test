@@ -13,7 +13,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/dpduado/dpduado-test/harness/helper"
+	"github.com/prism-pdp/prism-test/harness/helper"
 )
 
 type EvalProcTime struct {

@@ -32,6 +32,6 @@ func SetupOpt() {
 	OptSenderAddr = getopt.StringLong("sender-addr", 0, "", "sender's address")
 	OptSenderPrivKey = getopt.StringLong("sender-key", 0, "", "sender's private key")
 	OptPathCacheDir = getopt.StringLong("cache", 0, "./cache", "cache dir path")
-	OptPathLogFile = getopt.StringLong("log", 0, "./cache/dpduado.log", "log file path")
+	OptPathLogFile = getopt.StringLong("log", 0, "./cache/prism.log", "log file path")
 	OptDetectedList = getopt.StringLong("detected-list", 0, "", "detected list")
 }

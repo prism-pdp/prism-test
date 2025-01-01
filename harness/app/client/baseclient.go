@@ -3,7 +3,7 @@ package client
 import (
 	"github.com/ethereum/go-ethereum/common"
 
-	pdp "github.com/dpduado/dpduado-go/xz21"
+	pdp "github.com/prism-pdp/prism-go/xz21"
 )
 
 type BaseClient interface {

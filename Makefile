@@ -5,7 +5,7 @@ MAKEFLAGS += --no-print-directory
 include accounts.env
 -include ./cache/contract-addr.env
 
-# chose one from dpduado-sol/src
+# chose one from prism-sol/src
 CONTRACT = XZ21
 
 TRIAL_COUNT = 100
@@ -146,7 +146,7 @@ testnet/login:
 	$(MAKE) docker-exec SERVICE="testnet" CMD="sh"
 
 testnet@upgrade:
-	cd ./testnet/dpduado-sol; git pull
+	cd ./testnet/prism-sol; git pull
 
 harness/shell:
 	$(MAKE) docker-run SERVICE="harness" CMD="bash"
@@ -155,12 +155,12 @@ setup:
 	$(MAKE) show-accounts > accounts.env
 
 harness@build:
-	$(MAKE) docker-run SERVICE="harness" CMD="go build -o bin/harness ./cmd/dpduado"
+	$(MAKE) docker-run SERVICE="harness" CMD="go build -o bin/harness ./cmd/prism"
 
 harness@upgrade:
-	sed -i '/github.com\/dpduado\/dpduado-go/d' harness/app/go.mod
-	sed -i '/github.com\/dpduado\/dpduado-go/d' harness/app/go.sum
-	$(MAKE) docker-run SERVICE="harness" CMD="go get github.com/dpduado/dpduado-go"
+	sed -i '/github.com\/prism-pdp\/prism-go/d' harness/app/go.mod
+	sed -i '/github.com\/prism-pdp\/prism-go/d' harness/app/go.sum
+	$(MAKE) docker-run SERVICE="harness" CMD="go get github.com/prism-pdp/prism-go"
 	$(MAKE) build-img
 
 harness@simtest:
@@ -246,5 +246,5 @@ docker-log:
 	@docker compose logs -f
 
 docker-run-eval:
-	@docker compose -f docker-compose-eval.yaml run --rm aide aide $(MODE) /opt/dpduado/eval/$(TYPE)/logs /opt/dpduado/eval/$(TYPE)/results
+	@docker compose -f docker-compose-eval.yaml run --rm aide aide $(MODE) /opt/prism/eval/$(TYPE)/logs /opt/prism/eval/$(TYPE)/results
 
