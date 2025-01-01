@@ -1,0 +1,3 @@
+[submodule "testnet/prism-sol"]
+	path = testnet/prism-sol
+	url = https://github.com/prism-pdp/prism-sol.git
