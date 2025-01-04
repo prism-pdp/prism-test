@@ -27,6 +27,13 @@ upgrade:
 	$(MAKE) harness@upgrade
 	$(MAKE) testnet@upgrade
 
+ethcheck:
+	$(MAKE) build-img
+	$(MAKE) harness@build
+	$(MAKE) aide@build
+	$(MAKE) setup
+	$(MAKE) harness@ethtest
+
 eval:
 # build programs
 	$(MAKE) harness@build
@@ -121,6 +128,9 @@ aide@repair-batch:
 aide@write-log:
 	$(MAKE) docker-run SERVICE="harness" CMD="./bin/aide write-log \"$(X_LOG)\""
 
+testnet@build-img:
+	docker build -t prism-test/testnet ./testnet
+
 testnet/build:
 	$(MAKE) docker-run SERVICE="testnet" CMD='forge build'
 
@@ -152,7 +162,10 @@ harness/shell:
 	$(MAKE) docker-run SERVICE="harness" CMD="bash"
 
 setup:
-	$(MAKE) show-accounts > ./cache/accounts.env
+	@docker run --rm prism-test/testnet show-accounts > ./cache/accounts.env
+
+harness@build-img:
+	docker build -t prism-test/harness ./harness
 
 harness@build:
 	$(MAKE) docker-run SERVICE="harness" CMD="go build -o bin/harness ./cmd/prism"
@@ -165,11 +178,11 @@ harness@upgrade:
 
 harness@simtest:
 	rm -rf harness/app/cache/*
-	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --sim setup $(ADDRESS_0) $(PRIVKEY_0) $(ADDRESS_1) $(PRIVKEY_1)"
-	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --sim enroll auditor tpa1 $(ADDRESS_2)"
-	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --sim enroll auditor tpa2 $(ADDRESS_3)"
-	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --sim enroll user    su1  $(ADDRESS_4) $(PRIVKEY_4)"
-	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --sim enroll user    su2  $(ADDRESS_5) $(PRIVKEY_5)"
+	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --sim setup 0x0010 PRIVKEY_0 0011 PRIVKEY_1"
+	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --sim enroll auditor tpa1 0012"
+	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --sim enroll auditor tpa2 0013"
+	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --sim enroll user    su1  0014 PRIVKEY_4"
+	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --sim enroll user    su2  0015 PRIVKEY_5"
 	$(MAKE) aide@testdata FILE_PATH=./cache/dummy.data FILE_SIZE=100K FILE_VAL=1
 	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --sim upload su1 cache/dummy.data 100"
 	$(MAKE) aide@testdata FILE_PATH=./cache/dummy.data FILE_SIZE=100K FILE_VAL=2
@@ -234,7 +247,8 @@ rpc-test:
 	@$(MAKE) --no-print-directory rpc METHOD="eth_accounts"
 
 build-img:
-	@docker compose build
+	$(MAKE) harness@build-img
+	$(MAKE) testnet@build-img
 
 docker-run:
 	@docker compose run -it --rm $(SERVICE) $(CMD)

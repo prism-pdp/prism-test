@@ -12,8 +12,9 @@ WORKDIR /app
 COPY --chmod=755 ./asset/entrypoint.sh /entrypoint.sh
 
 # DO NOT EDIT!!! (0:SM, 1:SP, 2:TPA, 3:SU1, 4:SU2, 5:SU3)
-ENV NUM_FIRST_ACCOUNTS 6
-ENV RPC_HOST 0.0.0.0
-ENV RPC_PORT 8545
+ENV NUM_FIRST_ACCOUNTS=6
+ENV RPC_HOST=0.0.0.0
+ENV RPC_PORT=8545
+ENV WALLET_MNEMONIC="chaos knee unit sing method banana chicken quote script boat crouch pig"
 
 ENTRYPOINT [ "/entrypoint.sh" ]
