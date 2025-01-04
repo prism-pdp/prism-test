@@ -28,10 +28,10 @@ upgrade:
 	$(MAKE) testnet@upgrade
 
 ethcheck:
+	$(MAKE) setup
 	$(MAKE) harness@build
 	$(MAKE) testnet/down
 	$(MAKE) testnet/up
-	$(MAKE) setup
 	$(MAKE) harness@ethtest-setup
 	$(MAKE) harness@ethtest-main
 	$(MAKE) testnet/down
