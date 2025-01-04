@@ -8,8 +8,6 @@ services:
     environment:
       - BALANCE_FIRST_ACCOUNTS=300
       - WALLET_MNEMONIC=chaos knee unit sing method banana chicken quote script boat crouch pig
-    env_file:
-      - ./cache/accounts.env
     ports:
       - 8545:8545
     command: start

@@ -13,15 +13,16 @@ function get_key()
 }
 
 if [ "$1" = "" ]; then
-    /bin/ash
+	/bin/ash
 elif [ "$1" = "deploy" ]; then
-    contract="$2"
-    # PRIVKEY_0: SM, ADDRESS_1: SP, ADDRESS_2: TPA
+	contract="$2"
+	sm_key="$3"
+	sp_addr="$4"
 	forge create \
-        --private-key $PRIVKEY_0 \
-        src/${contract}.sol:${contract} \
-        --constructor-args $ADDRESS_1 $ADDRESS_2 > ./cache/deploy.log
-    cat ./cache/deploy.log | grep 'Deployed to:' | cut -d ':' -f 2 | tr -d ' ' | cut -c 3-
+		--private-key ${sm_key} \
+		src/${contract}.sol:${contract} \
+		--constructor-args ${sp_addr} > ./cache/deploy.log
+	cat ./cache/deploy.log | grep 'Deployed to:' | cut -d ':' -f 2 | tr -d ' ' | cut -c 3-
 elif [ "$1" = "show-accounts" ]; then
     for i in $(seq $NUM_FIRST_ACCOUNTS)
     do

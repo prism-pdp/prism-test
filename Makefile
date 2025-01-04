@@ -59,7 +59,7 @@ test-contract:
 	rm -f ./cache/contract.addr
 	rm -f ./cache/contract-addr.env
 	docker compose -f docker-compose-eval-contract.yaml up -d testnet
-	docker compose -f docker-compose-eval-contract.yaml exec testnet /entrypoint.sh deploy $(CONTRACT) | tee ./cache/contract.addr
+	docker compose -f docker-compose-eval-contract.yaml exec testnet /entrypoint.sh deploy $(CONTRACT) $(PRIVKEY_0) $(ADDRESS_1) | tee ./cache/contract.addr
 	echo CONTRACT_ADDR=`cat ./cache/contract.addr` > ./cache/contract-addr.env
 	docker compose -f docker-compose-eval-contract.yaml up harness
 
@@ -129,7 +129,7 @@ testnet/clean:
 
 testnet/up:
 	docker compose up -d testnet
-	$(MAKE) docker-exec SERVICE="testnet" CMD="deploy $(CONTRACT)" | tee ./cache/contract.addr
+	$(MAKE) docker-exec SERVICE="testnet" CMD="deploy $(CONTRACT) $(PRIVKEY_0) $(ADDRESS_1)" | tee ./cache/contract.addr
 	echo CONTRACT_ADDR=`cat ./cache/contract.addr` > ./cache/contract-addr.env
 
 testnet/down:
