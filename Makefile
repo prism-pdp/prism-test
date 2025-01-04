@@ -28,11 +28,13 @@ upgrade:
 	$(MAKE) testnet@upgrade
 
 ethcheck:
-	$(MAKE) build-img
 	$(MAKE) harness@build
-	$(MAKE) aide@build
+	$(MAKE) testnet/down
+	$(MAKE) testnet/up
 	$(MAKE) setup
-	$(MAKE) harness@ethtest
+	$(MAKE) harness@ethtest-setup
+	$(MAKE) harness@ethtest-main
+	$(MAKE) testnet/down
 
 eval:
 # build programs
@@ -191,13 +193,6 @@ harness@simtest:
 	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --sim challenge su1 0.55 1.0"
 	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --sim proof su1"
 	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --sim --detected-list ./cache/detected.list audit tpa1 su1"
-
-harness@ethtest:
-	$(MAKE) harness@ethtest-setup
-	$(MAKE) testnet/down
-	$(MAKE) testnet/up
-	$(MAKE) harness@ethtest-main
-	$(MAKE) testnet/down
 
 harness@ethtest-setup:
 	rm -rf ./harness/app/cache/*
