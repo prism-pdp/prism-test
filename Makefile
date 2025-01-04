@@ -2,7 +2,7 @@ SHELL := /bin/bash
 
 MAKEFLAGS += --no-print-directory
 
-include accounts.env
+-include ./cache/accounts.env
 -include ./cache/contract-addr.env
 
 # chose one from prism-sol/src
@@ -152,7 +152,7 @@ harness/shell:
 	$(MAKE) docker-run SERVICE="harness" CMD="bash"
 
 setup:
-	$(MAKE) show-accounts > accounts.env
+	$(MAKE) show-accounts > ./cache/accounts.env
 
 harness@build:
 	$(MAKE) docker-run SERVICE="harness" CMD="go build -o bin/harness ./cmd/prism"

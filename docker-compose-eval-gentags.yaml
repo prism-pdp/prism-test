@@ -8,7 +8,7 @@ services:
       - ./eval/gentags/logs:/opt/prism/logs
       - ./eval/eval-gentags.sh:/opt/prism/eval-gentags.sh
     env_file:
-      - accounts.env
+      - ./cache/accounts.env
     command: /opt/prism/eval-gentags.sh
 
 volumes:

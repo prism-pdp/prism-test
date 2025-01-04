@@ -9,7 +9,7 @@ services:
       - BALANCE_FIRST_ACCOUNTS=300
       - WALLET_MNEMONIC=chaos knee unit sing method banana chicken quote script boat crouch pig
     env_file:
-      - accounts.env
+      - ./cache/accounts.env
     ports:
       - 8545:8545
     command: start
@@ -24,7 +24,7 @@ services:
       - ./eval/contract/logs:/opt/prism/logs
       - ./eval/eval-contract.sh:/opt/prism/eval-contract.sh
     env_file:
-      - accounts.env
+      - ./cache/accounts.env
     command: /opt/prism/eval-contract.sh
 
 volumes:

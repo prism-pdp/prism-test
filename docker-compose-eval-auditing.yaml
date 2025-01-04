@@ -8,7 +8,7 @@ services:
       - ./eval/auditing/logs:/opt/prism/logs
       - ./eval/eval-auditing.sh:/opt/prism/eval-auditing.sh
     env_file:
-      - accounts.env
+      - ./cache/accounts.env
     command: /opt/prism/eval-auditing.sh
 
 volumes:

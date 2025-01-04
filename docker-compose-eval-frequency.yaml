@@ -8,7 +8,7 @@ services:
       - ./eval/frequency/logs:/opt/prism/logs
       - ./eval/eval-frequency.sh:/opt/prism/eval-frequency.sh
     env_file:
-      - accounts.env
+      - ./cache/accounts.env
     profiles:
       - "0.1"
       - all
@@ -23,7 +23,7 @@ services:
       - ./eval/frequency/logs:/opt/prism/logs
       - ./eval/eval-frequency.sh:/opt/prism/eval-frequency.sh
     env_file:
-      - accounts.env
+      - ./cache/accounts.env
     profiles:
       - "0.3"
       - all
@@ -38,7 +38,7 @@ services:
       - ./eval/frequency/logs:/opt/prism/logs
       - ./eval/eval-frequency.sh:/opt/prism/eval-frequency.sh
     env_file:
-      - accounts.env
+      - ./cache/accounts.env
     profiles:
       - "0.5"
       - all
@@ -53,7 +53,7 @@ services:
       - ./eval/frequency/logs:/opt/prism/logs
       - ./eval/eval-frequency.sh:/opt/prism/eval-frequency.sh
     env_file:
-      - accounts.env
+      - ./cache/accounts.env
     profiles:
       - "0.7"
       - all
@@ -68,7 +68,7 @@ services:
       - ./eval/frequency/logs:/opt/prism/logs
       - ./eval/eval-frequency.sh:/opt/prism/eval-frequency.sh
     env_file:
-      - accounts.env
+      - ./cache/accounts.env
     profiles:
       - "0.9"
       - all

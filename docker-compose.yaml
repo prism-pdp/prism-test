@@ -9,7 +9,7 @@ services:
       - BALANCE_FIRST_ACCOUNTS=300
       - WALLET_MNEMONIC=chaos knee unit sing method banana chicken quote script boat crouch pig
     env_file:
-      - accounts.env
+      - ./cache/accounts.env
     ports:
       - 8545:8545
     command: start
@@ -26,7 +26,7 @@ services:
       - ./harness/app:/app
       - go_cache:/root/.cache/go-build
     env_file:
-      - accounts.env
+      - ./cache/accounts.env
 
 volumes:
   go_cache:
