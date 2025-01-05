@@ -14,10 +14,7 @@ services:
 
   harness:
     image: prism-test/harness
-    build:
-      context: ./harness
-      args:
-        - GITHUB_TOKEN=${GITHUB_TOKEN}
+    build: ./harness
     container_name: harness
     hostname: harness
     volumes:
