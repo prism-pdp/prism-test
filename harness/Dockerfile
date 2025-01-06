@@ -19,5 +19,9 @@ RUN go mod download
 COPY --chmod=755 ./asset/entrypoint.sh /entrypoint.sh
 COPY ./asset/config.json.template /etc/prism/harness/config.json.template
 
+COPY ./app /app
+RUN go build -o /usr/local/bin/harness ./cmd/prism
+RUN go build -o /usr/local/bin/aide ./cmd/aide
+
 ENTRYPOINT ["/entrypoint.sh"]
 
