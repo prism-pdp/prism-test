@@ -2,8 +2,8 @@
 	"ReportName": "verifyproof_fixed-block-ratio",
 	"TargetMsg": "verifying proof",
 	"RangeMsg": "fixed block ratio",
-	"PathLogDir": "/opt/prism/eval/auditing/logs",
-	"PathResultDir": "/opt/prism/eval/auditing/results",
+	"PathLogDir": "/var/lib/prism-harness/eval/auditing/logs",
+	"PathResultDir": "/var/lib/prism-harness/eval/auditing/results",
 	"ProcTime": [
 		{
 			"Name": "auditing-100.log",

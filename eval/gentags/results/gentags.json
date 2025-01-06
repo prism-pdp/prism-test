@@ -2,8 +2,8 @@
 	"ReportName": "gentags",
 	"TargetMsg": "generate tags",
 	"RangeMsg": "",
-	"PathLogDir": "/opt/prism/eval/gentags/logs",
-	"PathResultDir": "/opt/prism/eval/gentags/results",
+	"PathLogDir": "/var/lib/prism-harness/eval/gentags/logs",
+	"PathResultDir": "/var/lib/prism-harness/eval/gentags/results",
 	"ProcTime": [
 		{
 			"Name": "gentags-100.log",

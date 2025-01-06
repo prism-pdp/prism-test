@@ -1,6 +1,6 @@
 {
-	"PathLogDir": "/opt/prism/eval/frequency/logs",
-	"PathResultDir": "/opt/prism/eval/frequency/results",
+	"PathLogDir": "/var/lib/prism-harness/eval/frequency/logs",
+	"PathResultDir": "/var/lib/prism-harness/eval/frequency/results",
 	"EvalData": {
 		"0.1": [
 			{
