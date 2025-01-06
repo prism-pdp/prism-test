@@ -18,6 +18,8 @@ ETHERNET_SENDER_OPTS_3 = --sender-addr $(ADDRESS_3) --sender-key $(PRIVKEY_3)
 ETHERNET_SENDER_OPTS_4 = --sender-addr $(ADDRESS_4) --sender-key $(PRIVKEY_4)
 ETHERNET_SENDER_OPTS_5 = --sender-addr $(ADDRESS_5) --sender-key $(PRIVKEY_5)
 
+HARNESS_VOL = ./harness/volume
+
 .PHONY: eval
 
 shell:
@@ -29,11 +31,10 @@ upgrade:
 
 ethcheck:
 	$(MAKE) setup
-	$(MAKE) harness@build
 	$(MAKE) testnet/down
 	$(MAKE) testnet/up
-	$(MAKE) harness@ethtest-setup
-	$(MAKE) harness@ethtest-main
+	$(MAKE) harness@ethcheck-setup
+	$(MAKE) harness@ethcheck-main
 	$(MAKE) testnet/down
 
 eval:
@@ -93,8 +94,8 @@ test-frequency-x:
 test-frequency-down:
 	docker compose -f docker-compose-eval-frequency.yaml --profile all down
 
-aide@build:
-	$(MAKE) docker-run SERVICE="harness" CMD="go build -o bin/aide ./cmd/aide"
+aide@run:
+	docker run --rm -v ./eval:/opt/prism/eval prism-test/harness aide $(CMD)
 
 aide@testdata:
 	$(MAKE) docker-run SERVICE="harness" CMD="./bin/aide testdata $(FILE_PATH) $(FILE_SIZE) $(FILE_VAL)"
@@ -169,46 +170,44 @@ setup:
 harness@build-img:
 	docker build -t prism-test/harness ./harness
 
-harness@build:
-	$(MAKE) docker-run SERVICE="harness" CMD="go build -o bin/harness ./cmd/prism"
-
 harness@upgrade:
 	sed -i '/github.com\/prism-pdp\/prism-go/d' harness/app/go.mod
 	sed -i '/github.com\/prism-pdp\/prism-go/d' harness/app/go.sum
 	$(MAKE) docker-run SERVICE="harness" CMD="go get github.com/prism-pdp/prism-go"
 	$(MAKE) build-img
 
-harness@simtest:
-	rm -rf harness/app/cache/*
-	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --sim setup 0x0010 PRIVKEY_0 0011 PRIVKEY_1"
-	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --sim enroll auditor tpa1 0012"
-	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --sim enroll auditor tpa2 0013"
-	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --sim enroll user    su1  0014 PRIVKEY_4"
-	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --sim enroll user    su2  0015 PRIVKEY_5"
-	$(MAKE) aide@testdata FILE_PATH=./cache/dummy.data FILE_SIZE=100K FILE_VAL=1
-	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --sim upload su1 cache/dummy.data 100"
-	$(MAKE) aide@testdata FILE_PATH=./cache/dummy.data FILE_SIZE=100K FILE_VAL=2
-	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --sim upload su1 cache/dummy.data 100"
-	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --sim upload su2 cache/dummy.data 50"
-	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --sim challenge su1 0.55 1.0"
-	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --sim proof su1"
-	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness --sim --detected-list ./cache/detected.list audit tpa1 su1"
+simcheck:
+	rm -rf $(HARNESS_VOL)/*
+	$(MAKE) harness@run CMD="harness --sim setup 0010 PRIVKEY_0 0011 PRIVKEY_1"
+	$(MAKE) harness@run CMD="harness --sim enroll auditor tpa1 0012"
+	$(MAKE) harness@run CMD="harness --sim enroll auditor tpa2 0013"
+	$(MAKE) harness@run CMD="harness --sim enroll user    su1  0014 PRIVKEY_4"
+	$(MAKE) harness@run CMD="harness --sim enroll user    su2  0015 PRIVKEY_5"
+	$(MAKE) harness@run CMD="aide testdata /var/lib/prism/cache/dummy.data 100K 1"
+	$(MAKE) harness@run CMD="harness --sim upload su1 /var/lib/prism/cache/dummy.data 100"
+	$(MAKE) harness@run CMD="aide testdata /var/lib/prism/cache/dummy.data 100K 2"
+	$(MAKE) harness@run CMD="harness --sim upload su1 /var/lib/prism/cache/dummy.data 100"
+	$(MAKE) harness@run CMD="harness --sim upload su2 /var/lib/prism/cache/dummy.data 50"
+	$(MAKE) harness@run CMD="harness --sim challenge su1 0.55 1.0"
+	$(MAKE) harness@run CMD="harness --sim proof su1"
+	$(MAKE) harness@run CMD="harness --sim --detected-list /var/lib/prism/cache/detected.list audit tpa1 su1"
 
-harness@ethtest-setup:
-	rm -rf ./harness/app/cache/*
-	fallocate -l 100M harness/app/cache/dummy.data
+harness@ethcheck-setup:
+	rm -rf $(HARNESS_VOL)/*
+	mkdir $(HARNESS_VOL)/cache
+	fallocate -l 100M $(HARNESS_VOL)/cache/dummy.data
 
-harness@ethtest-main:
-	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness $(ETHERNET_OPTS) $(ETHERNET_SENDER_OPTS_0) setup $(ADDRESS_0) $(PRIVKEY_0) $(ADDRESS_1) $(PRIVKEY_1)"
-	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness $(ETHERNET_OPTS) $(ETHERNET_SENDER_OPTS_0) enroll auditor tpa1 $(ADDRESS_2)"
-	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness $(ETHERNET_OPTS) $(ETHERNET_SENDER_OPTS_0) enroll auditor tpa2 $(ADDRESS_3)"
-	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness $(ETHERNET_OPTS) $(ETHERNET_SENDER_OPTS_0) enroll user    su1  $(ADDRESS_4) $(PRIVKEY_4)"
-	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness $(ETHERNET_OPTS) $(ETHERNET_SENDER_OPTS_0) enroll user    su2  $(ADDRESS_5) $(PRIVKEY_5)"
-	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness $(ETHERNET_OPTS) $(ETHERNET_SENDER_OPTS_1) upload su1 cache/dummy.data 100"
-	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness $(ETHERNET_OPTS) $(ETHERNET_SENDER_OPTS_1) upload su2 cache/dummy.data 50"
-	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness $(ETHERNET_OPTS) $(ETHERNET_SENDER_OPTS_4) challenge su1 0.55 1.0"
-	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness $(ETHERNET_OPTS) $(ETHERNET_SENDER_OPTS_1) proof su1"
-	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness $(ETHERNET_OPTS) $(ETHERNET_SENDER_OPTS_2) audit tpa1 su1"
+harness@ethcheck-main:
+	$(MAKE) harness@run CMD="harness $(ETHERNET_OPTS) $(ETHERNET_SENDER_OPTS_0) setup $(ADDRESS_0) $(PRIVKEY_0) $(ADDRESS_1) $(PRIVKEY_1)"
+	$(MAKE) harness@run CMD="harness $(ETHERNET_OPTS) $(ETHERNET_SENDER_OPTS_0) enroll auditor tpa1 $(ADDRESS_2)"
+	$(MAKE) harness@run CMD="harness $(ETHERNET_OPTS) $(ETHERNET_SENDER_OPTS_0) enroll auditor tpa2 $(ADDRESS_3)"
+	$(MAKE) harness@run CMD="harness $(ETHERNET_OPTS) $(ETHERNET_SENDER_OPTS_0) enroll user    su1  $(ADDRESS_4) $(PRIVKEY_4)"
+	$(MAKE) harness@run CMD="harness $(ETHERNET_OPTS) $(ETHERNET_SENDER_OPTS_0) enroll user    su2  $(ADDRESS_5) $(PRIVKEY_5)"
+	$(MAKE) harness@run CMD="harness $(ETHERNET_OPTS) $(ETHERNET_SENDER_OPTS_1) upload su1 /var/lib/prism/cache/dummy.data 100"
+	$(MAKE) harness@run CMD="harness $(ETHERNET_OPTS) $(ETHERNET_SENDER_OPTS_1) upload su2 /var/lib/prism/cache/dummy.data 50"
+	$(MAKE) harness@run CMD="harness $(ETHERNET_OPTS) $(ETHERNET_SENDER_OPTS_4) challenge su1 0.55 1.0"
+	$(MAKE) harness@run CMD="harness $(ETHERNET_OPTS) $(ETHERNET_SENDER_OPTS_1) proof su1"
+	$(MAKE) harness@run CMD="harness $(ETHERNET_OPTS) $(ETHERNET_SENDER_OPTS_2) audit tpa1 su1"
 
 harness@cmd-setup:
 	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness $(ETHERNET_OPTS) $(ETHERNET_SENDER_OPTS_0) setup $(ADDRESS_0) $(PRIVKEY_0) $(ADDRESS_1) $(PRIVKEY_1)"
@@ -247,6 +246,9 @@ build-img:
 
 docker-run:
 	@docker compose run -it --rm $(SERVICE) $(CMD)
+
+harness@run:
+	@docker compose run -it --rm harness $(CMD)
 
 docker-exec:
 	@docker compose exec $(SERVICE) /entrypoint.sh $(CMD)
