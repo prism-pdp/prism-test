@@ -49,6 +49,8 @@ func setup(_opts []string) {
 			client.LoadFakeLedger()
 		}
 	}
+
+	if err := os.MkdirAll(*helper.OptPathCacheDir, 0755); err != nil { panic(err) }
 }
 
 func runSetupPhase(_smAddr string, _smPrivKey string, _spAddr string, _spPrivKey string) {
