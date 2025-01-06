@@ -1,6 +1,6 @@
 .env
 
 cache/*
-harness/data/*
+harness/volume/*
 
 !.gitkeep

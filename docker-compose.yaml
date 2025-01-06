@@ -17,7 +17,7 @@ services:
     container_name: harness
     hostname: harness
     volumes:
-      - ./harness/data:/var/lib/prism
+      - ./harness/volume:/var/lib/prism
       - go_cache:/root/.cache/go-build
     env_file:
       - ./cache/accounts.env
