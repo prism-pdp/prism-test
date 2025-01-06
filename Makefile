@@ -131,9 +131,6 @@ aide@repair-batch:
 aide@write-log:
 	$(MAKE) docker-run SERVICE="harness" CMD="./bin/aide write-log \"$(X_LOG)\""
 
-testnet@build-img:
-	docker build -t prism-test/testnet ./testnet
-
 testnet/build:
 	$(MAKE) docker-run SERVICE="testnet" CMD='forge build'
 
@@ -242,7 +239,6 @@ rpc-test:
 
 build-img:
 	$(MAKE) harness@build-img
-	$(MAKE) testnet@build-img
 
 docker-run:
 	@docker compose run -it --rm $(SERVICE) $(CMD)
