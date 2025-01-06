@@ -18,7 +18,8 @@ ETHERNET_SENDER_OPTS_3 = --sender-addr $(ADDRESS_3) --sender-key $(PRIVKEY_3)
 ETHERNET_SENDER_OPTS_4 = --sender-addr $(ADDRESS_4) --sender-key $(PRIVKEY_4)
 ETHERNET_SENDER_OPTS_5 = --sender-addr $(ADDRESS_5) --sender-key $(PRIVKEY_5)
 
-HARNESS_VOL = ./harness/volume
+HARNESS_HOST_PATH = ./harness/volume
+HARNESS_CONTAINER_PATH = /var/lib/prism-harness
 
 .PHONY: eval
 
@@ -174,25 +175,25 @@ harness@upgrade:
 	$(MAKE) build-img
 
 simcheck:
-	rm -rf $(HARNESS_VOL)/*
+	rm -rf $(HARNESS_HOST_PATH)/*
 	$(MAKE) harness@run CMD="harness --sim setup 0010 PRIVKEY_0 0011 PRIVKEY_1"
 	$(MAKE) harness@run CMD="harness --sim enroll auditor tpa1 0012"
 	$(MAKE) harness@run CMD="harness --sim enroll auditor tpa2 0013"
 	$(MAKE) harness@run CMD="harness --sim enroll user    su1  0014 PRIVKEY_4"
 	$(MAKE) harness@run CMD="harness --sim enroll user    su2  0015 PRIVKEY_5"
-	$(MAKE) harness@run CMD="aide testdata /var/lib/prism/cache/dummy.data 100K 1"
-	$(MAKE) harness@run CMD="harness --sim upload su1 /var/lib/prism/cache/dummy.data 100"
-	$(MAKE) harness@run CMD="aide testdata /var/lib/prism/cache/dummy.data 100K 2"
-	$(MAKE) harness@run CMD="harness --sim upload su1 /var/lib/prism/cache/dummy.data 100"
-	$(MAKE) harness@run CMD="harness --sim upload su2 /var/lib/prism/cache/dummy.data 50"
+	$(MAKE) harness@run CMD="aide testdata $(HARNESS_CONTAINER_PATH)/cache/dummy.data 100K 1"
+	$(MAKE) harness@run CMD="harness --sim upload su1 $(HARNESS_CONTAINER_PATH)/cache/dummy.data 100"
+	$(MAKE) harness@run CMD="aide testdata $(HARNESS_CONTAINER_PATH)/cache/dummy.data 100K 2"
+	$(MAKE) harness@run CMD="harness --sim upload su1 $(HARNESS_CONTAINER_PATH)/cache/dummy.data 100"
+	$(MAKE) harness@run CMD="harness --sim upload su2 $(HARNESS_CONTAINER_PATH)/cache/dummy.data 50"
 	$(MAKE) harness@run CMD="harness --sim challenge su1 0.55 1.0"
 	$(MAKE) harness@run CMD="harness --sim proof su1"
-	$(MAKE) harness@run CMD="harness --sim --detected-list /var/lib/prism/cache/detected.list audit tpa1 su1"
+	$(MAKE) harness@run CMD="harness --sim --detected-list $(HARNESS_CONTAINER_PATH)/cache/detected.list audit tpa1 su1"
 
 harness@ethcheck-setup:
-	rm -rf $(HARNESS_VOL)/*
-	mkdir $(HARNESS_VOL)/cache
-	fallocate -l 100M $(HARNESS_VOL)/cache/dummy.data
+	rm -rf $(HARNESS_HOST_PATH)/*
+	mkdir $(HARNESS_HOST_PATH)/cache
+	fallocate -l 100M $(HARNESS_HOST_PATH)/cache/dummy.data
 
 harness@ethcheck-main:
 	$(MAKE) harness@run CMD="harness $(ETHERNET_OPTS) $(ETHERNET_SENDER_OPTS_0) setup $(ADDRESS_0) $(PRIVKEY_0) $(ADDRESS_1) $(PRIVKEY_1)"
@@ -200,8 +201,8 @@ harness@ethcheck-main:
 	$(MAKE) harness@run CMD="harness $(ETHERNET_OPTS) $(ETHERNET_SENDER_OPTS_0) enroll auditor tpa2 $(ADDRESS_3)"
 	$(MAKE) harness@run CMD="harness $(ETHERNET_OPTS) $(ETHERNET_SENDER_OPTS_0) enroll user    su1  $(ADDRESS_4) $(PRIVKEY_4)"
 	$(MAKE) harness@run CMD="harness $(ETHERNET_OPTS) $(ETHERNET_SENDER_OPTS_0) enroll user    su2  $(ADDRESS_5) $(PRIVKEY_5)"
-	$(MAKE) harness@run CMD="harness $(ETHERNET_OPTS) $(ETHERNET_SENDER_OPTS_1) upload su1 /var/lib/prism/cache/dummy.data 100"
-	$(MAKE) harness@run CMD="harness $(ETHERNET_OPTS) $(ETHERNET_SENDER_OPTS_1) upload su2 /var/lib/prism/cache/dummy.data 50"
+	$(MAKE) harness@run CMD="harness $(ETHERNET_OPTS) $(ETHERNET_SENDER_OPTS_1) upload su1 $(HARNESS_CONTAINER_PATH)/cache/dummy.data 100"
+	$(MAKE) harness@run CMD="harness $(ETHERNET_OPTS) $(ETHERNET_SENDER_OPTS_1) upload su2 $(HARNESS_CONTAINER_PATH)/cache/dummy.data 50"
 	$(MAKE) harness@run CMD="harness $(ETHERNET_OPTS) $(ETHERNET_SENDER_OPTS_4) challenge su1 0.55 1.0"
 	$(MAKE) harness@run CMD="harness $(ETHERNET_OPTS) $(ETHERNET_SENDER_OPTS_1) proof su1"
 	$(MAKE) harness@run CMD="harness $(ETHERNET_OPTS) $(ETHERNET_SENDER_OPTS_2) audit tpa1 su1"
