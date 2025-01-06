@@ -31,10 +31,10 @@ upgrade:
 
 ethcheck:
 	$(MAKE) setup
-	$(MAKE) testnet/down
-	$(MAKE) testnet/up
+	$(MAKE) testnet@down
+	$(MAKE) testnet@up
 	$(MAKE) ethcheck-main
-	$(MAKE) testnet/down
+	$(MAKE) testnet@down
 
 eval:
 # build programs
@@ -112,18 +112,18 @@ eval-frequency:
 	rm -f ./eval/frequency/results/*
 	$(MAKE) docker-run-eval MODE="eval-frequency" TYPE="frequency"
 
-testnet/up:
+testnet@up:
 	docker compose up -d testnet
 	$(MAKE) testnet@exec CMD="deploy $(CONTRACT) $(PRIVKEY_0) $(ADDRESS_1)" | tee ./cache/contract.addr
 	echo CONTRACT_ADDR=`cat ./cache/contract.addr` > ./cache/contract-addr.env
 
-testnet/down:
+testnet@down:
 	docker compose down testnet
 
-testnet/shell:
+testnet@shell:
 	$(MAKE) testnet@run CMD="sh"
 
-harness/shell:
+harness@shell:
 	$(MAKE) harness@run CMD="bash"
 
 setup:
