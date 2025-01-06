@@ -23,9 +23,6 @@ HARNESS_CONTAINER_PATH = /var/lib/prism-harness
 
 .PHONY: eval
 
-shell:
-	docker compose run $(SERVICE) bash
-
 upgrade:
 	$(MAKE) harness@upgrade
 
@@ -37,9 +34,6 @@ ethcheck:
 	$(MAKE) testnet@down
 
 eval:
-# build programs
-	$(MAKE) harness@build
-	$(MAKE) aide@build
 # perform evaluation: gentags
 	$(MAKE) test-gentags
 	$(MAKE) eval-gentags
