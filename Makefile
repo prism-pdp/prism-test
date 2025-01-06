@@ -133,9 +133,8 @@ harness@build-img:
 	docker build -t prism-test/harness ./harness
 
 harness@upgrade:
-	sed -i '/github.com\/prism-pdp\/prism-go/d' harness/app/go.mod
-	sed -i '/github.com\/prism-pdp\/prism-go/d' harness/app/go.sum
-	$(MAKE) docker-run SERVICE="harness" CMD="go get github.com/prism-pdp/prism-go"
+	$(MAKE) harness@run CMD="go get -u github.com/prism-pdp/prism-go"
+	docker compose run -it --rm -v ./harness/app/go.mod:/opt/prism-harness/go.mod -v ./harness/app/go.sum:/opt/prism-harness/go.sum harness go get github.com/prism-pdp/prism-go
 	$(MAKE) build-img
 
 simcheck:
@@ -181,9 +180,6 @@ rpc-test:
 
 build-img:
 	$(MAKE) harness@build-img
-
-docker-run:
-	@docker compose run -it --rm $(SERVICE) $(CMD)
 
 testnet@run:
 	@docker compose run -it --rm testnet $(CMD)
