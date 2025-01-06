@@ -82,7 +82,7 @@ func runEnrollUser(_name string, _addr string, _privKey string) {
 	// Prepare entities
 	// --------------------------
 	var sm entity.Manager
-	helper.LoadEntity(nameSM, &sm)
+	if err := helper.LoadEntity(nameSM, &sm); err != nil { panic(err) }
 	su := entity.GenUser(_name, _addr, _privKey, sm.GetParam(), *helper.SimFlag)
 
 	// --------------------------
@@ -107,7 +107,7 @@ func runEnrollAuditor(_name string, _addr string) {
 	// Prepare entities
 	// --------------------------
 	var sm entity.Manager
-	helper.LoadEntity(nameSM, &sm)
+	if err := helper.LoadEntity(nameSM, &sm); err != nil { panic(err) }
 	tpa := entity.GenAuditor(_name, _addr, *helper.SimFlag)
 
 	// --------------------------
@@ -133,8 +133,8 @@ func runUploadPhase(_name string, _path string, _chunkNum string) {
 	// --------------------------
 	var sp entity.Provider
 	var su entity.User
-	helper.LoadEntity(nameSP, &sp)
-	helper.LoadEntity(_name, &su)
+	if err := helper.LoadEntity(nameSP, &sp); err != nil { panic(err) }
+	if err := helper.LoadEntity(_name, &su); err != nil { panic(err) }
 
 	// --------------------------
 	// Main processing
@@ -199,7 +199,7 @@ func runUploadAuditingChal(_name string, _ratioData string, _ratioFile string) {
 	// Prepare entities
 	// --------------------------
 	var su entity.User
-	helper.LoadEntity(_name, &su)
+	if err := helper.LoadEntity(_name, &su); err != nil { panic(err) }
 
 	// --------------------------
 	// Main processing
@@ -238,8 +238,8 @@ func runUploadAuditingProof(_nameSU string) {
 	// --------------------------
 	var sp entity.Provider
 	var su entity.User
-	helper.LoadEntity(nameSP, &sp)
-	helper.LoadEntity(_nameSU, &su)
+	if err := helper.LoadEntity(nameSP, &sp); err != nil { panic(err) }
+	if err := helper.LoadEntity(_nameSU, &su); err != nil { panic(err) }
 
 	// --------------------------
 	// Main processing
@@ -278,9 +278,9 @@ func runVerifyAuditingProof(_nameTPA string, _nameSU string) {
 	var sp entity.Provider
 	var tpa entity.Auditor
 	var su entity.User
-	helper.LoadEntity(nameSP, &sp)
-	helper.LoadEntity(_nameTPA, &tpa)
-	helper.LoadEntity(_nameSU, &su)
+	if err := helper.LoadEntity(nameSP, &sp); err != nil { panic(err) }
+	if err := helper.LoadEntity(_nameTPA, &tpa); err != nil { panic(err) }
+	if err := helper.LoadEntity(_nameSU, &su); err != nil { panic(err) }
 
 	// --------------------------
 	// Main processing
@@ -376,7 +376,7 @@ func main() {
 		runVerifyAuditingProof(args[1], args[2])
 	case "test-gentags":
 		var su entity.User
-		helper.LoadEntity(args[1], &su)
+		if err := helper.LoadEntity(args[1], &su); err != nil { panic(err) }
 		data, err := helper.ReadFile(args[2])
 		if err != nil { helper.Panic(err) }
 		gentags(&su, data, args[3])
