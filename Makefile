@@ -34,8 +34,7 @@ ethcheck:
 	$(MAKE) setup
 	$(MAKE) testnet/down
 	$(MAKE) testnet/up
-	$(MAKE) harness@ethcheck-setup
-	$(MAKE) harness@ethcheck-main
+	$(MAKE) ethcheck-main
 	$(MAKE) testnet/down
 
 eval:
@@ -190,12 +189,10 @@ simcheck:
 	$(MAKE) harness@run CMD="harness --sim proof su1"
 	$(MAKE) harness@run CMD="harness --sim --detected-list $(HARNESS_CONTAINER_PATH)/cache/detected.list audit tpa1 su1"
 
-harness@ethcheck-setup:
+ethcheck-main:
 	rm -rf $(HARNESS_HOST_PATH)/*
 	mkdir $(HARNESS_HOST_PATH)/cache
 	fallocate -l 100M $(HARNESS_HOST_PATH)/cache/dummy.data
-
-harness@ethcheck-main:
 	$(MAKE) harness@run CMD="harness $(ETHERNET_OPTS) $(ETHERNET_SENDER_OPTS_0) setup $(ADDRESS_0) $(PRIVKEY_0) $(ADDRESS_1) $(PRIVKEY_1)"
 	$(MAKE) harness@run CMD="harness $(ETHERNET_OPTS) $(ETHERNET_SENDER_OPTS_0) enroll auditor tpa1 $(ADDRESS_2)"
 	$(MAKE) harness@run CMD="harness $(ETHERNET_OPTS) $(ETHERNET_SENDER_OPTS_0) enroll auditor tpa2 $(ADDRESS_3)"
@@ -206,27 +203,6 @@ harness@ethcheck-main:
 	$(MAKE) harness@run CMD="harness $(ETHERNET_OPTS) $(ETHERNET_SENDER_OPTS_4) challenge su1 0.55 1.0"
 	$(MAKE) harness@run CMD="harness $(ETHERNET_OPTS) $(ETHERNET_SENDER_OPTS_1) proof su1"
 	$(MAKE) harness@run CMD="harness $(ETHERNET_OPTS) $(ETHERNET_SENDER_OPTS_2) audit tpa1 su1"
-
-harness@cmd-setup:
-	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness $(ETHERNET_OPTS) $(ETHERNET_SENDER_OPTS_0) setup $(ADDRESS_0) $(PRIVKEY_0) $(ADDRESS_1) $(PRIVKEY_1)"
-
-harness@cmd-enroll-auditor:
-	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness $(ETHERNET_OPTS) $(ETHERNET_SENDER_OPTS_0) enroll auditor $(X_NAME) $(X_ADDR)"
-
-harness@cmd-enroll-user:
-	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness $(ETHERNET_OPTS) $(ETHERNET_SENDER_OPTS_0) enroll user    $(X_NAME) $(X_ADDR) $(X_KEY)"
-
-harness@cmd-upload:
-	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness $(ETHERNET_OPTS) $(X_ETHERNET_SENDER_OPTS) upload $(X_USER_NAME) $(X_PATH_FILE) $(X_SPLIT_COUNT)"
-
-harness@cmd-challenge:
-	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness $(ETHERNET_OPTS) $(X_ETHERNET_SENDER_OPTS) challenge $(X_USER_NAME) $(X_DATA_RATIO) $(X_FILE_RATIO)"
-
-harness@cmd-proof:
-	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness $(ETHERNET_OPTS) $(ETHERNET_SENDER_OPTS_1) proof"
-
-harness@cmd-audit:
-	$(MAKE) docker-run SERVICE="harness" CMD="./bin/harness $(ETHERNET_OPTS) $(X_ETHERNET_SENDER_OPTS) audit $(X_AUDITOR_NAME)"
 
 show-accounts:
 	@$(MAKE) docker-run SERVICE="testnet" CMD="show-accounts"
