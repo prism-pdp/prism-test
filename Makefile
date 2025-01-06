@@ -174,8 +174,7 @@ harness@run:
 	@docker compose run -it --rm harness $(CMD)
 
 harness@upgrade:
-	$(MAKE) harness@run CMD="go get -u github.com/prism-pdp/prism-go"
-	docker compose run -it --rm -v ./harness/app/go.mod:/opt/prism-harness/go.mod -v ./harness/app/go.sum:/opt/prism-harness/go.sum harness go get github.com/prism-pdp/prism-go
+	docker run --rm -v ./harness/app:/opt/prism-harness prism-test/harness go get github.com/prism-pdp/prism-go
 	$(MAKE) build-img
 
 logs:
