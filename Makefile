@@ -30,7 +30,7 @@ upgrade:
 	$(MAKE) harness@upgrade
 
 ethcheck:
-	$(MAKE) setup
+	$(MAKE) show-accounts > ./cache/accounts.env
 	$(MAKE) testnet@down
 	$(MAKE) testnet@up
 	$(MAKE) ethcheck-main
@@ -95,19 +95,19 @@ test-frequency-down:
 
 eval-gentags:
 	rm -f ./eval/gentags/results/*
-	$(MAKE) docker-run-eval MODE="eval-gentags" TYPE="gentags"
+	$(MAKE) aide@eval MODE="eval-gentags" TYPE="gentags"
 
 eval-auditing:
 	rm -f ./eval/auditing/results/*
-	$(MAKE) docker-run-eval MODE="eval-auditing" TYPE="auditing"
+	$(MAKE) aide@eval MODE="eval-auditing" TYPE="auditing"
 
 eval-contract:
 	rm -f ./harness/app/eval/contract/results/*
-	$(MAKE) docker-run-eval MODE="eval-contract" TYPE="contract"
+	$(MAKE) aide@eval MODE="eval-contract" TYPE="contract"
 
 eval-frequency:
 	rm -f ./eval/frequency/results/*
-	$(MAKE) docker-run-eval MODE="eval-frequency" TYPE="frequency"
+	$(MAKE) aide@eval MODE="eval-frequency" TYPE="frequency"
 
 testnet@up:
 	docker compose up -d testnet
@@ -122,9 +122,6 @@ testnet@shell:
 
 harness@shell:
 	$(MAKE) harness@run CMD="bash"
-
-setup:
-	$(MAKE) show-accounts > ./cache/accounts.env
 
 harness@build-img:
 	docker build -t prism-test/harness ./harness
@@ -190,5 +187,5 @@ harness@run:
 logs:
 	@docker compose logs -f
 
-docker-run-eval:
+aide@eval:
 	@docker run -it --rm -v ./eval:/var/lib/prism-harness/eval prism-test/harness aide $(MODE) /var/lib/prism-harness/eval/$(TYPE)/logs /var/lib/prism-harness/eval/$(TYPE)/results
