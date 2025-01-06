@@ -28,7 +28,6 @@ shell:
 
 upgrade:
 	$(MAKE) harness@upgrade
-	$(MAKE) testnet@upgrade
 
 ethcheck:
 	$(MAKE) setup
@@ -97,9 +96,6 @@ test-frequency-down:
 aide@run:
 	docker run --rm -v ./eval:/opt/prism/eval prism-test/harness aide $(CMD)
 
-aide@testdata:
-	$(MAKE) docker-run SERVICE="harness" CMD="./bin/aide testdata $(FILE_PATH) $(FILE_SIZE) $(FILE_VAL)"
-
 eval-gentags:
 	rm -f ./eval/gentags/results/*
 	$(MAKE) docker-run-eval MODE="eval-gentags" TYPE="gentags"
@@ -116,53 +112,22 @@ eval-frequency:
 	rm -f ./eval/frequency/results/*
 	$(MAKE) docker-run-eval MODE="eval-frequency" TYPE="frequency"
 
-aide@corruption:
-	$(MAKE) docker-run SERVICE="harness" CMD="./bin/aide corruption $(X_DIR_TARGET) $(X_DAMAGE_RATE) $(X_PATH_RESULT)"
-
-aide@list-corrupted-files:
-	@$(MAKE) docker-run SERVICE="harness" CMD="./bin/aide list-corrupted-files $(X_TPA_NAME)"
-
-aide@repair:
-	$(MAKE) docker-run SERVICE="harness" CMD="./bin/aide repair $(X_PATH_FILE)"
-
-aide@repair-batch:
-	$(MAKE) docker-run SERVICE="harness" CMD="./bin/aide repair-batch $(X_PATH_LIST)"
-
-aide@write-log:
-	$(MAKE) docker-run SERVICE="harness" CMD="./bin/aide write-log \"$(X_LOG)\""
-
-testnet/build:
-	$(MAKE) docker-run SERVICE="testnet" CMD='forge build'
-
-testnet/clean:
-	$(MAKE) docker-run SERVICE="testnet" CMD='forge clean'
-
 testnet/up:
 	docker compose up -d testnet
-	$(MAKE) docker-exec SERVICE="testnet" CMD="deploy $(CONTRACT) $(PRIVKEY_0) $(ADDRESS_1)" | tee ./cache/contract.addr
+	$(MAKE) testnet@exec CMD="deploy $(CONTRACT) $(PRIVKEY_0) $(ADDRESS_1)" | tee ./cache/contract.addr
 	echo CONTRACT_ADDR=`cat ./cache/contract.addr` > ./cache/contract-addr.env
 
 testnet/down:
 	docker compose down testnet
 
-# Unused
-testnet/test:
-	$(MAKE) docker-run SERVICE="testnet" CMD='forge test'
-
 testnet/shell:
-	$(MAKE) docker-run SERVICE="testnet" CMD="sh"
-
-testnet/login:
-	$(MAKE) docker-exec SERVICE="testnet" CMD="sh"
-
-testnet@upgrade:
-	cd ./testnet/prism-sol; git pull
+	$(MAKE) testnet@run CMD="sh"
 
 harness/shell:
-	$(MAKE) docker-run SERVICE="harness" CMD="bash"
+	$(MAKE) harness@run CMD="bash"
 
 setup:
-	@docker run --rm prism-test/testnet show-accounts > ./cache/accounts.env
+	$(MAKE) show-accounts > ./cache/accounts.env
 
 harness@build-img:
 	docker build -t prism-test/harness ./harness
@@ -205,7 +170,7 @@ ethcheck-main:
 	$(MAKE) harness@run CMD="harness $(ETHERNET_OPTS) $(ETHERNET_SENDER_OPTS_2) audit tpa1 su1"
 
 show-accounts:
-	@$(MAKE) docker-run SERVICE="testnet" CMD="show-accounts"
+	@$(MAKE) testnet@run CMD="show-accounts"
 
 rpc:
 	@echo METHOD:$(METHOD), PARAMS:[$(PARAMS)]
@@ -220,13 +185,16 @@ build-img:
 docker-run:
 	@docker compose run -it --rm $(SERVICE) $(CMD)
 
+testnet@run:
+	@docker compose run -it --rm testnet $(CMD)
+
+testnet@exec:
+	@docker compose exec testnet /entrypoint.sh $(CMD)
+
 harness@run:
 	@docker compose run -it --rm harness $(CMD)
 
-docker-exec:
-	@docker compose exec $(SERVICE) /entrypoint.sh $(CMD)
-
-docker-log:
+logs:
 	@docker compose logs -f
 
 docker-run-eval:
