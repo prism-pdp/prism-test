@@ -1,7 +1,0 @@
-services:
-  aide:
-    image: prism-test/harness
-    container_name: aide
-    volumes:
-      - ./harness/app/bin/aide:/usr/local/bin/aide
-      - ./eval:/opt/prism/eval

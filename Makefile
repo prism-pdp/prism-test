@@ -93,9 +93,6 @@ test-frequency-x:
 test-frequency-down:
 	docker compose -f docker-compose-eval-frequency.yaml --profile all down
 
-aide@run:
-	docker run --rm -v ./eval:/opt/prism/eval prism-test/harness aide $(CMD)
-
 eval-gentags:
 	rm -f ./eval/gentags/results/*
 	$(MAKE) docker-run-eval MODE="eval-gentags" TYPE="gentags"
@@ -194,5 +191,4 @@ logs:
 	@docker compose logs -f
 
 docker-run-eval:
-	@docker compose -f docker-compose-eval.yaml run --rm aide aide $(MODE) /opt/prism/eval/$(TYPE)/logs /opt/prism/eval/$(TYPE)/results
-
+	@docker run -it --rm -v ./eval:/var/lib/prism-harness/eval prism-test/harness aide $(MODE) /var/lib/prism-harness/eval/$(TYPE)/logs /var/lib/prism-harness/eval/$(TYPE)/results
