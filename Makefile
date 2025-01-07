@@ -23,7 +23,10 @@ HARNESS_CONTAINER_PATH = /var/lib/prism-harness
 
 .PHONY: eval
 
-simcheck:
+setup:
+	$(MAKE) show-accounts > ./cache/accounts.env
+
+simcheck: setup
 	rm -rf $(HARNESS_HOST_PATH)/*
 	$(MAKE) harness@run CMD="harness --sim setup 0010 PRIVKEY_0 0011 PRIVKEY_1"
 	$(MAKE) harness@run CMD="harness --sim enroll auditor tpa1 0012"
@@ -39,8 +42,7 @@ simcheck:
 	$(MAKE) harness@run CMD="harness --sim proof su1"
 	$(MAKE) harness@run CMD="harness --sim --detected-list $(HARNESS_CONTAINER_PATH)/cache/detected.list audit tpa1 su1"
 
-ethcheck:
-	$(MAKE) show-accounts > ./cache/accounts.env
+ethcheck: setup
 	$(MAKE) testnet@down
 	$(MAKE) testnet@up
 	$(MAKE) ethcheck-main
