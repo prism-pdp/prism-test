@@ -67,15 +67,19 @@ eval:
 # perform evaluation: gentags
 	$(MAKE) test-gentags
 	$(MAKE) eval-gentags
+	$(MAKE) test-gentags-down
 # perform evaluation: auditing
 	$(MAKE) test-auditing
 	$(MAKE) eval-auditing
+	$(MAKE) test-auditing-down
 # perform evaluation: contract
 	$(MAKE) test-contract
 	$(MAKE) eval-contract
+	$(MAKE) test-contract-down
 # perform evaluation: frequency
 	$(MAKE) test-frequency
 	$(MAKE) eval-frequency
+	$(MAKE) test-frequency-down
 
 test-gentags: setup
 	$(MAKE) test-gentags-down
