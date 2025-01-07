@@ -5,7 +5,7 @@ go 1.22.2
 require (
 	github.com/ethereum/go-ethereum v1.14.12
 	github.com/pborman/getopt/v2 v2.1.0
-	github.com/prism-pdp/prism-go v0.0.0-20250102011131-cbfd2a002da1
+	github.com/prism-pdp/prism-go v0.0.0-20250106165958-52bba78b5e00
 	golang.org/x/exp v0.0.0-20241217172543-b2144cdd0a67
 )
 

@@ -121,6 +121,8 @@ github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZb
 github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=
 github.com/prism-pdp/prism-go v0.0.0-20250102011131-cbfd2a002da1 h1:OBnkElFsZtjXQbR1jayWhM49NitaJBm7X1WjolStIBE=
 github.com/prism-pdp/prism-go v0.0.0-20250102011131-cbfd2a002da1/go.mod h1:uXR3SFrcjsRF4WetpQ7uTrSbAzf/U4m49cmYlZnpIiU=
+github.com/prism-pdp/prism-go v0.0.0-20250106165958-52bba78b5e00 h1:PPWC1PRoNWyxyi/TzN6gzBmPdnmBjxCpgliSR5m8kSw=
+github.com/prism-pdp/prism-go v0.0.0-20250106165958-52bba78b5e00/go.mod h1:uXR3SFrcjsRF4WetpQ7uTrSbAzf/U4m49cmYlZnpIiU=
 github.com/prometheus/client_golang v1.12.0 h1:C+UIj/QWtmqY13Arb8kwMt5j34/0Z2iKamrJ+ryC0Gg=
 github.com/prometheus/client_golang v1.12.0/go.mod h1:3Z9XVyYiZYEO+YQWt3RD2R3jrbd179Rt297l4aS6nDY=
 github.com/prometheus/client_model v0.2.1-0.20210607210712-147c58e9608a h1:CmF68hwI0XsOQ5UwlBopMi2Ow4Pbg32akc4KIVCOm+Y=
