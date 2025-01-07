@@ -8,10 +8,10 @@ PATH_CACHE=/opt/prism/cache
 PATH_LOG=$PATH_CACHE/prism.log
 
 HARNESS_OPTS="--server ws://testnet:8545 --contract $CONTRACT_ADDR --log $PATH_LOG --cache $PATH_CACHE"
-HARNESS="/opt/prism/bin/harness $HARNESS_OPTS"
+HARNESS="harness $HARNESS_OPTS"
 
 AIDE_OPTS="--log $PATH_LOG"
-AIDE="/opt/prism/bin/aide $AIDE_OPTS"
+AIDE="aide $AIDE_OPTS"
 
 SENDER_OPTS_SM="--sender-addr $ADDRESS_0 --sender-key $PRIVKEY_0"
 SENDER_OPTS_SP="--sender-addr $ADDRESS_1 --sender-key $PRIVKEY_1"

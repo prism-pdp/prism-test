@@ -8,10 +8,10 @@ PATH_TESTDATA=/tmp/test.dat
 TRIAL_COUNT=100
 
 HARNESS_OPTS="--sim --log $PATH_LOG --cache $PATH_CACHE"
-HARNESS="/opt/prism/bin/harness $HARNESS_OPTS"
+HARNESS="harness $HARNESS_OPTS"
 
 AIDE_OPTS="--log $PATH_LOG"
-AIDE="/opt/prism/bin/aide $AIDE_OPTS"
+AIDE="aide $AIDE_OPTS"
 
 rm -rf $PATH_CACHE/*
 

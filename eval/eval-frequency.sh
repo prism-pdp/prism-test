@@ -7,10 +7,10 @@ PATH_CACHE=/opt/prism/cache
 FILE_RATIO=$1
 
 HARNESS_OPTS="--sim --log $PATH_CACHE/prism.log --cache $PATH_CACHE"
-HARNESS="/opt/prism/bin/harness $HARNESS_OPTS"
+HARNESS="harness $HARNESS_OPTS"
 
 AIDE_OPTS="--log $PATH_CACHE/prism.log"
-AIDE="/opt/prism/bin/aide $AIDE_OPTS"
+AIDE="aide $AIDE_OPTS"
 
 rm -rf $PATH_CACHE/*
 
