@@ -77,17 +77,17 @@ eval:
 	$(MAKE) test-frequency
 	$(MAKE) eval-frequency
 
-test-gentags:
+test-gentags: setup
 	$(MAKE) test-gentags-down
 	rm -rf ./eval/gentags/logs/*
 	docker compose -f docker-compose-eval-gentags.yaml up
 
-test-auditing:
+test-auditing: setup
 	$(MAKE) test-auditing-down
 	rm -rf ./eval/auditing/logs/*
 	docker compose -f docker-compose-eval-auditing.yaml up
 
-test-contract:
+test-contract: setup
 	$(MAKE) test-contract-down
 	rm -f ./cache/contract.addr
 	rm -f ./cache/contract-addr.env
@@ -105,7 +105,7 @@ test-auditing-down:
 test-contract-down:
 	docker compose -f docker-compose-eval-contract.yaml down
 
-test-frequency:
+test-frequency: setup
 	$(MAKE) test-frequency-down
 	rm -rf ./eval/frequency/logs/*
 	docker compose -f docker-compose-eval-frequency.yaml --profile all up
