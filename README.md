@@ -14,6 +14,12 @@ A testing project for PRISM, a Provable Data Possession (PDP) system, designed f
 - [**prism-sol**](https://github.com/prism-pdp/prism-sol): a Solidity project for PRISM
 - [**Docker**](https://www.docker.com/): For environment virtualization and management
 
+## System Requirements
+
+This project has been tested and is verified to work on **Ubuntu 24.04.01 LTS**.
+We recommend using this version of Ubuntu for the best experience.
+Other operating systems or versions might require additional setup or may not be supported.
+
 ## Installation
 
 ### 1. Install Docker
