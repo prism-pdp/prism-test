@@ -49,3 +49,11 @@ It does run a local testnet and manages data by Ethereum smart contracts.
 make ethcheck
 ```
 
+## Running Experiments
+
+You can run the experiments with following command.
+
+```bash
+make eval
+```
+
