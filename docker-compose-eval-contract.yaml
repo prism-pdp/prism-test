@@ -1,13 +1,8 @@
 services:
   testnet:
-    image: prism-test/testnet
+    image: prism/prism-sol
     container_name: contract_testnet
     hostname: testnet
-    volumes:
-      - ./testnet/prism-sol:/app
-    environment:
-      - BALANCE_FIRST_ACCOUNTS=300
-      - WALLET_MNEMONIC=chaos knee unit sing method banana chicken quote script boat crouch pig
     ports:
       - 8545:8545
     command: start
