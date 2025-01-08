@@ -63,20 +63,28 @@ ethcheck-main:
 	$(MAKE) harness@run CMD="harness $(ETHERNET_OPTS) $(ETHERNET_SENDER_OPTS_1) proof su1"
 	$(MAKE) harness@run CMD="harness $(ETHERNET_OPTS) $(ETHERNET_SENDER_OPTS_2) audit tpa1 su1"
 
-eval:
-# perform evaluation: gentags
+experiment:
+	$(MAKE) experiment-gentags
+	$(MAKE) experiment-auditing
+	$(MAKE) experiment-contract
+	$(MAKE) experiment-frequency
+
+experiment-gentags:
 	$(MAKE) test-gentags
 	$(MAKE) eval-gentags
 	$(MAKE) test-gentags-down
-# perform evaluation: auditing
+
+experiment-auditing:
 	$(MAKE) test-auditing
 	$(MAKE) eval-auditing
 	$(MAKE) test-auditing-down
-# perform evaluation: contract
+
+experiment-contract:
 	$(MAKE) test-contract
 	$(MAKE) eval-contract
 	$(MAKE) test-contract-down
-# perform evaluation: frequency
+
+experiment-frequency:
 	$(MAKE) test-frequency
 	$(MAKE) eval-frequency
 	$(MAKE) test-frequency-down
