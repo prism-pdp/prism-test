@@ -57,9 +57,34 @@ make ethcheck
 
 ## Running Experiments
 
-You can run the experiments with following command.
+You can run all experiments with following command.
 
 ```bash
-make eval
+make experiment
+```
+
+This experiments consist of the following four experiments.
+
+- experiment-gentags: Experiment of average processing time for generating tags
+- experiment-auditing: Experiment of average processing time for auditing
+- experiment-contract: Experiment of average gas consumption of the smart contract
+- experiment-frequency: Experiment of detection capability for data corruption
+
+If you want to run individual experiment, you can run it with following commands.
+
+```bash
+make experiment-gentags
+```
+
+```bash
+make experiment-auditing
+```
+
+```bash
+make experiment-contract
+```
+
+```bash
+make experiment-frequency
 ```
 
