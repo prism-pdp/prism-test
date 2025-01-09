@@ -4,7 +4,6 @@ services:
     container_name: frequency_harness0.1
     volumes:
       - harness0.1:/opt/prism/cache
-      - ./harness/app/bin:/opt/prism/bin
       - ./eval/frequency/logs:/opt/prism/logs
       - ./eval/eval-frequency.sh:/opt/prism/eval-frequency.sh
     env_file:
@@ -19,7 +18,6 @@ services:
     container_name: frequency_harness0.3
     volumes:
       - harness0.3:/opt/prism/cache
-      - ./harness/app/bin:/opt/prism/bin
       - ./eval/frequency/logs:/opt/prism/logs
       - ./eval/eval-frequency.sh:/opt/prism/eval-frequency.sh
     env_file:
@@ -34,7 +32,6 @@ services:
     container_name: frequency_harness0.5
     volumes:
       - harness0.5:/opt/prism/cache
-      - ./harness/app/bin:/opt/prism/bin
       - ./eval/frequency/logs:/opt/prism/logs
       - ./eval/eval-frequency.sh:/opt/prism/eval-frequency.sh
     env_file:
@@ -49,7 +46,6 @@ services:
     container_name: frequency_harness0.7
     volumes:
       - harness0.7:/opt/prism/cache
-      - ./harness/app/bin:/opt/prism/bin
       - ./eval/frequency/logs:/opt/prism/logs
       - ./eval/eval-frequency.sh:/opt/prism/eval-frequency.sh
     env_file:
@@ -64,7 +60,6 @@ services:
     container_name: frequency_harness0.9
     volumes:
       - harness0.9:/opt/prism/cache
-      - ./harness/app/bin:/opt/prism/bin
       - ./eval/frequency/logs:/opt/prism/logs
       - ./eval/eval-frequency.sh:/opt/prism/eval-frequency.sh
     env_file:
