@@ -10,6 +10,9 @@ elif [ "$1" = "make-conf" ]; then
 		--arg privKey $3 \
 		--arg contractAddr $4 \
 		-f /etc/prism/harness/config.json.template > ./cache/config.json
+elif [ "$1" = "clean" ]; then
+	rm -rf /var/lib/prism-harness/*
+	mkdir /var/lib/prism-harness/cache
 else
 	exec "$@"
 fi

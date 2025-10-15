@@ -2,66 +2,29 @@ SHELL := /bin/bash
 
 MAKEFLAGS += --no-print-directory
 
--include ./cache/accounts.env
--include ./cache/contract-addr.env
-
 # chose one from prism-sol/src
 CONTRACT = XZ21
 
 TRIAL_COUNT = 100
 
-ETHERNET_OPTS = --server ws://testnet:8545 --contract $(CONTRACT_ADDR)
-ETHERNET_SENDER_OPTS_0 = --sender-addr $(ADDRESS_0) --sender-key $(PRIVKEY_0)
-ETHERNET_SENDER_OPTS_1 = --sender-addr $(ADDRESS_1) --sender-key $(PRIVKEY_1)
-ETHERNET_SENDER_OPTS_2 = --sender-addr $(ADDRESS_2) --sender-key $(PRIVKEY_2)
-ETHERNET_SENDER_OPTS_3 = --sender-addr $(ADDRESS_3) --sender-key $(PRIVKEY_3)
-ETHERNET_SENDER_OPTS_4 = --sender-addr $(ADDRESS_4) --sender-key $(PRIVKEY_4)
-ETHERNET_SENDER_OPTS_5 = --sender-addr $(ADDRESS_5) --sender-key $(PRIVKEY_5)
-
 HARNESS_HOST_PATH = ./harness/volume
 HARNESS_CONTAINER_PATH = /var/lib/prism-harness
 
-.PHONY: eval
+CACHE_ACCOUNTS = ./cache/accounts.env
 
-setup:
+-include ./cache/accounts.env
+-include ./cache/contract-addr.env
+
+$(CACHE_ACCOUNTS):
 	$(MAKE) show-accounts > ./cache/accounts.env
 
-simcheck: setup
-	rm -rf $(HARNESS_HOST_PATH)/*
-	$(MAKE) harness@run CMD="harness --sim setup 0010 PRIVKEY_0 0011 PRIVKEY_1"
-	$(MAKE) harness@run CMD="harness --sim enroll auditor tpa1 0012"
-	$(MAKE) harness@run CMD="harness --sim enroll auditor tpa2 0013"
-	$(MAKE) harness@run CMD="harness --sim enroll user    su1  0014 PRIVKEY_4"
-	$(MAKE) harness@run CMD="harness --sim enroll user    su2  0015 PRIVKEY_5"
-	$(MAKE) harness@run CMD="aide testdata $(HARNESS_CONTAINER_PATH)/cache/dummy.data 100K 1"
-	$(MAKE) harness@run CMD="harness --sim upload su1 $(HARNESS_CONTAINER_PATH)/cache/dummy.data 100"
-	$(MAKE) harness@run CMD="aide testdata $(HARNESS_CONTAINER_PATH)/cache/dummy.data 100K 2"
-	$(MAKE) harness@run CMD="harness --sim upload su1 $(HARNESS_CONTAINER_PATH)/cache/dummy.data 100"
-	$(MAKE) harness@run CMD="harness --sim upload su2 $(HARNESS_CONTAINER_PATH)/cache/dummy.data 50"
-	$(MAKE) harness@run CMD="harness --sim challenge su1 0.55 1.0"
-	$(MAKE) harness@run CMD="harness --sim proof su1"
-	$(MAKE) harness@run CMD="harness --sim --detected-list $(HARNESS_CONTAINER_PATH)/cache/detected.list audit tpa1 su1"
+simtest:
+	cd test && ./run_simtest.sh
 
-ethcheck: setup
+ethtest:
 	$(MAKE) testnet@down
 	$(MAKE) testnet@up
-	$(MAKE) ethcheck-main
-	$(MAKE) testnet@down
-
-ethcheck-main:
-	rm -rf $(HARNESS_HOST_PATH)/*
-	mkdir $(HARNESS_HOST_PATH)/cache
-	fallocate -l 100M $(HARNESS_HOST_PATH)/cache/dummy.data
-	$(MAKE) harness@run CMD="harness $(ETHERNET_OPTS) $(ETHERNET_SENDER_OPTS_0) setup $(ADDRESS_0) $(PRIVKEY_0) $(ADDRESS_1) $(PRIVKEY_1)"
-	$(MAKE) harness@run CMD="harness $(ETHERNET_OPTS) $(ETHERNET_SENDER_OPTS_0) enroll auditor tpa1 $(ADDRESS_2)"
-	$(MAKE) harness@run CMD="harness $(ETHERNET_OPTS) $(ETHERNET_SENDER_OPTS_0) enroll auditor tpa2 $(ADDRESS_3)"
-	$(MAKE) harness@run CMD="harness $(ETHERNET_OPTS) $(ETHERNET_SENDER_OPTS_0) enroll user    su1  $(ADDRESS_4) $(PRIVKEY_4)"
-	$(MAKE) harness@run CMD="harness $(ETHERNET_OPTS) $(ETHERNET_SENDER_OPTS_0) enroll user    su2  $(ADDRESS_5) $(PRIVKEY_5)"
-	$(MAKE) harness@run CMD="harness $(ETHERNET_OPTS) $(ETHERNET_SENDER_OPTS_1) upload su1 $(HARNESS_CONTAINER_PATH)/cache/dummy.data 100"
-	$(MAKE) harness@run CMD="harness $(ETHERNET_OPTS) $(ETHERNET_SENDER_OPTS_1) upload su2 $(HARNESS_CONTAINER_PATH)/cache/dummy.data 50"
-	$(MAKE) harness@run CMD="harness $(ETHERNET_OPTS) $(ETHERNET_SENDER_OPTS_4) challenge su1 0.55 1.0"
-	$(MAKE) harness@run CMD="harness $(ETHERNET_OPTS) $(ETHERNET_SENDER_OPTS_1) proof su1"
-	$(MAKE) harness@run CMD="harness $(ETHERNET_OPTS) $(ETHERNET_SENDER_OPTS_2) audit tpa1 su1"
+	cd test && ./run_ethtest.sh
 
 experiment:
 	$(MAKE) experiment-gentags
@@ -89,17 +52,17 @@ experiment-frequency:
 	$(MAKE) eval-frequency
 	$(MAKE) test-frequency-down
 
-test-gentags: setup
+test-gentags: $(CACHE_ACCOUNTS)
 	$(MAKE) test-gentags-down
 	rm -rf ./eval/gentags/logs/*
 	docker compose -f docker-compose-eval-gentags.yaml up
 
-test-auditing: setup
+test-auditing: $(CACHE_ACCOUNTS)
 	$(MAKE) test-auditing-down
 	rm -rf ./eval/auditing/logs/*
 	docker compose -f docker-compose-eval-auditing.yaml up
 
-test-contract: setup
+test-contract: $(CACHE_ACCOUNTS)
 	$(MAKE) test-contract-down
 	rm -f ./cache/contract.addr
 	rm -f ./cache/contract-addr.env
@@ -117,7 +80,7 @@ test-auditing-down:
 test-contract-down:
 	docker compose -f docker-compose-eval-contract.yaml down
 
-test-frequency: setup
+test-frequency: $(CACHE_ACCOUNTS)
 	$(MAKE) test-frequency-down
 	rm -rf ./eval/frequency/logs/*
 	docker compose -f docker-compose-eval-frequency.yaml --profile all up
@@ -161,7 +124,7 @@ rpc:
 rpc-test:
 	@$(MAKE) --no-print-directory rpc METHOD="eth_accounts"
 
-testnet@up:
+testnet@up: $(CACHE_ACCOUNTS)
 	docker compose up -d testnet
 	$(MAKE) testnet@exec CMD="deploy $(CONTRACT) $(PRIVKEY_0) $(ADDRESS_1)" | tee ./cache/contract.addr
 	echo CONTRACT_ADDR=`cat ./cache/contract.addr` > ./cache/contract-addr.env
@@ -176,7 +139,7 @@ testnet@exec:
 	@docker compose exec testnet /entrypoint.sh $(CMD)
 
 testnet@run:
-	@docker compose run -it --rm testnet $(CMD)
+	@docker compose run --rm testnet $(CMD)
 
 harness@shell:
 	$(MAKE) harness@run CMD="bash"
