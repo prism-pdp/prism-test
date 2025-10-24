@@ -18,14 +18,20 @@ rm -rf $PATH_CACHE/*
 $HARNESS setup $ADDRESS_0 $PRIVKEY_0 $ADDRESS_1 $PRIVKEY_1 
 $HARNESS enroll user su1  $ADDRESS_4 $PRIVKEY_4
 
-$AIDE testdata $PATH_TESTDATA 1000M 255
+# loop: data size
+for data_size in `seq 1 1 5`; do
+    $AIDE write-log "Start gentags test (size:${data_size}G)"
 
-# gentags
-for block_num in `seq 100 100 1000`; do
-    for i in `seq $TRIAL_COUNT`; do
-        $AIDE write-log "Start upload test data (cycle:$i)"
-        $HARNESS test-gentags su1 $PATH_TESTDATA $block_num
-        $AIDE write-log "Finish upload test data (cycle:$i)"
+    # generate test data
+    $AIDE testdata $PATH_TESTDATA ${data_size}G 255
+
+    # loop: block num
+    for block_num in `seq 100 100 1000`; do
+        for i in `seq $TRIAL_COUNT`; do
+            $AIDE write-log "Start upload test data (cycle:$i)"
+            $HARNESS test-gentags su1 $PATH_TESTDATA $block_num
+            $AIDE write-log "Finish upload test data (cycle:$i)"
+        done
+        mv $PATH_LOG /opt/prism/logs/gentags-${data_size}G-${block_num}.log
     done
-    mv $PATH_LOG /opt/prism/logs/gentags-${block_num}.log
 done
