@@ -113,6 +113,11 @@ graph-gentags:
 		prism/graph \
 		./run_make_graph.sh
 
+graph-auditing:
+	docker run --rm -v ./eval/auditing:/share -w /share \
+		prism/graph \
+		./run_make_graph.sh
+
 build-graph:
 	docker build -t prism/graph -f docker/Dockerfile.graph docker
 
