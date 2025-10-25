@@ -1,0 +1,22 @@
+{
+  "1G": {
+    "avg_increase_ms": 687.0388888888889,
+    "std_increase_ms": 130.8628740747776
+  },
+  "2G": {
+    "avg_increase_ms": 741.132222222222,
+    "std_increase_ms": 255.31882376637375
+  },
+  "3G": {
+    "avg_increase_ms": 773.4244444444442,
+    "std_increase_ms": 561.4741271000638
+  },
+  "4G": {
+    "avg_increase_ms": 661.0266666666666,
+    "std_increase_ms": 9.61304452293856
+  },
+  "5G": {
+    "avg_increase_ms": 654.7944444444445,
+    "std_increase_ms": 31.977639887549273
+  }
+}

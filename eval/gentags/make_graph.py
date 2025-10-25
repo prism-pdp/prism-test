@@ -7,12 +7,13 @@ from matplotlib.ticker import FuncFormatter
 # グローバル設定：線の見た目（あとで調整しやすい用）
 # =========================================
 LINE_STYLES = {
-    "1G": {"label": "1G", "linestyle": "-", "color": "#017b4a"},
-    "2G": {"label": "2G", "linestyle": "-", "color": "#fcb500"},
-    "3G": {"label": "3G", "linestyle": "-", "color": "#093d9e"},
+    "1G": {"label": "1G", "linestyle": "-", "color": "#017b4a", "linewidth": 2.0},
+    "2G": {"label": "2G", "linestyle": "-", "color": "#fcb500", "linewidth": 2.0},
+    "3G": {"label": "3G", "linestyle": "-", "color": "#093d9e", "linewidth": 2.0},
 }
 
-FONT_SIZE = 16
+FIG_SIZE = (8, 4)
+FONT_SIZE = 15
 
 def plot_data(data: dict, output_path: str) -> None:
     """
@@ -28,7 +29,7 @@ def plot_data(data: dict, output_path: str) -> None:
     output_path: 保存先SVGパス
     """
 
-    fig, ax = plt.subplots()
+    fig, ax = plt.subplots(figsize=FIG_SIZE)
 
     for filesize, series in data.items():
         if filesize not in LINE_STYLES:
@@ -43,23 +44,23 @@ def plot_data(data: dict, output_path: str) -> None:
         y_avg  = [series[b]["avg_ms"] for b in blocks_sorted]
         y_std  = [series[b]["std_ms"] for b in blocks_sorted]
 
-        ax.errorbar(
+        ax.plot(
             x_vals,
             y_avg,
-            yerr=y_std,
-            capsize=5,          # 誤差バーの先端の横棒
             **style
         )
 
-    ax.set_xlabel("# of Blocks", fontsize = FONT_SIZE)
-    ax.set_ylabel("Time [ms]",   fontsize = FONT_SIZE)
+    ax.set_xlabel("Test File Split Count (Number of Blocks)", fontsize = FONT_SIZE)
+    ax.set_ylabel("Average Processing Time [ms]",   fontsize = FONT_SIZE)
+
+    ax.set_xlim(100, 1000)
 
     ax.tick_params(axis='x', labelsize=FONT_SIZE*0.8)
     ax.tick_params(axis='y', labelsize=FONT_SIZE*0.8)
 
     ax.grid(True, which="both", linestyle="--", alpha=0.4)
 
-    ax.legend(title="File Size", loc="lower center", bbox_to_anchor=(0.5, 1.02), ncol=5, fontsize=FONT_SIZE*0.6)
+    ax.legend(loc="upper left", ncol=3, fontsize=FONT_SIZE*0.6)
 
     ax.yaxis.set_major_formatter(FuncFormatter(lambda x, _: f"{x:,.0f}"))
 

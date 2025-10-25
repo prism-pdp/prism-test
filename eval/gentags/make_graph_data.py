@@ -44,6 +44,27 @@ def parse_filename(fname: str) -> tuple[str, str]:
         raise ValueError(f"unexpected filename format: {fname}")
     return m.group("fsize"), int(m.group("bsize"))
 
+def calc_growth_stats(graph_data: dict) -> dict:
+    growth_stats = {}
+    for fsize, blocks in graph_data.items():
+        # ブロック数を数値ソート
+        sorted_blocks = sorted(blocks.keys(), key=lambda k: int(k))
+
+        # 隣接する平均値の差分を計算
+        deltas = [
+            blocks[sorted_blocks[i + 1]]["avg_ms"] - blocks[sorted_blocks[i]]["avg_ms"]
+            for i in range(len(sorted_blocks) - 1)
+        ]
+
+        if deltas:
+            avg_delta = mean(deltas)
+            std_delta = stdev(deltas) if len(deltas) > 1 else 0.0
+            growth_stats[fsize] = {
+                "avg_increase_ms": avg_delta,
+                "std_increase_ms": std_delta
+            }
+    return growth_stats
+
 
 def main(log_paths: list[Path]) -> dict:
     """複数ログを解析して FILESIZE→BLOCKSIZE→{avg_ms, std_ms} の辞書を作成"""
@@ -72,7 +93,7 @@ if __name__ == "__main__":
         sys.exit(1)
 
     log_dir = Path(sys.argv[1])
-    out_path = Path(sys.argv[2])
+    out_dir = Path(sys.argv[2])
 
     if not log_dir.exists():
         print(f"Error: directory not found -> {log_dir}")
@@ -84,6 +105,9 @@ if __name__ == "__main__":
         sys.exit(0)
 
     graph_data = main(logs)
-
-    with open(out_path, "w", encoding="utf-8") as f:
+    with open(out_dir / "graph-data.json", "w", encoding="utf-8") as f:
         json.dump(graph_data, f, indent=2, sort_keys=True, ensure_ascii=False)
+
+    growth_stats = calc_growth_stats(graph_data)
+    with open(out_dir / "growth-stats.json", "w", encoding="utf-8") as f:
+        json.dump(growth_stats, f, indent=2, sort_keys=True, ensure_ascii=False)
