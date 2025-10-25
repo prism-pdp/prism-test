@@ -1,0 +1,13 @@
+FROM python:3.11-slim
+
+# 作業ディレクトリを設定
+WORKDIR /app
+
+# 必要なPythonパッケージをインストール
+RUN pip install --no-cache-dir \
+    matplotlib \
+    numpy \
+    pandas
+
+# デフォルトコマンド
+ENTRYPOINT ["bash"]

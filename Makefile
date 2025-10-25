@@ -108,6 +108,14 @@ eval-frequency:
 	rm -f ./eval/frequency/results/*
 	$(MAKE) aide@eval MODE="eval-frequency" TYPE="frequency"
 
+graph-gentags:
+	docker run --rm -v ./eval/gentags:/share -w /share \
+		prism/graph \
+		./run_make_graph.sh
+
+build-graph:
+	docker build -t prism/graph -f docker/Dockerfile.graph docker
+
 upgrade:
 	$(MAKE) harness@upgrade
 
