@@ -7,15 +7,12 @@ from matplotlib.ticker import FuncFormatter
 # グローバル設定：線の見た目（あとで調整しやすい用）
 # =========================================
 LINE_STYLES = {
-    "1G": {"label": "1G", "linestyle": "-", "color": "#b8b08d"},
-    "2G": {"label": "2G", "linestyle": "-", "color": "#017b4a"},
-    "3G": {"label": "3G", "linestyle": "-", "color": "#fcb500"},
-    "4G": {"label": "4G", "linestyle": "-", "color": "#093d9e"},
-    "5G": {"label": "5G", "linestyle": "-", "color": "#eb2d2f"},
+    "1G": {"label": "1G", "linestyle": "-", "color": "#017b4a"},
+    "2G": {"label": "2G", "linestyle": "-", "color": "#fcb500"},
+    "3G": {"label": "3G", "linestyle": "-", "color": "#093d9e"},
 }
 
 FONT_SIZE = 16
-
 
 def plot_data(data: dict, output_path: str) -> None:
     """
@@ -34,7 +31,10 @@ def plot_data(data: dict, output_path: str) -> None:
     fig, ax = plt.subplots()
 
     for filesize, series in data.items():
-        # seriesは { "100": {...}, "200": {...}, ... }
+        if filesize not in LINE_STYLES:
+            print(f"⚠️ スキップ: 未定義ファイルサイズ {filesize}")
+            continue
+        style = LINE_STYLES[filesize]
 
         # ブロック数キーをint化してソート
         blocks_sorted = sorted(series.keys(), key=lambda k: int(k))
@@ -42,8 +42,6 @@ def plot_data(data: dict, output_path: str) -> None:
         x_vals = [int(b) for b in blocks_sorted]
         y_avg  = [series[b]["avg_ms"] for b in blocks_sorted]
         y_std  = [series[b]["std_ms"] for b in blocks_sorted]
-
-        style = LINE_STYLES.get(filesize, {"label": filesize})
 
         ax.errorbar(
             x_vals,
