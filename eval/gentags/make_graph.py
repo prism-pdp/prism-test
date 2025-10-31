@@ -54,6 +54,7 @@ def plot_data(data: dict, output_path: str) -> None:
     ax.set_ylabel("Average Processing Time [ms]",   fontsize = FONT_SIZE)
 
     ax.set_xlim(100, 1000)
+    ax.set_ylim(0, None)
 
     ax.tick_params(axis='x', labelsize=FONT_SIZE*0.8)
     ax.tick_params(axis='y', labelsize=FONT_SIZE*0.8)
